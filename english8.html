@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>동사 5총사 아케이드 트레이너</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #161f30;
+      --accent-get: #f59e0b;
+      --accent-take: #06b6d4;
+      --accent-have: #ec4899;
+      --accent-make: #10b981;
+      --accent-put: #8b5cf6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #24324f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    /* 상단 스코어보드 */
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 0.6rem 1rem;
+      border-radius: 0.8rem;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .score-box { color: #38bdf8; }
+    .combo-box { color: #f43f5e; }
+
+    /* 메인 카드 */
+    .arena-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.5rem 1rem 1.2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    /* 타이머 바 */
+    .timer-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+      transform-origin: left;
+      transition: width 0.1s linear;
+    }
+
+    .badge-category {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background: rgba(255,255,255,0.06);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .ko-prompt {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: keep-all;
+    }
+
+    .en-result {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #38bdf8;
+      min-height: 2rem;
+      margin-bottom: 0.5rem;
+      word-break: keep-all;
+    }
+
+    .feedback-bubble {
+      font-size: 0.85rem;
+      font-weight: 700;
+      min-height: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+    .feedback-bubble.correct { color: #34d399; }
+    .feedback-bubble.wrong { color: #f87171; }
+
+    /* 5대 만능 동사 버튼 그리드 */
+    .verb-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .verb-btn {
+      padding: 0.85rem 0.2rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+    }
+
+    .verb-btn:active {
+      transform: scale(0.92);
+    }
+
+    .verb-btn[data-verb="GET"] { border-color: rgba(245, 158, 11, 0.4); color: var(--accent-get); }
+    .verb-btn[data-verb="TAKE"] { border-color: rgba(6, 182, 212, 0.4); color: var(--accent-take); }
+    .verb-btn[data-verb="HAVE"] { border-color: rgba(236, 72, 153, 0.4); color: var(--accent-have); }
+    .verb-btn[data-verb="MAKE"] { border-color: rgba(16, 185, 129, 0.4); color: var(--accent-make); }
+    .verb-btn[data-verb="PUT"] { border-color: rgba(139, 92, 246, 0.4); color: var(--accent-put); }
+
+    .verb-btn.hit {
+      background: #fff !important;
+      color: #000 !important;
+      transform: scale(1.06);
+    }
+
+    /* 모드 전환 및 유틸 버튼 */
+    .mode-bar {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .sub-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.6rem 0.9rem;
+      border-radius: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .sub-btn.active {
+      color: #fff;
+      border-color: #38bdf8;
+      background: #0369a133;
+    }
+
+    /* 하단 가이드 리스트 */
+    .list-wrapper {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .list-header {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #0f172a;
+      color: var(--muted);
+    }
+    .list-item {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .list-item.selected {
+      background: rgba(56, 189, 248, 0.12);
+      border-left: 3px solid #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="scoreboard">
+    <div class="score-box">SCORE: <span id="scoreVal">0</span></div>
+    <div class="combo-box">🔥 COMBO: <span id="comboVal">0</span></div>
+    <div>진행: <span id="progressVal">1/50</span></div>
+  </div>
+
+  <div class="arena-card">
+    <div class="timer-container">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div class="badge-category" id="hintCat">상태 변화/행동 즉시 낚아채기</div>
+    <div class="ko-prompt" id="koPrompt">문제를 불러오는 중...</div>
+    <div class="feedback-bubble" id="feedback">어떤 만능 동사를 쓸까요?</div>
+    <div class="en-result" id="enResult">_ _ _ _ _</div>
+
+    <div class="verb-grid">
+      <button class="verb-btn" data-verb="GET">GET<span>변화</span></button>
+      <button class="verb-btn" data-verb="TAKE">TAKE<span>소모/끌림</span></button>
+      <button class="verb-btn" data-verb="HAVE">HAVE<span>상태보유</span></button>
+      <button class="verb-btn" data-verb="MAKE">MAKE<span>유발/참석</span></button>
+      <button class="verb-btn" data-verb="PUT">PUT<span>위치놓음</span></button>
+    </div>
+  </div>
+
+  <div class="mode-bar">
+    <button class="sub-btn active" id="timerToggleBtn">⏱ 타임어택: 켜짐</button>
+    <button class="sub-btn" id="nextQuizBtn">다음 문제 ⏭</button>
+    <button class="sub-btn" id="listenAgainBtn">🔊 다시 듣기</button>
+  </div>
+
+  <div class="list-wrapper">
+    <div class="list-header">50문장 전체 치트 시트</div>
+    <div id="cheatList"></div>
+  </div>
+</div>
+
+<script>
+  const bank = [
+    // GET (1~10)
+    { verb: "GET", ko: "퇴근하고 완전 녹초가 됐어.", en: "I got so tired after work." },
+    { verb: "GET", ko: "길 잃어서 한참 헤맸잖아.", en: "I got lost on my way here." },
+    { verb: "GET", ko: "그 말 듣고 순간 욱했어.", en: "I got mad when I heard that." },
+    { verb: "GET", ko: "비 맞아서 옷이 다 젖었어.", en: "I got wet in the rain." },
+    { verb: "GET", ko: "이제야 그게 무슨 말인지 이해됐어.", en: "I finally got the point." },
+    { verb: "GET", ko: "날씨가 점점 쌀쌀해지네.", en: "It is getting colder outside." },
+    { verb: "GET", ko: "회의 끝나고 바로 연락할게.", en: "I will get back to you after the meeting." },
+    { verb: "GET", ko: "그 소식 듣고 깜짝 놀랐잖아.", en: "I got shocked by the news." },
+    { verb: "GET", ko: "버스에서 내리자마자 비가 쏟아졌어.", en: "I got off the bus, and it started raining." },
+    { verb: "GET", ko: "나 준비 다 끝났어, 나가자.", en: "I got ready, let's head out." },
+
+    // TAKE (11~20)
+    { verb: "TAKE", ko: "거기까지 가는 데 1시간 넘게 걸려.", en: "It takes over an hour to get there." },
+    { verb: "TAKE", ko: "늦을 것 같으면 그냥 택시 타.", en: "Just take a taxi if you are running late." },
+    { verb: "TAKE", ko: "머리 아프면 이 약 먹어봐.", en: "Take this pill for your headache." },
+    { verb: "TAKE", ko: "심호흡 크게 한 번 해봐.", en: "Take a deep breath and relax." },
+    { verb: "TAKE", ko: "서두르지 말고 천천히 해.", en: "Take your time, no rush." },
+    { verb: "TAKE", ko: "방이 너무 더워서 겉옷 벗었어.", en: "I took off my jacket because it was hot." },
+    { verb: "TAKE", ko: "우리 잠깐 10분만 쉬었다 하자.", en: "Let's take a short break." },
+    { verb: "TAKE", ko: "그 사람 말 너무 심각하게 받아들이지 마.", en: "Don't take it too seriously." },
+    { verb: "TAKE", ko: "오늘 점심은 포장해 와서 먹었어.", en: "I took out some lunch today." },
+    { verb: "TAKE", ko: "내가 그거 책임지고 처리할게.", en: "I will take care of that for you." },
+
+    // HAVE (21~30)
+    { verb: "HAVE", ko: "오늘 진짜 정신없이 바빴어.", en: "I had such a crazy day today." },
+    { verb: "HAVE", ko: "나 지금 골치 아픈 일이 좀 있어.", en: "I have a big problem right now." },
+    { verb: "HAVE", ko: "어제 친구들이랑 진짜 재밌게 놀았어.", en: "We had a great time yesterday." },
+    { verb: "HAVE", ko: "점심때 걔랑 잠깐 얘기 좀 나눴어.", en: "I had a quick chat with him." },
+    { verb: "HAVE", ko: "지금 결정하기엔 고민이 좀 필요해.", en: "I have some doubts about that." },
+    { verb: "HAVE", ko: "목이 너무 칼칼하고 아파.", en: "I have a sore throat today." },
+    { verb: "HAVE", ko: "오늘 오후에 치과 예약이 잡혀 있어.", en: "I have a dentist appointment this afternoon." },
+    { verb: "HAVE", ko: "요즘 잠을 통 깊게 못 자.", en: "I have trouble sleeping these days." },
+    { verb: "HAVE", ko: "그거에 대해 다른 생각이 좀 있어.", en: "I have a different idea on this." },
+    { verb: "HAVE", ko: "어젯밤에 진짜 이상한 꿈 꿨잖아.", en: "I had a really weird dream last night." },
+
+    // MAKE (31~40)
+    { verb: "MAKE", ko: "네 칭찬 덕분에 오늘 하루 기분 최고야.", en: "You just made my day." },
+    { verb: "MAKE", ko: "오늘 급한 일 생겨서 약속 못 갈 것 같아.", en: "I can't make it today." },
+    { verb: "MAKE", ko: "그 사람 말 때문에 완전 멘붕 왔어.", en: "His words made me panic." },
+    { verb: "MAKE", ko: "내가 서류 작성하다 실수를 좀 했어.", en: "I made a mistake on the document." },
+    { verb: "MAKE", ko: "그거 진짜 그럴듯하게 들리네.", en: "That makes a lot of sense." },
+    { verb: "MAKE", ko: "주말에 영화 볼 시간 좀 내보려고 해.", en: "I'll make time this weekend." },
+    { verb: "MAKE", ko: "둘 중에 하나 확실하게 결정해.", en: "Make up your mind soon." },
+    { verb: "MAKE", ko: "문 잠겼는지 다시 한번 확인해 봐.", en: "Make sure the door is locked." },
+    { verb: "MAKE", ko: "걔가 농담으로 날 웃게 만들었어.", en: "He made me laugh with his jokes." },
+    { verb: "MAKE", ko: "오늘 프로젝트 회의에서 좋은 성과 냈어.", en: "We made great progress today." },
+
+    // PUT (41~50)
+    { verb: "PUT", ko: "겉옷은 그냥 소파 위에 올려둬.", en: "Put your jacket on the sofa." },
+    { verb: "PUT", ko: "어떻게 설명해야 할지 말이 잘 안 나오네.", en: "How should I put this?" },
+    { verb: "PUT", ko: "가방 너무 무거우니까 바닥에 내려놔.", en: "Put down your heavy bag." },
+    { verb: "PUT", ko: "날씨 쌀쌀하니까 모자 쓰고 나가.", en: "Put on your warm hat." },
+    { verb: "PUT", ko: "그 일은 다음 주로 미루는 게 낫겠어.", en: "Let's put off the meeting till next week." },
+    { verb: "PUT", ko: "다른 사람 입장에서 한번 생각해 봐.", en: "Put yourself in his shoes." },
+    { verb: "PUT", ko: "스마트폰은 주머니에 다시 넣어둬.", en: "Put your phone back in your pocket." },
+    { verb: "PUT", ko: "이번 프로젝트에 시간과 공을 많이 들였어.", en: "I put a lot of effort into this." },
+    { verb: "PUT", ko: "남은 음식은 냉장고에 넣어둬.", en: "Put the leftovers in the fridge." },
+    { verb: "PUT", ko: "다 쓴 물건은 제자리에 갖다 놔.", en: "Put everything back where it was." }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let combo = 0;
+  let timerActive = true;
+  let timerInterval = null;
+  let timeLeft = 100; // %
+  let synth = window.speechSynthesis;
+  let isUnlocked = false;
+
+  // DOM
+  const koPrompt = document.getElementById("koPrompt");
+  const enResult = document.getElementById("enResult");
+  const feedback = document.getElementById("feedback");
+  const scoreVal = document.getElementById("scoreVal");
+  const comboVal = document.getElementById("comboVal");
+  const progressVal = document.getElementById("progressVal");
+  const timerBar = document.getElementById("timerBar");
+  const cheatList = document.getElementById("cheatList");
+  const timerToggleBtn = document.getElementById("timerToggleBtn");
+  const nextQuizBtn = document.getElementById("nextQuizBtn");
+  const listenAgainBtn = document.getElementById("listenAgainBtn");
+  const verbBtns = document.querySelectorAll(".verb-btn");
+
+  // 모바일 오디오 언락
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0.01;
+      synth.speak(u);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  // 치트 리스트 렌더
+  bank.forEach((item, idx) => {
+    const d = document.createElement("div");
+    d.className = "list-item";
+    d.id = `item-${idx}`;
+    d.innerHTML = `<span><b>[${item.verb}]</b> ${item.ko}</span><span>#${idx+1}</span>`;
+    d.addEventListener("click", () => {
+      unlockAudio();
+      loadQuestion(idx);
+    });
+    cheatList.appendChild(d);
+  });
+
+  function speak(text) {
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.95;
+    synth.speak(u);
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    if (!timerActive) {
+      timerBar.style.width = "100%";
+      return;
+    }
+    timeLeft = 100;
+    timerBar.style.width = "100%";
+    timerInterval = setInterval(() => {
+      timeLeft -= 2.5; // 약 4초
+      timerBar.style.width = `${Math.max(0, timeLeft)}%`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        onTimeOut();
+      }
+    }, 100);
+  }
+
+  function onTimeOut() {
+    combo = 0;
+    comboVal.innerText = combo;
+    feedback.innerText = `⏳ 시간 초과! 정답 동사: [${bank[currentIndex].verb}]`;
+    feedback.className = "feedback-bubble wrong";
+    showAnswer();
+  }
+
+  function loadQuestion(idx) {
+    currentIndex = idx;
+    const item = bank[currentIndex];
+    progressVal.innerText = `${currentIndex + 1}/${bank.length}`;
+    koPrompt.innerText = item.ko;
+    enResult.innerText = `_ _ _ (${item.verb.length}글자) ...`;
+    feedback.innerText = "3초 안에 직관적으로 선택하세요!";
+    feedback.className = "feedback-bubble";
+
+    document.querySelectorAll(".list-item").forEach((el, i) => {
+      el.classList.toggle("selected", i === currentIndex);
+    });
+    const selectedEl = document.getElementById(`item-${currentIndex}`);
+    if (selectedEl) selectedEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    verbBtns.forEach(btn => btn.classList.remove("hit"));
+    startTimer();
+  }
+
+  function showAnswer() {
+    const item = bank[currentIndex];
+    enResult.innerText = item.en;
+    speak(item.en);
+  }
+
+  function handleChoice(chosenVerb, targetBtn) {
+    unlockAudio();
+    clearInterval(timerInterval);
+    const item = bank[currentIndex];
+
+    if (chosenVerb === item.verb) {
+      // 정답
+      combo++;
+      score += 100 + (combo * 20);
+      feedback.innerText = `🎯 PERFECT! (${chosenVerb})`;
+      feedback.className = "feedback-bubble correct";
+      targetBtn.classList.add("hit");
+    } else {
+      // 오답
+      combo = 0;
+      feedback.innerText = `❌ 아쉬워요! 정답은 [${item.verb}]`;
+      feedback.className = "feedback-bubble wrong";
+    }
+
+    scoreVal.innerText = score;
+    comboVal.innerText = combo;
+    showAnswer();
+  }
+
+  // 버튼 리스너
+  verbBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      handleChoice(btn.getAttribute("data-verb"), btn);
+    });
+  });
+
+  nextQuizBtn.addEventListener("click", () => {
+    unlockAudio();
+    if (currentIndex < bank.length - 1) {
+      loadQuestion(currentIndex + 1);
+    } else {
+      loadQuestion(0);
+    }
+  });
+
+  listenAgainBtn.addEventListener("click", () => {
+    unlockAudio();
+    speak(bank[currentIndex].en);
+  });
+
+  timerToggleBtn.addEventListener("click", () => {
+    timerActive = !timerActive;
+    timerToggleBtn.innerText = timerActive ? "⏱ 타임어택: 켜짐" : "⏱ 타임어택: 꺼짐";
+    timerToggleBtn.classList.toggle("active", timerActive);
+    startTimer();
+  });
+
+  // 시작
+  loadQuestion(0);
+</script>
+
+</body>
+</html>
