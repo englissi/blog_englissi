@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>생각의 뼈대(PREP) 50 남녀 티키타카 트레이너</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --male-color: #38bdf8;
+      --female-color: #f472b6;
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --danger: #f43f5e;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0.8rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.3rem 0;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* 메인 인터랙티브 카드 */
+    .stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.4rem 1.1rem 1.2rem;
+      position: relative;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .top-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .meta-badge {
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .speaker-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 800;
+      padding: 0.25rem 0.7rem;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .speaker-indicator.male {
+      color: var(--male-color);
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.1);
+    }
+    .speaker-indicator.female {
+      color: var(--female-color);
+      border-color: rgba(244, 114, 182, 0.4);
+      background: rgba(244, 114, 182, 0.1);
+    }
+
+    /* 질문 영역 (남성 화자) */
+    .question-box {
+      background: #090d16;
+      border: 1px solid #22324f;
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
+      transition: all 0.2s;
+    }
+    .question-box.active {
+      border-color: var(--male-color);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .topic-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .q-text-en {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #bae6fd;
+      line-height: 1.4;
+    }
+
+    /* PREP 4단계 답변 영역 (여성 화자) */
+    .answer-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .prep-step {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.65rem;
+      padding: 0.55rem 0.75rem;
+      transition: all 0.2s;
+    }
+    .prep-step.active {
+      background: rgba(244, 114, 182, 0.12);
+      border-color: var(--female-color);
+      transform: translateX(4px);
+    }
+
+    .step-pill {
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.35rem;
+      min-width: 2.2rem;
+      text-align: center;
+      background: #1e293b;
+      color: #94a3b8;
+    }
+    .prep-step.active .step-pill {
+      background: var(--female-color);
+      color: #090d16;
+    }
+
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .step-role {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .step-text {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+    .prep-step.active .step-text {
+      color: #fff;
+    }
+
+    /* 조작 컨트롤 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    button:active { transform: scale(0.96); }
+    button.btn-primary { background: var(--primary); border-color: var(--primary); }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 50문항 목록 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .qa-list {
+      list-style: none;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .qa-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+    .qa-item:last-child { border-bottom: none; }
+    .qa-item.playing {
+      background: rgba(99, 102, 241, 0.15);
+      border-left: 4px solid var(--accent);
+    }
+    .item-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #bae6fd;
+      margin-bottom: 0.2rem;
+    }
+    .item-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>생각의 뼈대(PREP) 50 남녀 티키타카</h1>
+    <p>질문(남성)을 듣고, 1초 만에 4단계 PREP 답변(여성)으로 받아치는 훈련</p>
+  </header>
+
+  <div class="stage-card">
+    <div class="top-meta-bar">
+      <div class="meta-badge" id="metaBadge">Set 1 / 50</div>
+      <div class="speaker-indicator" id="speakerIndicator">
+        <span id="speakerIcon">🗣️</span> <span id="speakerText">대기 중</span>
+      </div>
+    </div>
+
+    <!-- 질문 섹션 (남성 화자) -->
+    <div class="question-box" id="questionBox">
+      <div class="topic-tag" id="topicTag">주제: 재택근무 vs 사무실 출근</div>
+      <div class="q-text-en" id="qText">Do you prefer working from home or at the office?</div>
+    </div>
+
+    <!-- PREP 답변 섹션 (여성 화자) -->
+    <div class="answer-container">
+      <div class="prep-step" id="stepP1">
+        <div class="step-pill">P</div>
+        <div class="step-content">
+          <div class="step-role">결론 (Point)</div>
+          <div class="step-text" id="textP1">I totally prefer working from home.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" id="stepR">
+        <div class="step-pill">R</div>
+        <div class="step-content">
+          <div class="step-role">핵심 이유 (Reason)</div>
+          <div class="step-text" id="textR">It saves so much energy. Commuting is exhausting.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" id="stepE">
+        <div class="step-pill">E</div>
+        <div class="step-content">
+          <div class="step-role">구체적 사례/장면 (Example)</div>
+          <div class="step-text" id="textE">Yesterday it poured rain. I just worked with my warm coffee.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" id="stepP2">
+        <div class="step-pill">P</div>
+        <div class="step-content">
+          <div class="step-role">마무리 (Point)</div>
+          <div class="step-text" id="textP2">So yeah, I'm way more productive this way.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playPauseBtn">▶ 티키타카 연속 재생</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="stopBtn">⏹ 정지</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">속도:</label>
+      <select id="speedSelect">
+        <option value="0.9">0.9x</option>
+        <option value="1.0" selected>1.0x (표준)</option>
+        <option value="1.15">1.15x (실전)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">턴 간격:</label>
+      <select id="intervalSelect">
+        <option value="500">0.5초 (스피드)</option>
+        <option value="1000" selected>1.0초 (표준)</option>
+        <option value="1800">1.8초 (따라하기)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>50개 PREP 문답 세트</span>
+      <span>터치 시 해당 번호 즉시 이동</span>
+    </div>
+    <ul class="qa-list" id="qaList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawBank = [
+    { id: 1, topic: "재택근무 vs 사무실", q: "Do you prefer working from home or at the office?", p1: "I totally prefer working from home.", r: "It saves so much energy. Commuting is exhausting.", e: "Yesterday it poured rain. I just worked with my warm coffee.", p2: "So yeah, I'm way more productive this way." },
+    { id: 2, topic: "아침형 vs 저녁형", q: "Are you a morning person or a night owl?", p1: "I'm definitely a night owl.", r: "My brain only turns on after the sun goes down.", e: "This morning I snoozed my alarm four times.", p2: "That's why mornings are always brutal for me." },
+    { id: 3, topic: "직접 요리 vs 배달", q: "Do you prefer cooking at home or ordering delivery?", p1: "I almost always order delivery.", r: "Cleaning up afterwards is too much work.", e: "Last week I tried making pasta. The kitchen was a disaster.", p2: "So delivery just makes my life a lot easier." },
+    { id: 4, topic: "대중교통 vs 자가용", q: "Do you prefer taking public transit or driving?", p1: "I take the subway every single day.", r: "You never get stuck in traffic.", e: "This morning cars weren't moving at all. But my train was on time.", p2: "It's definitely the most reliable way to travel." },
+    { id: 5, topic: "주말 휴식 스타일", q: "How do you usually spend your weekends?", p1: "I usually stay home and recharge.", r: "Dealing with crowds stresses me out.", e: "Last Sunday, I was glued to my couch watching Netflix all day.", p2: "That's the best way to get ready for Monday." },
+    { id: 6, topic: "운동 루틴", q: "How often do you work out?", p1: "I try to exercise at least three times a week.", r: "Sitting at a desk all day ruins my back.", e: "Yesterday I went for a run in the park. My head felt so clear.", p2: "It keeps both my body and mind in good shape." },
+    { id: 7, topic: "모닝 커피 습관", q: "Do you drink coffee on a regular basis?", p1: "I can't survive without coffee in the morning.", r: "It's the only thing that wakes my brain up.", e: "Today I had a huge iced Americano before my first meeting.", p2: "It's an absolute necessity for my daily routine." },
+    { id: 8, topic: "온라인 쇼핑", q: "Do you prefer shopping online or in physical stores?", p1: "I do almost all my shopping online.", r: "It saves a massive amount of time and effort.", e: "Last night I ordered groceries, and they arrived before sunrise.", p2: "I can't imagine going back to crowded supermarkets." },
+    { id: 9, topic: "스마트폰 사용", q: "Do you think you spend too much time on your phone?", p1: "Yes, I'm honestly addicted to my smartphone.", r: "I check short-form videos without even realizing it.", e: "Last night I meant to sleep early, but scrolled until 2 AM.", p2: "I really need to set a screen time limit." },
+    { id: 10, topic: "스트레스 해소", q: "What do you do when you are under a lot of stress?", p1: "I put on my headphones and take a long walk.", r: "Good music completely blocks out noisy thoughts.", e: "Two days ago I walked by the river for an hour. It helped a lot.", p2: "Walking is my go-to therapy for high stress." },
+    { id: 11, topic: "대면 vs 화상 회의", q: "Which do you prefer, in-person or video meetings?", p1: "I prefer in-person meetings for serious discussions.", r: "It's much easier to read facial expressions and body language.", e: "Last month we solved a huge bottleneck in a 30-minute face-to-face chat.", p2: "Direct communication prevents costly misunderstandings." },
+    { id: 12, topic: "팀워크 vs 독립 업무", q: "Do you work better in a team or independently?", p1: "I work much faster when I work independently.", r: "Coordinating schedules and opinions often slows things down.", e: "Last quarter I finished a solo report three days ahead of deadline.", p2: "Autonomy gives me the highest level of productivity." },
+    { id: 13, topic: "직장 선택 기준", q: "What is the most important factor when choosing a job?", p1: "For me, work-life balance comes before anything else.", r: "No amount of money can compensate for burnout.", e: "My friend earns high pay but works until midnight every day.", p2: "Sustainable work hours are essential for long-term health." },
+    { id: 14, topic: "마감 기한 관리", q: "How do you manage tight deadlines at work?", p1: "I always break large tasks into smaller daily chunks.", r: "Focusing on one bite-sized piece stops panic.", e: "Last week I had a 50-page slide, but finished 10 pages a day easily.", p2: "Structured pacing is the key to beating tight deadlines." },
+    { id: 15, topic: "직장 내 피드백", q: "Is constructive feedback helpful in your work?", p1: "Constructive feedback is crucial for professional growth.", r: "We often fail to see our own blind spots.", e: "My manager pointed out a major data error yesterday. It saved the deal.", p2: "Honest critique leads to much higher quality results." },
+    { id: 16, topic: "근무 복장 자율화", q: "Should companies allow casual dress codes?", p1: "Companies should definitely allow casual clothes.", r: "Physical comfort directly boosts mental creativity.", e: "Since our team switched to hoodies, the office vibe became lighter.", p2: "Comfortable clothes lead to an innovative work culture." },
+    { id: 17, topic: "퇴근 후 업무 연락", q: "Should employers contact staff after hours?", p1: "Work messages should completely stop after business hours.", r: "Constant notifications keep employees under constant stress.", e: "I used to receive late-night emails, and it ruined my sleep completely.", p2: "Respecting off-hours is essential for maintaining productivity." },
+    { id: 18, topic: "직무 자기계발", q: "Do you spend time learning new job skills?", p1: "I invest at least an hour every week in upgrading my skills.", r: "The job market is changing too fast to rely on old knowledge.", e: "Recently I took an AI prompt course, and it cut my work time in half.", p2: "Continuous learning is the only real job security today." },
+    { id: 19, topic: "좋은 관리자의 자질", q: "What makes a great manager?", p1: "A great manager must be an active listener.", r: "Employees lose motivation when their opinions are ignored.", e: "My leader always asks for our ideas before making major decisions.", p2: "Listening carefully builds true loyalty and teamwork." },
+    { id: 20, topic: "신입 사원 교육", q: "What is the most effective way to train new hires?", p1: "Hands-on mentorship works far better than lectures.", r: "People learn fastest by solving real-world issues side-by-side.", e: "Shadow-working with a senior staff taught me everything in two weeks.", p2: "Practical guidance beats passive reading every time." },
+    { id: 21, topic: "생성형 AI 활용", q: "Do you regularly use AI tools for daily tasks?", p1: "I use generative AI tools every single day.", r: "It handles repetitive drafting and summary tasks in seconds.", e: "This afternoon I organized 20 customer reviews instantly with AI.", p2: "AI has become an indispensable productivity booster." },
+    { id: 22, topic: "전자책 vs 종이책", q: "Do you prefer printed books or e-books?", p1: "I prefer e-books on a tablet over paper books.", r: "You can carry an entire library anywhere without heavy weight.", e: "During my commute yesterday, I read two chapters easily on the train.", p2: "Portability makes reading much more consistent for busy people." },
+    { id: 23, topic: "SNS의 영향", q: "Does social media have a positive or negative impact?", p1: "I think social media does more harm than good nowadays.", r: "It constantly triggers unhealthy social comparison and anxiety.", e: "I felt down after seeing fancy vacation photos of strangers last week.", p2: "We need to practice digital detox more often." },
+    { id: 24, topic: "OTT 스트리밍", q: "Do you think video streaming platforms are worth the cost?", p1: "They are definitely worth every single penny.", r: "For the price of one movie ticket, you get unlimited shows.", e: "Last weekend I binged a great documentary series on Saturday night.", p2: "Streaming platforms offer the highest entertainment value." },
+    { id: 25, topic: "온라인 학습", q: "Are online learning platforms as effective as offline classes?", p1: "Online platforms are far more practical for working adults.", r: "You can replay difficult parts whenever and wherever you want.", e: "I rewatched a difficult coding lesson three times late last night.", p2: "Flexibility in self-paced learning is unmatched." },
+    { id: 26, topic: "현금 없는 사회", q: "Do you support a cashless society using mobile payments?", p1: "I haven't carried physical cash for over two years.", r: "Paying with a phone or smart watch is incredibly fast and secure.", e: "I bought groceries, took the bus, and had lunch with just my phone today.", p2: "Cashless payments make daily transactions effortless." },
+    { id: 27, topic: "노이즈 캔슬링 이어폰", q: "Do you use noise-canceling wireless earbuds?", p1: "I cannot step out of my door without my earbuds.", r: "Active noise cancelation protects my focus in noisy public spaces.", e: "On the loud train this morning, I studied in complete peace with them.", p2: "They create an instant personal workspace anywhere." },
+    { id: 28, topic: "숏폼 콘텐츠", q: "Do you watch short-form videos often?", p1: "I try to avoid short-form videos as much as possible.", r: "They severely ruin your attention span without giving deep value.", e: "Last month I lost an hour just flicking through 15-second clips.", p2: "Protecting deep focus requires cutting down on micro-videos." },
+    { id: 29, topic: "자율주행 자동차", q: "Are you open to using self-driving cars?", p1: "I welcome self-driving technology with open arms.", r: "Human error causes the vast majority of deadly traffic accidents.", e: "Smart highway assist already handles stressful highway jams for me.", p2: "Autonomous driving will save countless lives in the long run." },
+    { id: 30, topic: "스마트폰 교체 주기", q: "How often should people upgrade their smartphones?", p1: "Upgrading every three to four years is more than enough.", r: "Recent phone upgrades only offer minor tweaks, not game-changers.", e: "My four-year-old device still runs all apps smoothly without issues.", p2: "Keeping phones longer saves money and cuts electronic waste." },
+    { id: 31, topic: "혼자 여행", q: "Do you prefer traveling alone or with companions?", p1: "I strongly prefer solo traveling.", r: "You have complete freedom to change your plans on a whim.", e: "Last fall, I changed my cafe destination mid-walk without asking anyone.", p2: "Solo trips give you the ultimate sense of true relaxation." },
+    { id: 32, topic: "호텔 선택 기준", q: "What is the most important factor when booking a hotel?", p1: "Location and cleanliness matter more than fancy facilities.", r: "Being close to subway stations saves precious sightseeing time.", e: "Staying next to the central station saved me two hours daily last trip.", p2: "A well-located hotel makes the entire trip stress-free." },
+    { id: 33, topic: "맛집 검색 방법", q: "How do you choose a restaurant for dining out?", p1: "I always check verified customer photo reviews with honest ratings.", r: "Marketing photos can easily deceive hungry customers.", e: "Last weekend I avoided a tourist trap because reviews warned about bad service.", p2: "Real local reviews are the safest guide to good food." },
+    { id: 34, topic: "취미의 중요성", q: "Why is having an active hobby essential?", p1: "A good hobby separates your identity from your daily job.", r: "It provides a safe harbor to unwind after high-stress work.", e: "Playing acoustic guitar for 30 minutes every evening melts my fatigue away.", p2: "Hobbies keep our emotional battery fully charged." },
+    { id: 35, topic: "영화관 vs 집", q: "Do you prefer watching movies in a theater or at home?", p1: "I still prefer going to a movie theater for big films.", r: "Massive screens and surround sound can never be matched at home.", e: "Watching the latest sci-fi movie in IMAX blew my mind last month.", p2: "The immersive cinematic experience is worth every penny." },
+    { id: 36, topic: "반려동물 기르기", q: "What are the benefits of raising a pet?", p1: "Raising a pet offers unconditional emotional comfort.", r: "Coming home to an excited greeting eliminates daily loneliness.", e: "My puppy wagged his tail and greeted me warmly after a tough day.", p2: "Pets teach us empathy and bring pure joy into a home." },
+    { id: 37, topic: "휴양 vs 관광", q: "Do you prefer an active sightseeing trip or a relaxing resort stay?", p1: "I definitely pick a relaxing resort vacation.", r: "Running between tourist spots makes you more tired than work.", e: "Last summer I just laid by the pool reading books for four days.", p2: "Vacations should focus on resting, not ticking checklist boxes." },
+    { id: 38, topic: "충동구매 방지", q: "How do you prevent impulse buying when shopping?", p1: "I strictly enforce a 48-hour waiting rule before checking out.", r: "Most sudden shopping impulses fade away after two good nights of sleep.", e: "I put an expensive jacket in my cart Tuesday and deleted it Thursday.", p2: "A short cooldown period saves thousands of dollars easily." },
+    { id: 39, topic: "선물 고르기", q: "What makes a great gift for friends?", p1: "Practical items they would use daily make the best gifts.", r: "Decorative trinkets usually end up gathering dust in a corner.", e: "I gifted a sleek thermal tumbler to my colleague, and she uses it daily.", p2: "Utility and thoughtfulness make any present memorable." },
+    { id: 40, topic: "중고 거래", q: "Do you buy or sell secondhand goods online?", p1: "I actively trade secondhand goods via neighborhood apps.", r: "You can find mint-condition items at half the retail price.", e: "I purchased an almost new computer monitor for half price last week.", p2: "Secondhand trading is smart financial management and eco-friendly." },
+    { id: 41, topic: "일회용 플라스틱 규제", q: "Should governments strictly ban single-use plastics?", p1: "Governments must enforce strict bans on single-use plastics.", r: "Plastic pollution is destroying our marine ecosystems.", e: "I saw shocking footage of sea turtles choking on plastic straws recently.", p2: "Firm regulations are necessary to save our natural planet." },
+    { id: 42, topic: "자전거 전용 도로", q: "Should cities invest more in bike-only lanes?", p1: "Expanding dedicated bike lanes is a smart urban investment.", r: "It reduces traffic gridlock and cuts carbon emissions simultaneously.", e: "Since my district added separated paths, bike commuting doubled safely.", p2: "Safer bike lanes build healthier and cleaner communities." },
+    { id: 43, topic: "주 4일 근무제", q: "Do you support adopting a four-day workweek?", p1: "I fully support introducing a four-day workweek.", r: "Well-rested employees deliver much sharper focus during work hours.", e: "Companies in trial programs reported higher profits and no productivity loss.", p2: "A three-day weekend is the future of sustainable labor." },
+    { id: 44, topic: "전자 영수증", q: "Should businesses replace paper receipts with digital ones?", p1: "Paper receipts should be completely phased out.", r: "Millions of tons of thermal paper are tossed into trash bins right away.", e: "I get all my store receipts via mobile app notifications automatically.", p2: "Digital receipts are cleaner, safer, and far easier to track." },
+    { id: 45, topic: "AI 시대의 외국어", q: "Is learning a second language still necessary in the age of AI?", p1: "Speaking another language directly builds human trust and empathy.", r: "Machines can translate words, but cannot replace genuine rapport.", e: "During dinner with foreign partners, a short casual chat made instant friends.", p2: "Real-time human conversation will always remain irreplaceable." },
+    { id: 46, topic: "음식물 쓰레기", q: "What is the best way to reduce household food waste?", p1: "Planning weekly grocery menus in advance stops excessive purchases.", r: "People throw away food when they shop without a clear plan.", e: "I started cooking strictly from my ingredient list, cutting waste to zero.", p2: "Mindful meal planning saves money and protects the environment." },
+    { id: 47, topic: "반려동물 목줄 규정", q: "Should pet owners be heavily fined for neglecting leash rules?", p1: "Strict fines must be imposed on reckless pet owners.", r: "Unleashed animals can trigger dangerous bite accidents in seconds.", e: "A large unleashed dog rushed toward a toddler in my local park yesterday.", p2: "Strict rules protect both public safety and animal welfare." },
+    { id: 48, topic: "정년 연장", q: "Should the legal retirement age be raised?", p1: "Raising the retirement age is an unavoidable economic reality.", r: "Life expectancy has risen, and older workers carry rich expertise.", e: "My 65-year-old uncle still manages complex mechanical projects easily.", p2: "Utilizing experienced seniors keeps aging economies vibrant." },
+    { id: 49, topic: "교실 내 스마트폰", q: "Should schools ban smartphones inside classrooms?", p1: "Classrooms should strictly remain phone-free zones during lectures.", r: "Constant social alerts sabotage teen concentration and lessons.", e: "Schools that locked phones in morning lockers saw exam scores rise.", p2: "A distraction-free environment is essential for effective learning." },
+    { id: 50, topic: "성공의 기준", q: "What defines true career success, high income or personal fulfillment?", p1: "True career success comes from personal fulfillment and purpose.", r: "A giant paycheck feels hollow if your work lacks personal meaning.", e: "I left a repetitive high-paying job to build software, and I'm happier.", p2: "Passion and purpose are the real foundations of a rewarding career." }
+  ];
+
+  let playlist = [...rawBank];
+  let currentIndex = 0;
+  let isRunning = false;
+  let isRandom = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const metaBadge = document.getElementById("metaBadge");
+  const speakerIndicator = document.getElementById("speakerIndicator");
+  const speakerIcon = document.getElementById("speakerIcon");
+  const speakerText = document.getElementById("speakerText");
+  const topicTag = document.getElementById("topicTag");
+  const qText = document.getElementById("qText");
+  const questionBox = document.getElementById("questionBox");
+  const stepP1 = document.getElementById("stepP1");
+  const stepR = document.getElementById("stepR");
+  const stepE = document.getElementById("stepE");
+  const stepP2 = document.getElementById("stepP2");
+  const textP1 = document.getElementById("textP1");
+  const textR = document.getElementById("textR");
+  const textE = document.getElementById("textE");
+  const textP2 = document.getElementById("textP2");
+  const qaList = document.getElementById("qaList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() {
+    voices = synth.getVoices() || [];
+  }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function getBestVoice(gender) {
+    if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+    const enVoices = voices.filter(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US") || v.lang.startsWith("en")));
+    if (enVoices.length === 0) return null;
+
+    if (gender === "male") {
+      const maleV = enVoices.find(v => {
+        const name = v.name.toLowerCase();
+        return name.includes("male") || name.includes("david") || name.includes("george") || name.includes("james") || name.includes("guy") || name.includes("alex") || name.includes("daniel");
+      });
+      return maleV || enVoices[0];
+    } else {
+      const femaleV = enVoices.find(v => {
+        const name = v.name.toLowerCase();
+        return name.includes("female") || name.includes("samantha") || name.includes("zira") || name.includes("victoria") || name.includes("karen") || name.includes("susan") || name.includes("joanna");
+      });
+      return femaleV || (enVoices.length > 1 ? enVoices[1] : enVoices[0]);
+    }
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      dummy.rate = 2.0;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderList() {
+    qaList.innerHTML = "";
+    rawBank.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "qa-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-title">${item.id}. [${item.topic}]</div>
+        <div class="item-desc">Q: ${item.q}</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+        startCycle();
+      });
+      qaList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".qa-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    metaBadge.innerText = `Set ${currentIndex + 1} / ${playlist.length}`;
+    topicTag.innerText = `주제: ${curr.topic}`;
+    qText.innerText = curr.q;
+    textP1.innerText = curr.p1;
+    textR.innerText = curr.r;
+    textE.innerText = curr.e;
+    textP2.innerText = curr.p2;
+
+    clearHighlights();
+  }
+
+  function clearHighlights() {
+    questionBox.classList.remove("active");
+    stepP1.classList.remove("active");
+    stepR.classList.remove("active");
+    stepE.classList.remove("active");
+    stepP2.classList.remove("active");
+    speakerIndicator.className = "speaker-indicator";
+    speakerIcon.innerText = "🗣️";
+    speakerText.innerText = "대기 중";
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakRole(text, gender, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      const voice = getBestVoice(gender);
+      if (voice) utter.voice = voice;
+
+      if (gender === "male") {
+        utter.pitch = 0.95;
+      } else {
+        utter.pitch = 1.15;
+      }
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 5) * 1000 * (1 / rate) + 3800;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  async function playTikiTaka(index) {
+    if (!isRunning) return;
+    const item = playlist[index];
+    const spd = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 1. 남성 질문 화자
+    clearHighlights();
+    questionBox.classList.add("active");
+    speakerIndicator.className = "speaker-indicator male";
+    speakerIcon.innerText = "👨‍💼";
+    speakerText.innerText = "MAN (질문)";
+    await speakRole(item.q, "male", spd);
+    questionBox.classList.remove("active");
+    await sleep(delay);
+
+    if (!isRunning) return;
+
+    // 2. 여성 답변 화자 (P - Point)
+    speakerIndicator.className = "speaker-indicator female";
+    speakerIcon.innerText = "👩‍💼";
+    speakerText.innerText = "WOMAN (P - 결론)";
+    stepP1.classList.add("active");
+    await speakRole(item.p1, "female", spd);
+    stepP1.classList.remove("active");
+    await sleep(250);
+
+    if (!isRunning) return;
+
+    // 3. 여성 답변 화자 (R - Reason)
+    speakerText.innerText = "WOMAN (R - 이유)";
+    stepR.classList.add("active");
+    await speakRole(item.r, "female", spd);
+    stepR.classList.remove("active");
+    await sleep(250);
+
+    if (!isRunning) return;
+
+    // 4. 여성 답변 화자 (E - Example)
+    speakerText.innerText = "WOMAN (E - 사례)";
+    stepE.classList.add("active");
+    await speakRole(item.e, "female", spd);
+    stepE.classList.remove("active");
+    await sleep(250);
+
+    if (!isRunning) return;
+
+    // 5. 여성 답변 화자 (P - Point 마침표)
+    speakerText.innerText = "WOMAN (P - 마무리)";
+    stepP2.classList.add("active");
+    await speakRole(item.p2, "female", spd);
+    stepP2.classList.remove("active");
+    clearHighlights();
+    await sleep(delay);
+  }
+
+  async function startCycle() {
+    unlockAudio();
+    isRunning = true;
+    playPauseBtn.innerText = "⏸ 일시정지";
+    playPauseBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < playlist.length) {
+      updateUI();
+      await playTikiTaka(currentIndex);
+      if (!isRunning) break;
+      if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+      } else {
+        if (isRandom) playlist = shuffle(rawBank);
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playPauseBtn.innerText = "▶ 티키타카 연속 재생";
+    playPauseBtn.classList.add("btn-primary");
+    clearHighlights();
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isRunning) stopPlayback();
+    else startCycle();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "#38bdf8" : "#fff";
+    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
