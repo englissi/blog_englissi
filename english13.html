@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>토스 1초 단문 페어링 & 음성 싱크 트레이너 100</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #38bdf8;
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --success: #34d399;
+      --danger: #f87171;
+      --cue: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0.8rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.3rem 0;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* 메인 트레이닝 스테이지 카드 */
+    .stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.4rem 1.1rem 1.3rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      position: relative;
+    }
+
+    .top-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meta-badge {
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .part-tag {
+      font-size: 0.72rem;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    /* 질문 박스 (Examiner) */
+    .question-box {
+      background: #090d16;
+      border: 1px solid #22324f;
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
+      transition: all 0.2s;
+    }
+    .question-box.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+    .q-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cue);
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .q-text {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #bae6fd;
+      line-height: 1.4;
+    }
+
+    /* 단문 페어링 (결론 단문 + 팩트 단문) */
+    .pair-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pair-step {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      transition: all 0.2s;
+    }
+    .pair-step.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+    .pair-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pair-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .pair-step.active .pair-badge {
+      color: var(--accent);
+    }
+    .pair-text {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #94a3b8;
+      line-height: 1.35;
+    }
+    .pair-step.active .pair-text {
+      color: #fff;
+    }
+
+    /* 녹음 & 싱크로율 판정 보드 */
+    .sync-board {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 0.85rem;
+      padding: 0.8rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sync-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rec-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .rec-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .rec-indicator.recording .rec-dot {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation: pulseRec 1s infinite;
+    }
+    .rec-indicator.recording { color: var(--danger); }
+
+    @keyframes pulseRec {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .sync-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .sync-score-num {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--success);
+    }
+
+    .heard-text {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+      padding: 0.45rem 0.65rem;
+      border-radius: 0.5rem;
+      min-height: 2.2rem;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    /* 컨트롤 바 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    button:active { transform: scale(0.96); }
+    button.btn-primary { background: var(--primary); border-color: var(--primary); }
+    button.btn-record { background: #991b1b; border-color: #ef4444; color: #fff; }
+    button.btn-record.recording { background: #dc2626; animation: pulseRec 1.2s infinite; }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 100문항 목록 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .qa-list {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .qa-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+    .qa-item:last-child { border-bottom: none; }
+    .qa-item.playing {
+      background: rgba(56, 189, 248, 0.12);
+      border-left: 4px solid var(--accent);
+    }
+    .item-q {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #bae6fd;
+      margin-bottom: 0.2rem;
+    }
+    .item-ans {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>토스 1초 단문 페어링 & 싱크 트레이너 100</h1>
+    <p>접속사 없이 2문장 연타! 내 음성을 녹음하여 원어민 정답 싱크로율을 확인하세요.</p>
+  </header>
+
+  <div class="stage-card">
+    <div class="top-meta-bar">
+      <div class="meta-badge" id="metaBadge">Question 1 / 100</div>
+      <div class="part-tag" id="partTag">Part 1. 쇼핑·편의</div>
+    </div>
+
+    <!-- 시험관 질문 (Examiner) -->
+    <div class="question-box" id="questionBox">
+      <div class="q-label"><span>🎙️</span> EXAMINER QUESTION</div>
+      <div class="q-text" id="qText">Do you prefer shopping online or in stores?</div>
+    </div>
+
+    <!-- 1초 단문 페어링 (결론 + 팩트) -->
+    <div class="pair-container">
+      <div class="pair-step" id="step1">
+        <div class="pair-header">
+          <span class="pair-badge">1문장: 결론 단문 (Hook)</span>
+        </div>
+        <div class="pair-text" id="textS1">I definitely prefer shopping online.</div>
+      </div>
+
+      <div class="pair-step" id="step2">
+        <div class="pair-header">
+          <span class="pair-badge">2문장: 팩트·이유 단문 (Anchor)</span>
+        </div>
+        <div class="pair-text" id="textS2">It saves so much time and energy.</div>
+      </div>
+    </div>
+
+    <!-- 음성 싱크로율 분석기 -->
+    <div class="sync-board">
+      <div class="sync-top">
+        <div class="rec-indicator" id="recIndicator">
+          <div class="rec-dot"></div>
+          <span id="recStatusText">마이크 대기 중</span>
+        </div>
+        <div class="sync-score-wrap">
+          음성 싱크로율: <span class="sync-score-num" id="syncScoreNum">--%</span>
+        </div>
+      </div>
+      <div class="heard-text" id="heardText">🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 위 두 문장을 말씀해 보세요.</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playNativeBtn">▶ 원어민 페어링 듣기</button>
+    <button class="btn-record" id="recordSyncBtn">🔴 답변 녹음 & 싱크 분석</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">원어민 속도:</label>
+      <select id="speedSelect">
+        <option value="0.9">0.9x</option>
+        <option value="1.0" selected>1.0x (표준)</option>
+        <option value="1.15">1.15x (실전)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">문장 대기 시간:</label>
+      <select id="intervalSelect">
+        <option value="600">0.6초 (스피드)</option>
+        <option value="1000" selected>1.0초 (표준)</option>
+        <option value="1600">1.6초 (따라하기)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>100개 단문 페어링 세트</span>
+      <span>터치 시 해당 문제 즉시 이동</span>
+    </div>
+    <ul class="qa-list" id="qaList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawBank = [
+    // Part 1. 일상 소비, 쇼핑 & 편의시설 (01 ~ 25)
+    { id: 1, part: "Part 1. 쇼핑·편의", q: "Do you prefer shopping online or in stores?", s1: "I definitely prefer shopping online.", s2: "It saves so much time and energy." },
+    { id: 2, part: "Part 1. 쇼핑·편의", q: "How often do you visit coffee shops?", s1: "I go to a coffee shop almost every day.", s2: "I grab an iced Americano every morning." },
+    { id: 3, part: "Part 1. 쇼핑·편의", q: "What is most important when buying clothes?", s1: "Comfort is the most important factor for me.", s2: "I hate wearing tight or stiff clothes." },
+    { id: 4, part: "Part 1. 쇼핑·편의", q: "Do you use food delivery apps frequently?", s1: "I order food through apps twice a week.", s2: "Cooking takes way too much cleanup." },
+    { id: 5, part: "Part 1. 쇼핑·편의", q: "Where do you usually buy groceries?", s1: "I buy my groceries at a local supermarket.", s2: "It is only a five-minute walk from my home." },
+    { id: 6, part: "Part 1. 쇼핑·편의", q: "Do you check online reviews before buying?", s1: "I always check verified customer reviews first.", s2: "Real photos prevent terrible purchases." },
+    { id: 7, part: "Part 1. 쇼핑·편의", q: "Do you prefer paying with cash or cards?", s1: "I never carry physical cash anymore.", s2: "Paying with my phone takes one second." },
+    { id: 8, part: "Part 1. 쇼핑·편의", q: "How much do you spend on dining out?", s1: "I spend around twenty dollars per meal.", s2: "Eating good food relieves my daily stress." },
+    { id: 9, part: "Part 1. 쇼핑·편의", q: "What kind of shoes do you wear daily?", s1: "I wear comfortable running sneakers every day.", s2: "My feet hurt badly in formal leather shoes." },
+    { id: 10, part: "Part 1. 쇼핑·편의", q: "Do you prefer big malls or small local shops?", s1: "I prefer large shopping malls with everything inside.", s2: "They have parking, restaurants, and cinemas together." },
+    { id: 11, part: "Part 1. 쇼핑·편의", q: "Have you ever bought secondhand items?", s1: "I frequently buy used goods on neighborhood apps.", s2: "You can find mint-condition electronics at half price." },
+    { id: 12, part: "Part 1. 쇼핑·편의", q: "Do you use discount coupons when shopping?", s1: "I always look for mobile discount coupons.", s2: "Even a small discount adds up over time." },
+    { id: 13, part: "Part 1. 쇼핑·편의", q: "What is your favorite bakery item?", s1: "I always pick plain butter croissants.", s2: "They taste amazing with hot black coffee." },
+    { id: 14, part: "Part 1. 쇼핑·편의", q: "Do you prefer buying brand-name products?", s1: "I rarely care about expensive luxury brands.", s2: "Practical utility matters far more to me." },
+    { id: 15, part: "Part 1. 쇼핑·편의", q: "How do you get to the shopping center?", s1: "I usually take the subway there.", s2: "Driving in weekend traffic is a nightmare." },
+    { id: 16, part: "Part 1. 쇼핑·편의", q: "Do you return products often?", s1: "I hardly ever return items I bought.", s2: "Repacking and shipping them back is too annoying." },
+    { id: 17, part: "Part 1. 쇼핑·편의", q: "What do you buy most often online?", s1: "I order household supplies like detergent and water.", s2: "Heavy items get delivered right to my door." },
+    { id: 18, part: "Part 1. 쇼핑·편의", q: "Do you prefer self-checkout counters?", s1: "I always head to the self-checkout kiosks.", s2: "There is almost zero line to wait in." },
+    { id: 19, part: "Part 1. 쇼핑·편의", q: "What time do you usually go shopping?", s1: "I shop late on weekday evenings.", s2: "The aisles are quiet and totally empty." },
+    { id: 20, part: "Part 1. 쇼핑·편의", q: "Is customer service important to you?", s1: "Friendly staff service makes a huge difference.", s2: "Rude employees completely ruin my mood." },
+    { id: 21, part: "Part 1. 쇼핑·편의", q: "Do you carry a reusable shopping bag?", s1: "I always keep an eco-bag in my backpack.", s2: "It saves plastic bag fees at the counter." },
+    { id: 22, part: "Part 1. 쇼핑·편의", q: "Do you prefer window shopping?", s1: "I hate wandering around without a plan.", s2: "I only enter stores when I need something." },
+    { id: 23, part: "Part 1. 쇼핑·편의", q: "Have you tried buying furniture online?", s1: "I ordered my computer desk online last year.", s2: "The dimensions fit my corner space perfectly." },
+    { id: 24, part: "Part 1. 쇼핑·편의", q: "Do you buy seasonal sale items?", s1: "I buy winter coats during end-of-season sales.", s2: "The huge price drop saves hundreds of dollars." },
+    { id: 25, part: "Part 1. 쇼핑·편의", q: "How do you decide what to eat for lunch?", s1: "I pick whatever is fastest and closest.", s2: "My lunch hour is too short to waste." },
+
+    // Part 2. 직장, 비즈니스 & 디지털 업무 (26 ~ 50)
+    { id: 26, part: "Part 2. 직장·업무", q: "Do you prefer working from home?", s1: "I totally prefer working from home.", s2: "Skipping the morning commute saves my sanity." },
+    { id: 27, part: "Part 2. 직장·업무", q: "How do you communicate with coworkers?", s1: "I send quick messages on business chat apps.", s2: "Typing a short text prevents pointless meetings." },
+    { id: 28, part: "Part 2. 직장·업무", q: "Do you prefer working in a quiet space?", s1: "I need complete silence to stay productive.", s2: "Tiny background noises break my concentration." },
+    { id: 29, part: "Part 2. 직장·업무", q: "What is the most stressful part of work?", s1: "Unrealistic deadlines stress me out the most.", s2: "Rushing tasks always results in careless errors." },
+    { id: 30, part: "Part 2. 직장·업무", q: "Do you like attending video conferences?", s1: "I prefer video calls over face-to-face meetings.", s2: "Everyone shares screen documents without printing." },
+    { id: 31, part: "Part 2. 직장·업무", q: "How do you organize your daily tasks?", s1: "I write a simple checklist every morning.", s2: "Crossing off completed items keeps me motivated." },
+    { id: 32, part: "Part 2. 직장·업무", q: "Do you prefer working alone or in a team?", s1: "I work much faster when working independently.", s2: "Aligning different opinions takes up too much time." },
+    { id: 33, part: "Part 2. 직장·업무", q: "What makes a great team leader?", s1: "A great leader must listen to staff opinions.", s2: "Ignoring feedback destroys team morale." },
+    { id: 34, part: "Part 2. 직장·업무", q: "Do you take breaks during work hours?", s1: "I take a five-minute walk every two hours.", s2: "Stretching my back resets my focus." },
+    { id: 35, part: "Part 2. 직장·업무", q: "Is punctuality important in the office?", s1: "Being on time shows basic professional respect.", s2: "Late arrivals disrupt the entire meeting schedule." },
+    { id: 36, part: "Part 2. 직장·업무", q: "Do you use AI tools for your work?", s1: "I use generative AI assistants every single day.", s2: "It drafts email outlines in three seconds." },
+    { id: 37, part: "Part 2. 직장·업무", q: "How do you deal with a difficult client?", s1: "I always stay calm and listen carefully.", s2: "Arguing with an angry customer makes things worse." },
+    { id: 38, part: "Part 2. 직장·업무", q: "Would you accept a job with a long commute?", s1: "I would reject any job with a two-hour commute.", s2: "Spending four hours on the road causes burnout." },
+    { id: 39, part: "Part 2. 직장·업무", q: "Do you work on weekends sometimes?", s1: "I strictly disconnect from work on weekends.", s2: "Resting properly recharges my mental battery." },
+    { id: 40, part: "Part 2. 직장·업무", q: "What is the best way to train new employees?", s1: "One-on-one practical coaching works the best.", s2: "Hands-on practice beats reading dry manuals." },
+    { id: 41, part: "Part 2. 직장·업무", q: "Do you prefer email or phone calls?", s1: "I prefer sending clear email summaries.", s2: "Written records prevent misunderstandings later." },
+    { id: 42, part: "Part 2. 직장·업무", q: "Should companies allow casual dress codes?", s1: "Companies should definitely permit casual clothes.", s2: "Comfortable hoodies and sneakers boost creativity." },
+    { id: 43, part: "Part 2. 직장·업무", q: "How do you handle sudden work emergencies?", s1: "I prioritize the most urgent issue first.", s2: "Panicking solves nothing when problems happen." },
+    { id: 44, part: "Part 2. 직장·업무", q: "Have you ever given a business presentation?", s1: "I presented a project proposal last quarter.", s2: "I kept my presentation slides visual and short." },
+    { id: 45, part: "Part 2. 직장·업무", q: "Do you prefer salary or job satisfaction?", s1: "Job satisfaction matters much more than salary.", s2: "High pay cannot fix daily emotional misery." },
+    { id: 46, part: "Part 2. 직장·업무", q: "How do you keep up with industry trends?", s1: "I read tech newsletters during my commute.", s2: "They summarize critical market news concisely." },
+    { id: 47, part: "Part 2. 직장·업무", q: "Do you print documents at work?", s1: "I rarely print paper documents anymore.", s2: "Reading PDFs on my tablet saves paper." },
+    { id: 48, part: "Part 2. 직장·업무", q: "Should companies offer flexible working hours?", s1: "Flexible hours should be standard everywhere.", s2: "People hit peak productivity at different times." },
+    { id: 49, part: "Part 2. 직장·업무", q: "How do you celebrate a project completion?", s1: "Our team grabs a delicious dinner together.", s2: "Good food is the best reward for hard work." },
+    { id: 50, part: "Part 2. 직장·업무", q: "Do you want to run your own business someday?", s1: "I definitely want to launch my own business.", s2: "Working for my own dreams is truly exciting." },
+
+    // Part 3. 여가, 취미, 건강 & 여행 (51 ~ 75)
+    { id: 51, part: "Part 3. 여가·건강", q: "What do you usually do on weekends?", s1: "I usually stay home and recharge completely.", s2: "Binging Netflix on the couch melts my fatigue." },
+    { id: 52, part: "Part 3. 여가·건강", q: "How often do you exercise each week?", s1: "I go jogging three times a week.", s2: "Running in the cool night breeze clears my head." },
+    { id: 53, part: "Part 3. 여가·건강", q: "Do you prefer traveling alone or in a group?", s1: "I strongly prefer solo travel.", s2: "I can change my itinerary without asking anyone." },
+    { id: 54, part: "Part 3. 여가·건강", q: "What is your favorite way to relax?", s1: "Listening to calm acoustic music relaxes me most.", s2: "Soft guitar sounds block out noisy worries." },
+    { id: 55, part: "Part 3. 여가·건강", q: "Do you prefer reading books or watching movies?", s1: "I prefer watching two-hour movies.", s2: "Visual storytelling entertains me much faster." },
+    { id: 56, part: "Part 3. 여가·건강", q: "Where do you want to travel next?", s1: "I want to visit a quiet seaside town.", s2: "Staring at blue ocean waves relieves my stress." },
+    { id: 57, part: "Part 3. 여가·건강", q: "Do you play any musical instruments?", s1: "I play the acoustic guitar in my free time.", s2: "Strumming basic chords calms my racing mind." },
+    { id: 58, part: "Part 3. 여가·건강", q: "What kind of workout do you hate most?", s1: "I absolutely despise heavy weightlifting.", s2: "Sore muscles the next day feel awful." },
+    { id: 59, part: "Part 3. 여가·건강", q: "Do you like outdoor activities like hiking?", s1: "I avoid climbing steep mountains at all costs.", s2: "My knees hurt badly on rocky downhill paths." },
+    { id: 60, part: "Part 3. 여가·건강", q: "How many hours of sleep do you need?", s1: "I need at least seven hours of deep sleep.", s2: "Sleeping less than six hours ruins my workday." },
+    { id: 61, part: "Part 3. 여가·건강", q: "Do you prefer beach resorts or city tours?", s1: "I always pick relaxing beachfront resorts.", s2: "Lying by the pool with a book is pure bliss." },
+    { id: 62, part: "Part 3. 여가·건강", q: "Have you ever attended a live music concert?", s1: "I went to an outdoor rock concert last summer.", s2: "The explosive bass vibrations gave me goosebumps." },
+    { id: 63, part: "Part 3. 여가·건강", q: "Do you enjoy cooking as a hobby?", s1: "Cooking is my favorite weekend hobby.", s2: "Making pasta from scratch brings me genuine joy." },
+    { id: 64, part: "Part 3. 여가·건강", q: "What do you pack first for a trip?", s1: "I pack my smartphone charger and power bank first.", s2: "A dead phone battery during travel is terrifying." },
+    { id: 65, part: "Part 3. 여가·건강", q: "Do you take vitamins or health supplements?", s1: "I take multivitamin pills every single morning.", s2: "It keeps my daily energy level stable." },
+    { id: 66, part: "Part 3. 여가·건강", q: "How do you spend rainy weekends?", s1: "I make warm tea and read indoor books.", s2: "Listening to raindrops against the window feels cozy." },
+    { id: 67, part: "Part 3. 여가·건강", q: "Do you take photos while traveling?", s1: "I snap quick photos of street food and scenery.", s2: "Looking at travel pictures brings back vivid memories." },
+    { id: 68, part: "Part 3. 여가·건강", q: "Do you like playing mobile video games?", s1: "I play simple puzzle games on the subway.", s2: "Solving quick stages passes the commute time." },
+    { id: 69, part: "Part 3. 여가·건강", q: "Have you tried extreme sports like surfing?", s1: "I tried beginner surfing lessons in Jeju once.", s2: "I fell into the ocean ten times in an hour." },
+    { id: 70, part: "Part 3. 여가·건강", q: "How do you stay hydrated every day?", s1: "I carry a large thermal tumbler everywhere.", s2: "Sipping cold water prevents midday headaches." },
+    { id: 71, part: "Part 3. 여가·건강", q: "Do you prefer planning trips or being spontaneous?", s1: "I always make detailed daily travel plans.", s2: "Booking hotels in advance prevents sudden panic." },
+    { id: 72, part: "Part 3. 여가·건강", q: "What is your favorite season of the year?", s1: "Autumn is my absolute favorite season.", s2: "The crisp cool breeze feels refreshing." },
+    { id: 73, part: "Part 3. 여가·건강", q: "Do you like visiting art museums?", s1: "I enjoy visiting modern art galleries occasionally.", s2: "Staring at creative paintings sparks fresh inspiration." },
+    { id: 74, part: "Part 3. 여가·건강", q: "How do you cure a bad cold?", s1: "I drink warm honey lemon water and sleep.", s2: "Deep rest is the only real cure for a cold." },
+    { id: 75, part: "Part 3. 여가·건강", q: "Do you prefer morning or night workouts?", s1: "I prefer working out late in the evening.", s2: "It helps me fall into a deep sleep at night." },
+
+    // Part 4. IT, 모바일 & 현대 사회 이슈 (76 ~ 100)
+    { id: 76, part: "Part 4. IT·사회", q: "Do you watch short-form videos often?", s1: "I try to stay away from short-form clips.", s2: "Flicking through 15-second videos destroys my attention." },
+    { id: 77, part: "Part 4. IT·사회", q: "Do you prefer wireless earbuds over wired?", s1: "I can never go back to wired earphones.", s2: "Tangled cords in my pocket drove me crazy." },
+    { id: 78, part: "Part 4. IT·사회", q: "Should schools ban smartphones in class?", s1: "Classrooms should strictly remain phone-free zones.", s2: "Social media notifications distract students during lectures." },
+    { id: 79, part: "Part 4. IT·사회", q: "Do you subscribe to multiple OTT streaming apps?", s1: "I only keep one streaming subscription active.", s2: "Paying for three apps at once is a waste of money." },
+    { id: 80, part: "Part 4. IT·사회", q: "Is learning a foreign language still useful?", s1: "Speaking English directly builds genuine human trust.", s2: "Translating machines cannot replace eye-to-eye rapport." },
+    { id: 81, part: "Part 4. IT·사회", q: "Do you carry physical books or a tablet?", s1: "I carry an e-reader tablet in my bag.", s2: "Carrying ten heavy paper books ruins my shoulder." },
+    { id: 82, part: "Part 4. IT·사회", q: "Should cities build more dedicated bike lanes?", s1: "Cities must expand separated bike lanes immediately.", s2: "It cuts vehicle traffic gridlock and toxic emissions." },
+    { id: 83, part: "Part 4. IT·사회", q: "Do you support a four-day workweek?", s1: "I fully support adopting a four-day workweek.", s2: "Well-rested employees produce much sharper results." },
+    { id: 84, part: "Part 4. IT·사회", q: "Do you worry about smartphone screen time?", s1: "I check my screen time usage every Sunday.", s2: "Seeing four hours of mindless scrolling shocks me." },
+    { id: 85, part: "Part 4. IT·사회", q: "Should stores stop printing paper receipts?", s1: "Paper receipts should be completely phased out.", s2: "Most people toss them straight into trash cans." },
+    { id: 86, part: "Part 4. IT·사회", q: "Do you use noise-canceling headphones?", s1: "Active noise cancelation is an absolute lifesaver.", s2: "It blocks loud train rumbling and noisy chatter." },
+    { id: 87, part: "Part 4. IT·사회", q: "Would you ride in a driverless robotaxi?", s1: "I would gladly ride in an autonomous vehicle.", s2: "Computers never drive drunk or fall asleep." },
+    { id: 88, part: "Part 4. IT·사회", q: "Do you back up your digital photos?", s1: "I sync all my phone pictures to cloud storage.", s2: "Losing precious family photos would break my heart." },
+    { id: 89, part: "Part 4. IT·사회", q: "Is social media harmful to teenagers?", s1: "Social media creates toxic social comparison.", s2: "Seeing fake luxury lives triggers severe teen anxiety." },
+    { id: 90, part: "Part 4. IT·사회", q: "Do you prefer text messages or voice calls?", s1: "I almost always prefer sending text messages.", s2: "Sudden phone calls interrupt my work focus." },
+    { id: 91, part: "Part 4. IT·사회", q: "Should governments ban single-use plastic cups?", s1: "Single-use plastic cups must be banned strictly.", s2: "Plastic trash is choking our oceans and marine life." },
+    { id: 92, part: "Part 4. IT·사회", q: "How often do you replace your smartphone?", s1: "I keep using my phone for four straight years.", s2: "New annual models only offer tiny camera upgrades." },
+    { id: 93, part: "Part 4. IT·사회", q: "Do you use smart watch health features?", s1: "My smart watch tracks my daily steps and heart rate.", s2: "Closing my daily activity rings keeps me active." },
+    { id: 94, part: "Part 4. IT·사회", q: "Should public transit fares be cheaper?", s1: "Subway fares should stay affordable for everyone.", s2: "Low transit costs encourage green commuting." },
+    { id: 95, part: "Part 4. IT·사회", q: "Do you prefer electric vehicles over gas cars?", s1: "Electric cars are the future of daily driving.", s2: "Zero exhaust fumes and quiet acceleration feel amazing." },
+    { id: 96, part: "Part 4. IT·사회", q: "How do you organize your desktop icons?", s1: "I clean my computer desktop every Friday afternoon.", s2: "A messy screen slows down my file searching." },
+    { id: 97, part: "Part 4. IT·사회", q: "Should companies provide free lunch to staff?", s1: "Free cafeteria meals are a fantastic employee perk.", s2: "Deciding where to eat lunch wastes thirty minutes." },
+    { id: 98, part: "Part 4. IT·사회", q: "Do you shop online late at night?", s1: "I banned myself from midnight online shopping.", s2: "Sleepy brains make terrible financial choices." },
+    { id: 99, part: "Part 4. IT·사회", q: "Is public Wi-Fi safe to use?", s1: "I never access my bank accounts on public Wi-Fi.", s2: "Unsecured networks leave passwords vulnerable to hackers." },
+    { id: 100, part: "Part 4. IT·사회", q: "What is the best part of modern technology?", s1: "Video calling family abroad is the greatest convenience.", s2: "I can see my relatives' smiles from across the world." }
+  ];
+
+  let playlist = [...rawBank];
+  let currentIndex = 0;
+  let isPlaying = false;
+  let isRandom = false;
+  let isRecording = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  // Web Speech API 인식 객체
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+  }
+
+  const playNativeBtn = document.getElementById("playNativeBtn");
+  const recordSyncBtn = document.getElementById("recordSyncBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const metaBadge = document.getElementById("metaBadge");
+  const partTag = document.getElementById("partTag");
+  const questionBox = document.getElementById("questionBox");
+  const qText = document.getElementById("qText");
+  const step1 = document.getElementById("step1");
+  const step2 = document.getElementById("step2");
+  const textS1 = document.getElementById("textS1");
+  const textS2 = document.getElementById("textS2");
+  const recIndicator = document.getElementById("recIndicator");
+  const recStatusText = document.getElementById("recStatusText");
+  const syncScoreNum = document.getElementById("syncScoreNum");
+  const heardText = document.getElementById("heardText");
+  const qaList = document.getElementById("qaList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() { voices = synth.getVoices() || []; }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function getEnVoice() {
+    if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+    return voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // 레벤슈타인 거리 기반 텍스트 싱크로율 계산 (0~100%)
+  function calculateSimilarity(str1, str2) {
+    const s1 = str1.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    const s2 = str2.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    if (s1 === s2) return 100;
+    if (s1.length === 0 || s2.length === 0) return 0;
+
+    const matrix = [];
+    for (let i = 0; i <= s2.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= s1.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= s2.length; i++) {
+      for (let j = 1; j <= s1.length; j++) {
+        if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    const distance = matrix[s2.length][s1.length];
+    const maxLen = Math.max(s1.length, s2.length);
+    const score = Math.round(((maxLen - distance) / maxLen) * 100);
+    return Math.max(0, score);
+  }
+
+  function renderList() {
+    qaList.innerHTML = "";
+    rawBank.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "qa-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-q">${item.id}. ${item.q}</div>
+        <div class="item-ans"><b>[1]</b> ${item.s1}<br><b>[2]</b> ${item.s2}</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+      });
+      qaList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".qa-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    metaBadge.innerText = `Question ${currentIndex + 1} / ${playlist.length}`;
+    partTag.innerText = curr.part;
+    qText.innerText = curr.q;
+    textS1.innerText = curr.s1;
+    textS2.innerText = curr.s2;
+
+    clearHighlights();
+    syncScoreNum.innerText = "--%";
+    syncScoreNum.style.color = "var(--success)";
+    heardText.innerText = "🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 위 두 문장을 말씀해 보세요.";
+  }
+
+  function clearHighlights() {
+    questionBox.classList.remove("active");
+    step1.classList.remove("active");
+    step2.classList.remove("active");
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakText(text, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isPlaying) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      const voice = getEnVoice();
+      if (voice) utter.voice = voice;
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 5) * 1000 * (1 / rate) + 3800;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  async function playNativePair() {
+    unlockAudio();
+    if (isPlaying) {
+      stopPlayback();
+      return;
+    }
+    isPlaying = true;
+    playNativeBtn.innerText = "⏸ 멈춤";
+    clearHighlights();
+
+    const curr = playlist[currentIndex];
+    const spd = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 질문 낭독
+    questionBox.classList.add("active");
+    await speakText(curr.q, spd);
+    questionBox.classList.remove("active");
+    await sleep(delay);
+
+    if (!isPlaying) return;
+
+    // 1문장 (결론 단문)
+    step1.classList.add("active");
+    await speakText(curr.s1, spd);
+    step1.classList.remove("active");
+    await sleep(250);
+
+    if (!isPlaying) return;
+
+    // 2문장 (팩트 단문)
+    step2.classList.add("active");
+    await speakText(curr.s2, spd);
+    step2.classList.remove("active");
+
+    stopPlayback();
+  }
+
+  function stopPlayback() {
+    isPlaying = false;
+    synth.cancel();
+    playNativeBtn.innerText = "▶ 원어민 페어링 듣기";
+    clearHighlights();
+  }
+
+  // 녹음 & 싱크로율 판정
+  function startRecordingSync() {
+    if (!recognition) {
+      alert("현재 브라우저는 Web Speech API 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 이용해 주세요.");
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+
+    stopPlayback();
+    isRecording = true;
+    recordSyncBtn.classList.add("recording");
+    recordSyncBtn.innerText = "⏹ 녹음 완료 (분석 중...)";
+    recIndicator.classList.add("recording");
+    recStatusText.innerText = "음성 청취 중... (지금 말씀하세요)";
+    heardText.innerText = "듣고 있습니다... 말씀이 끝나면 마이크가 자동으로 꺼집니다.";
+    syncScoreNum.innerText = "...";
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      heardText.innerText = `🗣️ 인식된 발화: "${transcript}"`;
+
+      const curr = playlist[currentIndex];
+      const targetFull = `${curr.s1} ${curr.s2}`;
+      const score = calculateSimilarity(transcript, targetFull);
+
+      syncScoreNum.innerText = `${score}%`;
+      if (score >= 80) {
+        syncScoreNum.style.color = "var(--success)";
+      } else if (score >= 50) {
+        syncScoreNum.style.color = "var(--cue)";
+      } else {
+        syncScoreNum.style.color = "var(--danger)";
+      }
+    };
+
+    recognition.onerror = (event) => {
+      recStatusText.innerText = "인식 오류 발생 (" + event.error + ")";
+      heardText.innerText = "마이크 입력을 확인하지 못했습니다. 다시 시도해 주세요.";
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      recordSyncBtn.classList.remove("recording");
+      recordSyncBtn.innerText = "🔴 답변 녹음 & 싱크 분석";
+      recIndicator.classList.remove("recording");
+      recStatusText.innerText = "분석 완료";
+    };
+  }
+
+  playNativeBtn.addEventListener("click", playNativePair);
+  recordSyncBtn.addEventListener("click", startRecordingSync);
+
+  prevBtn.addEventListener("click", () => {
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "var(--accent)" : "#fff";
+    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
