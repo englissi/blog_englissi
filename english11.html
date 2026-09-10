@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>동시 낭독(Simultaneous Reading) 100 마스터</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --danger: #f43f5e;
+      --success: #34d399;
+      --count-cue: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0.8rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.3rem 0;
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* 동시 낭독 스테이지 */
+    .stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.6rem 1.1rem 1.4rem;
+      text-align: center;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    .meta-badge {
+      position: absolute;
+      top: 0.8rem;
+      left: 0.8rem;
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .part-tag {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      font-size: 0.72rem;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    /* 3-2-1 발화 카운트다운 큐 */
+    .countdown-display {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--count-cue);
+      min-height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+      transition: transform 0.1s;
+    }
+    .countdown-display.active {
+      transform: scale(1.15);
+      text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+    }
+
+    .target-ko {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+      word-break: keep-all;
+      line-height: 1.4;
+    }
+
+    /* 동시 낭독 타깃 영문 (강조 애니메이션) */
+    .target-en {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #94a3b8;
+      line-height: 1.45;
+      word-break: keep-all;
+      min-height: 4.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.75rem;
+    }
+
+    .target-en.simul-active {
+      color: #fff;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: scale(1.02);
+    }
+
+    /* 호흡 & 연음 포인트 가이드 */
+    .rhythm-guide {
+      margin-top: 0.8rem;
+      font-size: 0.82rem;
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed #334155;
+      padding: 0.35rem 0.8rem;
+      border-radius: 0.5rem;
+      min-height: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 하단 조작 패널 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    button.btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 100문장 리스트 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .sentence-list {
+      list-style: none;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .sentence-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-item.playing {
+      background: rgba(56, 189, 248, 0.12);
+      border-left: 4px solid var(--accent);
+    }
+
+    .item-ko {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-en {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #bae6fd;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-rhythm {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>동시 낭독(Simultaneous Reading) 100</h1>
+    <p>3-2-1 큐에 맞춰 원어민 목소리 위로 내 목소리를 0.1초 차이 없이 포개세요.</p>
+  </header>
+
+  <div class="stage-card" id="stageCard">
+    <div class="meta-badge" id="metaBadge">Sentence 1 / 100</div>
+    <div class="part-tag" id="partTag">Part 1. 돌발 상황</div>
+
+    <!-- 3-2-1 카운트다운 알림창 -->
+    <div class="countdown-display" id="countdownDisplay">준비 (Ready)</div>
+
+    <div class="target-ko" id="targetKo">재생 버튼을 터치해 동시 낭독을 시작하세요.</div>
+    <div class="target-en" id="targetEn">Simultaneous Reading Ready</div>
+    <div class="rhythm-guide" id="rhythmGuide">💡 호흡 및 연음 가이드가 여기에 표시됩니다.</div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playPauseBtn">▶ 100문장 동시 낭독 시작</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="stopBtn">⏹ 정지</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">원어민 속도:</label>
+      <select id="speedSelect">
+        <option value="0.85">0.85x (입풀기)</option>
+        <option value="0.95" selected>1.0x (표준 동기화)</option>
+        <option value="1.1">1.1x (실전 고속)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">문장 대기 시간:</label>
+      <select id="intervalSelect">
+        <option value="1200">1.2초 (빠른 호흡)</option>
+        <option value="1800" selected>1.8초 (숨고르기)</option>
+        <option value="2500">2.5초 (여유)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>100문장 동시 낭독 코스</span>
+      <span>터치 시 해당 문장 즉시 이동</span>
+    </div>
+    <ul class="sentence-list" id="sentenceList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawData = [
+    // Part 1. 일상 돌발 상황 & 긴급 반응 (01 ~ 25)
+    { id: 1, part: "Part 1. 돌발 상황", ko: "회의에 늦어 뛰어 들어옴", en: "I'm so sorry I'm late. The traffic was unbelievable.", rhythm: "[late] 마침표 뚝 끊고, [un-be-LIEV-able] 강세" },
+    { id: 2, part: "Part 1. 돌발 상황", ko: "갑작스러운 폭우에 젖음", en: "I got totally soaked. It started pouring out of nowhere.", rhythm: "[got totally] 부드럽게 연결, [POUR-ing] 길게" },
+    { id: 3, part: "Part 1. 돌발 상황", ko: "커피 마시고 피로 회복", en: "This coffee really helps. I'm finally waking up.", rhythm: "[really helps] 툭 던지고, [waking up] 한 호흡" },
+    { id: 4, part: "Part 1. 돌발 상황", ko: "상대방 설명 단번에 이해", en: "I get your point now. That makes complete sense.", rhythm: "[get your point] 빠르게, [complete SENSE] 강조" },
+    { id: 5, part: "Part 1. 돌발 상황", ko: "무거운 가방 내려놓기", en: "This bag is killing me. Let me put it down.", rhythm: "[killing me] 스타카토, [put-it-down] 연음" },
+    { id: 6, part: "Part 1. 돌발 상황", ko: "배터리 방전으로 먹통", en: "My phone completely died. The screen just went black.", rhythm: "[died]에서 숨 고르고, [went black] 하강조" },
+    { id: 7, part: "Part 1. 돌발 상황", ko: "갑작스러운 약속 취소", en: "He just canceled on me. Now I have some free time.", rhythm: "[can-celed on me] 리듬, [FREE time] 경쾌하게" },
+    { id: 8, part: "Part 1. 돌발 상황", ko: "식당 문 닫혀서 헛걸음", en: "The doors are locked. Looks like they're closed today.", rhythm: "[locked] 단호하게 끊기, [closed to-day] 안정감" },
+    { id: 9, part: "Part 1. 돌발 상황", ko: "마감 직전 아슬아슬 완료", en: "I barely made the deadline. That was a close call.", rhythm: "[barely made] 속도감, [CLOSE call] 또렷하게" },
+    { id: 10, part: "Part 1. 돌발 상황", ko: "빙판길에 미끄러질 뻔함", en: "Watch your step out there. The floor is super slippery.", rhythm: "[Watch your step] 경고조, [SLIP-pery] 탄력" },
+    { id: 11, part: "Part 1. 돌발 상황", ko: "지갑 두고 와서 계산 불가", en: "I have no cash on me. I left my wallet at home.", rhythm: "[no cash] 명확히, [wallet at home] 부드럽게" },
+    { id: 12, part: "Part 1. 돌발 상황", ko: "버스가 바로 눈앞에서 출발", en: "I just missed the bus. It pulled away right in front of me.", rhythm: "[missed the bus] 짧게, [pulled a-way] 슬라이드" },
+    { id: 13, part: "Part 1. 돌발 상황", ko: "엘리베이터 점검 중", en: "The elevator isn't working. Let's take the stairs.", rhythm: "[isn't working] 플랫하게, [take the stairs] 리듬" },
+    { id: 14, part: "Part 1. 돌발 상황", ko: "새 구두 때문에 뒤꿈치 까짐", en: "These shoes are hurting my feet. I need to sit down.", rhythm: "[hurting my feet] 빠르게, [sit down] 가볍게" },
+    { id: 15, part: "Part 1. 돌발 상황", ko: "맛있는 음식 냄새 맡음", en: "This smells amazing. My mouth is watering already.", rhythm: "[smells a-mazing] 감탄조, [WA-ter-ing] 부드럽게" },
+    { id: 16, part: "Part 1. 돌발 상황", ko: "창문 틈새로 찬바람 쌩쌩", en: "Close the window tight. Cold air is leaking right in.", rhythm: "[window tight] 딱 끊고, [leaking right in] 신속히" },
+    { id: 17, part: "Part 1. 돌발 상황", ko: "바람에 모자 날아감", en: "My hat blew away. I have to run and grab it.", rhythm: "[blew a-way] 높게, [run and grab it] 연음" },
+    { id: 18, part: "Part 1. 돌발 상황", ko: "회의 마감 시간 촉박", en: "Hurry up everyone. We are running out of time.", rhythm: "[Hurry up] 툭 던지고, [running out of] 한 덩어리" },
+    { id: 19, part: "Part 1. 돌발 상황", ko: "두꺼운 겉옷 벗고 땀 식힘", en: "I took off my heavy jacket. It was way too hot inside.", rhythm: "[took off] 연음, [way too hot] 또박또박" },
+    { id: 20, part: "Part 1. 돌발 상황", ko: "국물이 너무 뜨거워 멈칫", en: "Don't drink it yet. The soup is boiling hot.", rhythm: "[drink it yet] 끊어치기, [BOIL-ing hot] 강세" },
+    { id: 21, part: "Part 1. 돌발 상황", ko: "주변 소음으로 통화 불가", en: "I can't hear you at all. It is way too noisy here.", rhythm: "[hear you at all] 연결, [too NOIS-y] 방점" },
+    { id: 22, part: "Part 1. 돌발 상황", ko: "컴퓨터 화면 완전 멈춤", en: "The screen froze completely. It's not responding at all.", rhythm: "[froze com-pletely] 무겁게, [not re-spond-ing] 단문" },
+    { id: 23, part: "Part 1. 돌발 상황", ko: "계단에서 발 헛디딤", en: "I twisted my ankle badly. I slipped on the last step.", rhythm: "[twisted my ankle] 둔탁하게, [last step] 종결" },
+    { id: 24, part: "Part 1. 돌발 상황", ko: "지하철 반대 방향 탑승", en: "I got on the wrong train. It's heading the other way.", rhythm: "[wrong train] 강조, [other way] 빠르게 이동" },
+    { id: 25, part: "Part 1. 돌발 상황", ko: "셔츠에 음식 얼룩 튐", en: "Look at my clean shirt. A red stain just popped.", rhythm: "[clean shirt] 반어적 억양, [stain popped] 짧게" },
+
+    // Part 2. 신체 상태 & 감정 변화 (26 ~ 50)
+    { id: 26, part: "Part 2. 신체·감정", ko: "물 한 병 단숨에 비움", en: "I drank the whole bottle down. I was dying of thirst.", rhythm: "[whole bottle down] 삼키듯, [dying of thirst] 호흡" },
+    { id: 27, part: "Part 2. 신체·감정", ko: "방안이 어지러워 한숨 쉼", en: "My room is such a mess. I can't find anything.", rhythm: "[such a mess] 강하게, [can't find a-ny-thing] 연결" },
+    { id: 28, part: "Part 2. 신체·감정", ko: "안경 벗어 앞이 안 보임", en: "I can't see a single thing. I forgot to wear my glasses.", rhythm: "[single thing] 딱 자르고, [glasses] 하강" },
+    { id: 29, part: "Part 2. 신체·감정", ko: "소파에 파묻혀 안 일어남", en: "I'm totally stuck on the couch. I have zero energy today.", rhythm: "[stuck on the couch] 늘어지게, [zero EN-er-gy] 포인트" },
+    { id: 30, part: "Part 2. 신체·감정", ko: "목이 간질거리며 기침 남", en: "My throat feels very dry. A bad cough keeps coming up.", rhythm: "[feels very dry] 가볍게, [keeps com-ing up] 연음" },
+    { id: 31, part: "Part 2. 신체·감정", ko: "바람에 우산 살 뒤집힘", en: "The strong wind turned my umbrella inside out.", rhythm: "[strong wind] 힘주고, [in-side OUT] 강한 악센트" },
+    { id: 32, part: "Part 2. 신체·감정", ko: "야근 중 졸려 눈꺼풀 감김", en: "My eyes keep shutting on me. I really need some sleep.", rhythm: "[shut-ting on me] 리듬, [really need] 간절하게" },
+    { id: 33, part: "Part 2. 신체·감정", ko: "가방 밑바닥에서 열쇠 찾음", en: "I finally grabbed the keys. They were buried deep inside.", rhythm: "[grabbed the keys] 쾌감, [bur-ied deep] 또렷하게" },
+    { id: 34, part: "Part 2. 신체·감정", ko: "풀린 신발 끈 밟고 휘청", en: "Watch out for your long laces. They are completely undone.", rhythm: "[Watch out] 짧게, [com-pletely un-done] 강조" },
+    { id: 35, part: "Part 2. 신체·감정", ko: "배에서 꼬르륵 요동침", en: "My stomach is growling crazy. Let's go grab something to eat.", rhythm: "[growling crazy] 탄력, [grab some-thing] 스피드" },
+    { id: 36, part: "Part 2. 신체·감정", ko: "지도 앱 따라가다 막다른 길", en: "We are completely lost. This alley is a total dead end.", rhythm: "[com-pletely lost] 멈춤, [dead END] 단호하게" },
+    { id: 37, part: "Part 2. 신체·감정", ko: "백팩 지퍼 열려 물건 쏟아짐", en: "Your backpack is wide open. Your papers are falling out.", rhythm: "[wide open] 경고 억양, [fall-ing out] 매끄럽게" },
+    { id: 38, part: "Part 2. 신체·감정", ko: "창문을 굵게 때리는 빗소리", en: "Look outside the bedroom window. The rain is pounding hard.", rhythm: "[bedroom window] 연결, [POUND-ing hard] 리듬감" },
+    { id: 39, part: "Part 2. 신체·감정", ko: "귓가에서 맴도는 모기 소리", en: "A mosquito is buzzing around. It won't leave me alone.", rhythm: "[buz-zing a-round] 찌르듯, [leave me a-lone] 앙칼지게" },
+    { id: 40, part: "Part 2. 신체·감정", ko: "팬 위에서 계란 익는 소리", en: "The pan is smoking hot. The eggs are sizzling nicely.", rhythm: "[smoking hot] 직관적, [SIZ-zling nicely] 의성어 억양" },
+    { id: 41, part: "Part 2. 신체·감정", ko: "두꺼운 책 덮고 기지개", en: "I finished reading the chapter. I need a good stretch.", rhythm: "[fin-ished reading] 툭, [good stretch] 몸 펴듯 길게" },
+    { id: 42, part: "Part 2. 신체·감정", ko: "차 창문 내리고 바람 쐼", en: "Roll down the side window. The cool breeze feels amazing.", rhythm: "[Roll down] 굴리고, [feels a-MAZ-ing] 환호 억양" },
+    { id: 43, part: "Part 2. 신체·감정", ko: "서랍 속 물건 급하게 뒤짐", en: "I'm tearing this drawer apart. Where did I leave that file?", rhythm: "[tear-ing apart] 격앙, [WHERE did I] 의문형" },
+    { id: 44, part: "Part 2. 신체·감정", ko: "뜨거운 머그잔 쥐고 온기 느낌", en: "Hold this hot mug with both hands. It will warm you right up.", rhythm: "[both hands] 또박, [warm you right up] 물 흐르듯" },
+    { id: 45, part: "Part 2. 신체·감정", ko: "쓰레기봉투 묶어 문밖에 둠", en: "Tie this big trash bag tight. It is full to the top.", rhythm: "[bag tight] 끊고, [full to the top] 안정감" },
+    { id: 46, part: "Part 2. 신체·감정", ko: "초록 불 깜빡여서 전력 질주", en: "Run across the street now. The green light is flashing.", rhythm: "[Run across] 추진력, [is FLASH-ing] 긴박하게" },
+    { id: 47, part: "Part 2. 신체·감정", ko: "불 끄자마자 방안 캄캄해짐", en: "Turn off the reading lamp. The whole room is pitch black.", rhythm: "[read-ing lamp] 자르고, [pitch BLACK] 하강" },
+    { id: 48, part: "Part 2. 신체·감정", ko: "골치 아픈 난제 해결 후 안도", en: "We finally sorted it out. The hardest part is gone.", rhythm: "[sor-ted it out] 매끄럽게, [GONE] 숨 내쉬듯" },
+    { id: 49, part: "Part 2. 신체·감정", ko: "칭찬 듣고 기분 날아갈 듯함", en: "Your kind words made my day. I feel so much better.", rhythm: "[made my day] 감동조, [much bet-ter] 밝게" },
+    { id: 50, part: "Part 2. 신체·감정", ko: "발표 무사히 마치고 다리 풀림", en: "The big presentation is done. My legs are shaking.", rhythm: "[is done] 뚝 마침표, [shak-ing] 털어내듯" },
+
+    // Part 3. 직장 업무 & 실전 소통 (51 ~ 75)
+    { id: 51, part: "Part 3. 직장·소통", ko: "회의 자료 출력하려는데 용지 없음", en: "The printer is out of paper. Put some more in the tray.", rhythm: "[out of paper] 한 호흡, [in the tray] 가볍게" },
+    { id: 52, part: "Part 3. 직장·소통", ko: "상대방 제안에 전적으로 동의", en: "I agree with you completely. That sounds like a plan.", rhythm: "[com-pletely] 찍고, [sounds like a PLAN] 리듬" },
+    { id: 53, part: "Part 3. 직장·소통", ko: "일정이 꼬여 미팅 시간 재조정", en: "My morning schedule is messed up. Can we push it back?", rhythm: "[messed up] 짧게 끊기, [push it back] 연음" },
+    { id: 54, part: "Part 3. 직장·소통", ko: "엑셀 파일 저장 안 하고 꺼짐", en: "I lost the whole file. The application suddenly crashed.", rhythm: "[whole file] 망연자실, [sud-denly CRASHED] 강세" },
+    { id: 55, part: "Part 3. 직장·소통", ko: "상대방 부탁을 정중히 거절", en: "I'd love to help you out. But I'm tied up right now.", rhythm: "[help you out] 친절하게, [tied up] 단호하게" },
+    { id: 56, part: "Part 3. 직장·소통", ko: "동료에게 커피 한 잔 권유", en: "Let's take a quick breather. I need some iced coffee.", rhythm: "[quick breath-er] 경쾌하게, [iced cof-fee] 또렷하게" },
+    { id: 57, part: "Part 3. 직장·소통", ko: "복잡한 계약서 조항 검토 중", en: "Take your time reading this. The terms are very tricky.", rhythm: "[read-ing this] 자르고, [very TRICK-y] 주의 깊게" },
+    { id: 58, part: "Part 3. 직장·소통", ko: "와이파이 비번 물어볼 때", en: "What's the network password here? The signal keeps dropping.", rhythm: "[pass-word here] 올리고, [keeps drop-ping] 짜증조" },
+    { id: 59, part: "Part 3. 직장·소통", ko: "상사에게 보고서 제출 완료", en: "I sent you the weekly report. Please review it when you can.", rhythm: "[week-ly report] 넘기고, [re-view it] 부드럽게" },
+    { id: 60, part: "Part 3. 직장·소통", ko: "전화 통화 끊김으로 재연락 약속", en: "The call is breaking up. I'll call you right back.", rhythm: "[break-ing up] 불안정 리듬, [right back] 확신" },
+    { id: 61, part: "Part 3. 직장·소통", ko: "마이크 음소거 깜빡하고 말함", en: "You are on mute right now. We can't hear a word.", rhythm: "[on MUTE] 지적 억양, [hear a word] 연결" },
+    { id: 62, part: "Part 3. 직장·소통", ko: "중요한 메모 수첩에 적어둠", en: "Jot this number down quickly. Don't lose this slip.", rhythm: "[Jot this down] 신속히, [lose this slip] 정밀하게" },
+    { id: 63, part: "Part 3. 직장·소통", ko: "급한 요청에 우선순위 부여", en: "Put this task first today. Everything else can wait.", rhythm: "[task FIRST] 강조, [else can wait] 쿨하게" },
+    { id: 64, part: "Part 3. 직장·소통", ko: "업무량 폭주로 야근 확정", en: "I'm buried in paperwork. I won't make it home early.", rhythm: "[bur-ied in] 무거운 억양, [make it home] 단숨에" },
+    { id: 65, part: "Part 3. 직장·소통", ko: "회의 도중 질문에 막혀 얼버무림", en: "Let me double check on that. I'll get back to you soon.", rhythm: "[check on that] 방어 리듬, [get back to you] 능숙하게" },
+    { id: 66, part: "Part 3. 직장·소통", ko: "발표 슬라이드 넘겨달라 부탁", en: "Next slide please. Let's move on to the numbers.", rhythm: "[slide please] 담백하게, [move on to] 슬라이딩" },
+    { id: 67, part: "Part 3. 직장·소통", ko: "퇴근길 지하철 승객 꽉 참", en: "The car is packed like sardines. I can barely breathe.", rhythm: "[packed like sar-dines] 비유 억양, [bare-ly breathe] 낮게" },
+    { id: 68, part: "Part 3. 직장·소통", ko: "점심 메뉴 결정 못 내릴 때", en: "I can't make up my mind. Just pick whatever you want.", rhythm: "[up my mind] 툭, [what-ev-er you want] 털어놓듯" },
+    { id: 69, part: "Part 3. 직장·소통", ko: "결재 서류에 사인 요청", en: "Put your signature right here. Then we are good to go.", rhythm: "[right here] 포인팅, [good to GO] 마무리" },
+    { id: 70, part: "Part 3. 직장·소통", ko: "실수 만회하겠다고 다짐", en: "It was my honest mistake. I'll fix it immediately.", rhythm: "[hon-est mistake] 솔직하게, [im-me-diate-ly] 속도감" },
+    { id: 71, part: "Part 3. 직장·소통", ko: "거래처 미팅 장소 도착 알림", en: "I just arrived at the lobby. Take your time coming down.", rhythm: "[at the lob-by] 알림조, [com-ing down] 여유 있게" },
+    { id: 72, part: "Part 3. 직장·소통", ko: "칭찬에 겸손하게 대답", en: "Don't give me all the credit. It was a team effort.", rhythm: "[all the cred-it] 가볍게 밀기, [team EF-fort] 방점" },
+    { id: 73, part: "Part 3. 직장·소통", ko: "서류 폰트 크기 지적", en: "Make the font a bit larger. It is hard to read from here.", rhythm: "[bit lar-ger] 요청조, [hard to read] 단호하게" },
+    { id: 74, part: "Part 3. 직장·소통", ko: "상대방의 지각 핑계 간파", en: "Stop making poor excuses. You just woke up late.", rhythm: "[poor ex-cuses] 쏘아붙이듯, [woke up late] 팩트" },
+    { id: 75, part: "Part 3. 직장·소통", ko: "다음 분기 목표 브리핑", en: "Keep up the solid work. We are heading in the right path.", rhythm: "[sol-id work] 격려, [right PATH] 상승조" },
+
+    // Part 4. 일상 회화 & 관계 티키타카 (76 ~ 100)
+    { id: 76, part: "Part 4. 티키타카", ko: "친구의 비밀 고백에 놀람", en: "You must be kidding me! I can't believe my own ears.", rhythm: "[kid-ding me] 급상승 억양, [be-lieve my ears] 호흡" },
+    { id: 77, part: "Part 4. 티키타카", ko: "식사 계산 내가 하겠다고 나섬", en: "Put your wallet away right now. This lunch is on me.", rhythm: "[wal-let a-way] 단호히, [is ON me] 힘주기" },
+    { id: 78, part: "Part 4. 티키타카", ko: "상대방 말에 오해가 있었을 때", en: "Don't get me wrong here. That wasn't my real intention.", rhythm: "[get me wrong] 멈춤, [in-TEN-tion] 명료하게" },
+    { id: 79, part: "Part 4. 티키타카", ko: "너무 웃겨서 눈물 날 지경", en: "You're cracking me up so hard. Tears are in my eyes.", rhythm: "[crack-ing me up] 리듬감, [in my eyes] 자연스럽게" },
+    { id: 80, part: "Part 4. 티키타카", ko: "오랜만에 만난 지인 반가움", en: "Look who showed up here! It has been way too long.", rhythm: "[who showed up] 탄성, [way too long] 길게 빼기" },
+    { id: 81, part: "Part 4. 티키타카", ko: "서운했던 감정 솔직히 털어놓음", en: "I felt a little left out. You should have called me.", rhythm: "[left out] 가라앉는 톤, [should have called] 후회조" },
+    { id: 82, part: "Part 4. 티키타카", ko: "배달 음식 주문 재촉", en: "Track the delivery rider. My stomach is ready to explode.", rhythm: "[de-liv-er-y] 빠르게, [ex-PLODE] 과장된 억양" },
+    { id: 83, part: "Part 4. 티키타카", ko: "여행 짐 싸는 중 고민", en: "Don't pack too many clothes. We need some empty space.", rhythm: "[ma-ny clothes] 자르고, [emp-ty space] 또렷하게" },
+    { id: 84, part: "Part 4. 티키타카", ko: "비행기 이륙 전 설렘", en: "Turn your device on flight mode. We are taking off soon.", rhythm: "[flight mode] 담백하게, [TAK-ing off] 비상 리듬" },
+    { id: 85, part: "Part 4. 티키타카", ko: "상대방의 새 헤어스타일 칭찬", en: "Your new haircut looks sharp. It really suits your style.", rhythm: "[looks sharp] 짧게, [suits your style] 따뜻하게" },
+    { id: 86, part: "Part 4. 티키타카", ko: "비밀 지켜달라고 신신당부", en: "Keep this between us two. Don't tell a living soul.", rhythm: "[be-tween us two] 낮게, [liv-ing SOUL] 속삭이듯" },
+    { id: 87, part: "Part 4. 티키타카", ko: "쇼핑 중 가격 보고 깜짝 놀람", en: "Put that dress back right now. That price tag is insane.", rhythm: "[dress back] 직결, [is in-SANE] 충격 억양" },
+    { id: 88, part: "Part 4. 티키타카", ko: "고민 상담 중 명쾌한 조언", en: "Follow your deep gut feeling. You already know the answer.", rhythm: "[gut feel-ing] 진중하게, [know the an-swer] 편안히" },
+    { id: 89, part: "Part 4. 티키타카", ko: "운동 끝나고 근육통 호소", en: "I can't even lift my arms. Today's workout was brutal.", rhythm: "[lift my arms] 탈진 톤, [was BRU-tal] 묵직하게" },
+    { id: 90, part: "Part 4. 티키타카", ko: "약속 장소 못 찾아 헤맬 때", en: "I'm standing near exit four. Wave your hand if you see me.", rhythm: "[ex-it four] 좌표 제시, [wave your hand] 신속히" },
+    { id: 91, part: "Part 4. 티키타카", ko: "영화 스포일러 방어", en: "Don't spoil the ending for me. I haven't watched it yet.", rhythm: "[spoil the end-ing] 경고조, [watched it yet] 단절" },
+    { id: 92, part: "Part 4. 티키타카", ko: "상대방 기운 북돋아 주기", en: "Chin up my good friend. You'll smash it next time.", rhythm: "[Chin up] 밝게, [SMASH it] 자신감 넘치게" },
+    { id: 93, part: "Part 4. 티키타카", ko: "시끄러운 음악 볼륨 줄이기", en: "Turn the volume down a notch. My head is splitting open.", rhythm: "[down a notch] 요청, [split-ting o-pen] 고통 톤" },
+    { id: 94, part: "Part 4. 티키타카", ko: "주말 약속 취소하고 방콕", en: "I'm calling it an early night. I need some quiet alone time.", rhythm: "[ear-ly night] 평온하게, [a-lone time] 여유" },
+    { id: 95, part: "Part 4. 티키타카", ko: "사진 찍어줄 때 구도 잡기", en: "Step a bit to your left. Say cheese on three.", rhythm: "[to your left] 디렉팅, [on THREE] 발랄하게" },
+    { id: 96, part: "Part 4. 티키타카", ko: "날씨 예보 우산 챙기기", en: "Take an umbrella with you. Dark clouds are rolling in.", rhythm: "[with you] 가볍게, [roll-ing in] 무게감" },
+    { id: 97, part: "Part 4. 티키타카", ko: "잃어버린 에어팟 찾는 상황", en: "I lost my wireless earbud. Check under the car seat.", rhythm: "[ear-bud] 끊고, [un-der the seat] 바닥 톤" },
+    { id: 98, part: "Part 4. 티키타카", ko: "늦은 밤 야식 유혹 참기", en: "Step away from the fridge. You will regret this tomorrow.", rhythm: "[from the fridge] 다급히, [re-gret this] 엄격하게" },
+    { id: 99, part: "Part 4. 티키타카", ko: "운전 중 길 끼어들기 감사", en: "Give him a little thank you wave. He let us cut right in.", rhythm: "[thank you wave] 훈훈하게, [cut right in] 매끄럽게" },
+    { id: 100, part: "Part 4. 티키타카", ko: "하루를 마무리하며 뿌듯함", en: "We wrapped up everything nicely. It is time to head home.", rhythm: "[wrap-ped up] 완결 억양, [HEAD home] 후련하게" }
+  ];
+
+  let playlist = [...rawData];
+  let currentIndex = 0;
+  let isRunning = false;
+  let isRandom = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const countdownDisplay = document.getElementById("countdownDisplay");
+  const targetKo = document.getElementById("targetKo");
+  const targetEn = document.getElementById("targetEn");
+  const rhythmGuide = document.getElementById("rhythmGuide");
+  const metaBadge = document.getElementById("metaBadge");
+  const partTag = document.getElementById("partTag");
+  const sentenceList = document.getElementById("sentenceList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() {
+    voices = synth.getVoices() || [];
+  }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      dummy.rate = 2.0;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderList() {
+    sentenceList.innerHTML = "";
+    rawData.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "sentence-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-ko">${item.id}. [${item.part}] ${item.ko}</div>
+        <div class="item-en">${item.en}</div>
+        <div class="item-rhythm">리듬: ${item.rhythm}</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+        startCycle();
+      });
+      sentenceList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".sentence-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    metaBadge.innerText = `Sentence ${currentIndex + 1} / ${playlist.length}`;
+    partTag.innerText = curr.part;
+    targetKo.innerText = curr.ko;
+    targetEn.innerText = curr.en;
+    rhythmGuide.innerText = `💡 ${curr.rhythm}`;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakTextMobile(text, lang, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      utter.rate = rate;
+
+      if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+      if (voices.length > 0) {
+        if (lang.startsWith("ko")) {
+          const koVoice = voices.find(v => v.lang && (v.lang.includes("ko") || v.lang.includes("KR")));
+          if (koVoice) utter.voice = koVoice;
+        } else {
+          const enVoice = voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+          if (enVoice) utter.voice = enVoice;
+        }
+      }
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 5) * 1000 * (1 / rate) + 3800;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  async function playSimulCycle(index) {
+    if (!isRunning) return;
+    const item = playlist[index];
+    const enSpeed = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 1. 상황 인지 (눈으로 영문 구조 스캔)
+    targetEn.classList.remove("simul-active");
+    countdownDisplay.className = "countdown-display";
+    countdownDisplay.innerText = "👀 눈으로 문장 스캔";
+    await sleep(900);
+    if (!isRunning) return;
+
+    // 2. 동시 낭독 카운트다운 큐 (3 -> 2 -> 1)
+    countdownDisplay.innerText = "3";
+    countdownDisplay.classList.add("active");
+    await sleep(450);
+    if (!isRunning) return;
+
+    countdownDisplay.innerText = "2";
+    await sleep(450);
+    if (!isRunning) return;
+
+    countdownDisplay.innerText = "1";
+    await sleep(450);
+    if (!isRunning) return;
+
+    // 3. 동시 낭독 발화 (원어민 음성과 동시에 목소리 포개기)
+    countdownDisplay.innerText = "🎙️ SPEAK NOW! (동시 낭독)";
+    targetEn.classList.add("simul-active");
+
+    await speakTextMobile(item.en, "en-US", enSpeed);
+
+    targetEn.classList.remove("simul-active");
+    countdownDisplay.classList.remove("active");
+    countdownDisplay.innerText = "대기 (Breathe)";
+    await sleep(delay);
+  }
+
+  async function startCycle() {
+    unlockAudio();
+    isRunning = true;
+    playPauseBtn.innerText = "⏸ 일시정지";
+    playPauseBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < playlist.length) {
+      updateUI();
+      await playSimulCycle(currentIndex);
+      if (!isRunning) break;
+      if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+      } else {
+        if (isRandom) playlist = shuffle(rawData);
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playPauseBtn.innerText = "▶ 100문장 동시 낭독 시작";
+    playPauseBtn.classList.add("btn-primary");
+    countdownDisplay.innerText = "정지 (Stopped)";
+    countdownDisplay.classList.remove("active");
+    targetEn.classList.remove("simul-active");
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isRunning) stopPlayback();
+    else startCycle();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "#38bdf8" : "#fff";
+    playlist = isRandom ? shuffle(rawData) : [...rawData];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
