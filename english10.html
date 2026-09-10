@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>통역사식 3초 직결 스피킹 트레이너 (50문장)</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #141d2e;
+      --accent: #38bdf8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #f87171;
+      --success: #34d399;
+      --border: #22314d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.4rem 0;
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .display-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.6rem 1rem 1.4rem;
+      text-align: center;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    .step-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .speaking-status {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .speaking .dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* 1초 상황 모션 캔버스 */
+    .scene-viewport {
+      width: 130px;
+      height: 110px;
+      background: #070b14;
+      border-radius: 1rem;
+      border: 1px solid #253553;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 0.8rem;
+      overflow: hidden;
+    }
+
+    .scene-icon {
+      font-size: 2.8rem;
+      display: inline-block;
+      transform-origin: center bottom;
+    }
+
+    .motion-crash { animation: animCrash 1.1s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
+    .motion-pulse { animation: animPulse 1s ease-in-out infinite; }
+    .motion-drop { animation: animDrop 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+    .motion-shake { animation: animShake 0.8s ease-in-out infinite; }
+    .motion-spin { animation: animSpin 1.4s linear infinite; }
+    .motion-slide { animation: animSlide 1.2s ease-in-out infinite; }
+
+    @keyframes animCrash {
+      0% { transform: translateY(-25px) rotate(-20deg); opacity: 0; }
+      40% { transform: translateY(6px) rotate(85deg); opacity: 1; }
+      55% { transform: translateY(0px) rotate(85deg); }
+      70%, 100% { transform: translateY(3px) rotate(85deg); }
+    }
+    @keyframes animPulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.6; }
+      50% { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 10px #38bdf8); }
+    }
+    @keyframes animDrop {
+      0% { transform: translateY(-20px); opacity: 0; }
+      50% { transform: translateY(10px); opacity: 1; }
+      60% { transform: translateY(6px); }
+      70%, 100% { transform: translateY(10px); opacity: 0.85; }
+    }
+    @keyframes animShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px) rotate(-8deg); }
+      40% { transform: translateX(6px) rotate(8deg); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    @keyframes animSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes animSlide {
+      0% { transform: translateX(-20px); opacity: 0; }
+      50% { transform: translateX(5px); opacity: 1; }
+      100% { transform: translateX(20px); opacity: 0; }
+    }
+
+    .current-ko {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .current-ko.active {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* 섀도잉 실패 문장 비교 바 */
+    .compare-box {
+      width: 100%;
+      margin-bottom: 0.7rem;
+      padding: 0.4rem 0.6rem;
+      background: rgba(11, 15, 25, 0.7);
+      border-radius: 0.5rem;
+      border: 1px dashed #334155;
+    }
+
+    .bad-expression {
+      color: var(--danger);
+      font-size: 0.8rem;
+      text-decoration: line-through;
+      opacity: 0.85;
+      word-break: keep-all;
+    }
+
+    .current-en {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #64748b;
+      line-height: 1.35;
+      word-break: keep-all;
+      transition: color 0.2s;
+    }
+
+    .current-en.active {
+      color: var(--accent);
+    }
+
+    .repeat-counter {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: var(--success);
+      font-weight: 700;
+      min-height: 1.2rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    button.btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .sentence-list {
+      list-style: none;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .sentence-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-item.playing {
+      background: rgba(37, 99, 235, 0.16);
+      border-left: 4px solid var(--accent);
+    }
+
+    .item-ko {
+      font-size: 0.85rem;
+      margin-bottom: 0.2rem;
+      color: #cbd5e1;
+    }
+
+    .item-bad {
+      font-size: 0.78rem;
+      color: #f87171bb;
+      text-decoration: line-through;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-en {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #bae6fd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>통역사식 3초 직결 스피킹 트레이너</h1>
+    <p>남의 대사 섀도잉은 끝! 1초 장면을 보고 내 생각을 2문장으로 직결하세요.</p>
+  </header>
+
+  <div class="display-card" id="displayCard">
+    <div class="step-badge" id="stepBadge">Scene 1 / 50</div>
+    <div class="speaking-status" id="speakingStatus">
+      <div class="dot"></div>
+      <span id="statusText">정지</span>
+    </div>
+
+    <!-- 1초 상황 모션 캔버스 -->
+    <div class="scene-viewport">
+      <div class="scene-icon" id="sceneIcon">🎬</div>
+    </div>
+
+    <div class="current-ko" id="currentKo">재생 버튼을 터치해 3초 직결 훈련을 시작하세요.</div>
+    <div class="compare-box">
+      <div class="bad-expression" id="currentBad">기존 섀도잉식 긴 문장 로딩 중...</div>
+    </div>
+    <div class="current-en" id="currentEn">Tap Play to Start</div>
+    <div class="repeat-counter" id="repeatCounter"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playPauseBtn">▶ 전체 재생</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="stopBtn">⏹ 정지</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">낭독 속도:</label>
+      <select id="speedSelect">
+        <option value="0.85">0.85x</option>
+        <option value="0.95" selected>1.0x (표준)</option>
+        <option value="1.1">1.1x</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">문장 대기 시간:</label>
+      <select id="intervalSelect">
+        <option value="600">0.6초 (스피드)</option>
+        <option value="1200" selected>1.2초 (표준)</option>
+        <option value="2000">2.0초 (따라하기)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>50개 통역사식 직결 훈련 목록</span>
+      <span>터치 시 해당 번호 이동</span>
+    </div>
+    <ul class="sentence-list" id="sentenceList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawBank = [
+    { id: 1, icon: "🌧️", motion: "motion-drop", ko: "비가 쏟아져 옷이 다 젖음", bad: "It was raining hard so my clothes were wet...", en: "I got totally soaked. It poured outside." },
+    { id: 2, icon: "👛", motion: "motion-shake", ko: "지갑을 안 가져와 계산을 못 함", bad: "Because I did not possess my wallet today...", en: "I have no cash. I left my wallet at home." },
+    { id: 3, icon: "🚗", motion: "motion-shake", ko: "차가 막혀 약속 시간에 늦음", bad: "Due to the heavy traffic congestion on the road...", en: "I'm running late. Traffic is crazy out here." },
+    { id: 4, icon: "💡", motion: "motion-pulse", ko: "상대방 말을 완전히 이해함", bad: "I fully comprehend what your meaning is...", en: "I got your point. That makes complete sense." },
+    { id: 5, icon: "📅", motion: "motion-pulse", ko: "상대가 약속을 취소해 시간이 뜸", bad: "Since our appointment was unexpectedly cancelled...", en: "He canceled on me. I'm totally free now." },
+    { id: 6, icon: "🛏️", motion: "motion-crash", ko: "너무 피곤해서 바로 눕고 싶음", bad: "I am currently suffering from severe exhaustion...", en: "I'm going to bed. I'm totally exhausted." },
+    { id: 7, icon: "📱", motion: "motion-pulse", ko: "폰 화면이 까맣게 꺼져 안 켜짐", bad: "My mobile smartphone device battery was dead...", en: "My phone died. The screen went pitch black." },
+    { id: 8, icon: "☕", motion: "motion-crash", ko: "커피를 쏟아서 테이블을 닦아야 함", bad: "I mistakenly spilled the beverage on the desk...", en: "I spilled my coffee. Hand me some napkins." },
+    { id: 9, icon: "🔒", motion: "motion-shake", ko: "문이 잠겨서 들어가지 못함", bad: "As a result of the entrance being securely locked...", en: "The door is locked. I can't get inside." },
+    { id: 10, icon: "⏰", motion: "motion-pulse", ko: "깜빡하고 약속 시간을 잊어버림", bad: "I deeply apologize because the schedule slipped...", en: "I forgot our meeting. I'm so sorry." },
+    { id: 11, icon: "☕", motion: "motion-pulse", ko: "커피 한 모금 마시고 잠이 확 깸", bad: "The caffeine from the coffee began to revitalize...", en: "This coffee worked. It woke me right up." },
+    { id: 12, icon: "🚫", motion: "motion-pulse", ko: "엘리베이터가 고장 나 계단 이용", bad: "The mechanical failure of the vertical transport...", en: "The elevator is broken. Let's take the stairs." },
+    { id: 13, icon: "🔌", motion: "motion-shake", ko: "배터리 충전기가 고장 나 충전 불가", bad: "The electric charging apparatus cannot deliver...", en: "It won't charge. The cable is completely broken." },
+    { id: 14, icon: "🚌", motion: "motion-slide", ko: "버스를 바로 눈앞에서 놓침", bad: "Unfortunately I missed boarding the transit bus...", en: "I missed the bus. It just pulled away." },
+    { id: 15, icon: "👠", motion: "motion-shake", ko: "새 구두가 발을 옥죄어 통증이 심함", bad: "The newly purchased leather footwear creates agony...", en: "These shoes are killing me. My feet hurt." },
+    { id: 16, icon: "🍲", motion: "motion-pulse", ko: "음식 냄새를 맡고 군침이 도는 상태", bad: "The olfactory stimulus of the cuisine stimulates...", en: "This smells amazing. My mouth is watering." },
+    { id: 17, icon: "💨", motion: "motion-slide", ko: "창문 틈으로 찬바람이 들어옴", bad: "The micro-gap in the window causes low temperature...", en: "Close the window. Cold air is leaking in." },
+    { id: 18, icon: "🧢", motion: "motion-spin", ko: "바람에 날아간 모자를 잡으러 뜀", bad: "The sudden gust of wind separated my headwear...", en: "My hat blew away. I have to grab it." },
+    { id: 19, icon: "🧊", motion: "motion-crash", ko: "빗길 바닥이 미끄러워 넘어질 뻔함", bad: "The aqueous substance on the walking surface...", en: "Watch your step. The floor is super slippery." },
+    { id: 20, icon: "⏱️", motion: "motion-spin", ko: "시계 초침을 보며 마감이 임박함", bad: "The temporal limitation for the deadline approaches...", en: "Hurry up. We are running out of time." },
+    { id: 21, icon: "🧥", motion: "motion-drop", ko: "두꺼운 겉옷을 벗고 땀을 식힘", bad: "Removing the heavy winter garment lowers my heat...", en: "I took off my coat. It was way too warm." },
+    { id: 22, icon: "🥣", motion: "motion-pulse", ko: "음식이 너무 뜨거워 입술을 뗌", bad: "The thermal energy of the served soup was high...", en: "Don't eat it yet. The soup is boiling hot." },
+    { id: 23, icon: "🔊", motion: "motion-shake", ko: "주변 소음으로 상대방 목소리 안 들림", bad: "The acoustic amplitude in this location impedes...", en: "I can't hear you. It is too loud here." },
+    { id: 24, icon: "💻", motion: "motion-spin", ko: "화면이 멈춰 클릭이 전혀 안 먹힘", bad: "The graphic operating interface has frozen up...", en: "The screen froze. It's not responding at all." },
+    { id: 25, icon: "🪜", motion: "motion-crash", ko: "계단 끝에서 삐끗해 발목을 삠", bad: "I experienced an unfortunate ankle distortion...", en: "I twisted my ankle. I slipped on the stairs." },
+    { id: 26, icon: "🚇", motion: "motion-slide", ko: "지하철을 반대 방향으로 잘못 탐", bad: "I boarded the locomotive traversing the reverse...", en: "I'm on the wrong train. It's going the other way." },
+    { id: 27, icon: "👔", motion: "motion-pulse", ko: "흰 셔츠에 빨간 국물이 튐", bad: "An oily food pigmentation contaminated my apparel...", en: "Look at my shirt. A red stain just popped." },
+    { id: 28, icon: "💧", motion: "motion-drop", ko: "물병을 단숨에 끝까지 비움", bad: "I consumed the entire hydration container rapidly...", en: "I finished the water. I was dying of thirst." },
+    { id: 29, icon: "📦", motion: "motion-shake", ko: "방에 물건이 널브러져 발 디딜 데 없음", bad: "The interior state of my domestic chamber is messy...", en: "My room is a mess. I need to clean up." },
+    { id: 30, icon: "👓", motion: "motion-pulse", ko: "안경을 벗어 앞이 전혀 안 보임", bad: "Optical deficiency occurred due to the absence...", en: "I can't see a thing. I forgot my glasses." },
+    { id: 31, icon: "🛋️", motion: "motion-drop", ko: "소파에 파묻혀 리모컨만 만지작거림", bad: "I maintained an inactive sedentary posture...", en: "I'm stuck on the sofa. I don't want to move." },
+    { id: 32, icon: "🧣", motion: "motion-pulse", ko: "목이 간질거리며 헛기침이 계속 남", bad: "An irritating sensation in my pharyngeal tract...", en: "I have a dry cough. My throat feels scratchy." },
+    { id: 33, icon: "☂️", motion: "motion-crash", ko: "우산 살이 바람에 뒤집혀 부러짐", bad: "Atmospheric pressure deformed my rain protection...", en: "My umbrella flipped. The wind broke it." },
+    { id: 34, icon: "🥱", motion: "motion-drop", ko: "모니터 앞에서 눈꺼풀이 감김", bad: "Ocular fatigue caused involuntary eye closure...", en: "My eyes are closing. I need some fresh air." },
+    { id: 35, icon: "🔑", motion: "motion-shake", ko: "가방 바닥을 뒤져 집 열쇠를 찾음", bad: "I executed a manual search inside the bag cavity...", en: "I found my keys. They were at the bottom." },
+    { id: 36, icon: "👟", motion: "motion-slide", ko: "풀린 신발 끈을 밟고 휘청거림", bad: "The loose footwear fastener caused instability...", en: "Tie your shoes. Your laces are dragging." },
+    { id: 37, icon: "🍽️", motion: "motion-shake", ko: "배에서 꼬르륵 소리가 크게 요동침", bad: "Internal gastrointestinal acoustic vibrations...", en: "My stomach is growling. Let's grab some food." },
+    { id: 38, icon: "🗺️", motion: "motion-spin", ko: "지도 앱이 엉뚱한 막다른 골목 안내", bad: "The digital navigational application malfunctioned...", en: "We are totally lost. This is a dead end." },
+    { id: 39, icon: "🎒", motion: "motion-pulse", ko: "백팩 지퍼가 열려 서류가 떨어질 뻔함", bad: "The luggage enclosure zipper remained unsecured...", en: "Zip up your backpack. Everything is falling out." },
+    { id: 40, icon: "🌧️", motion: "motion-drop", ko: "굵은 소나기가 창문을 두드림", bad: "Meteorological condensation struck the glass...", en: "Look outside. Rain is pounding on the glass." },
+    { id: 41, icon: "🦟", motion: "motion-spin", ko: "모기가 귓가에서 앵앵거리며 맴돎", bad: "An insect of the Culicidae family generates noise...", en: "A bug is buzzing. It won't leave me alone." },
+    { id: 42, icon: "🍳", motion: "motion-shake", ko: "팬 위에서 계란이 지글지글 익음", bad: "The frying container thermal conduction cooks...", en: "Breakfast is almost ready. The eggs are sizzling." },
+    { id: 43, icon: "📖", motion: "motion-pulse", ko: "책을 덮고 기지개를 시원하게 켬", bad: "Concluding the reading session I extended my spine...", en: "I'm finally done. I need a good stretch." },
+    { id: 44, icon: "🌬️", motion: "motion-slide", ko: "차 창문을 내리자 시원한 바람 유입", bad: "Lowering the automobile glass panel allowed air...", en: "Roll down the window. The cool breeze feels nice." },
+    { id: 45, icon: "🗄️", motion: "motion-shake", ko: "서랍을 열고 서류를 급하게 뒤적임", bad: "I conducted a hasty excavation through the drawer...", en: "I'm digging through the desk. Where is that file?" },
+    { id: 46, icon: "🍵", motion: "motion-pulse", ko: "따뜻한 머그잔으로 언 손을 녹임", bad: "The thermal cup transfers caloric energy to hand...", en: "Hold this warm mug. Your hands are freezing." },
+    { id: 47, icon: "🗑️", motion: "motion-drop", ko: "쓰레기봉투를 묶어 문밖에 내놓음", bad: "Compacting the municipal refuse container tightly...", en: "Take out the trash. The bag is completely full." },
+    { id: 48, icon: "🚦", motion: "motion-pulse", ko: "깜빡이는 횡단보도 신호로 전력 질주", bad: "I accelerated my locomotion toward the pedestrian...", en: "Run for it! The light is already flashing." },
+    { id: 49, icon: "💡", motion: "motion-pulse", ko: "조명을 끄자 방 안이 암전됨", bad: "Extinguishing the illumination unit created darkness...", en: "Turn off the lights. Let's get some sleep." },
+    { id: 50, icon: "🎯", motion: "motion-pulse", ko: "어려운 일을 끝내고 한숨 돌림", bad: "Successfully concluding the complex enterprise...", en: "We finally made it. The hard part is over." }
+  ];
+
+  let playlist = [...rawBank];
+  let currentIndex = 0;
+  let isRunning = false;
+  let isRandom = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const sceneIcon = document.getElementById("sceneIcon");
+  const currentKo = document.getElementById("currentKo");
+  const currentBad = document.getElementById("currentBad");
+  const currentEn = document.getElementById("currentEn");
+  const repeatCounter = document.getElementById("repeatCounter");
+  const stepBadge = document.getElementById("stepBadge");
+  const speakingStatus = document.getElementById("speakingStatus");
+  const statusText = document.getElementById("statusText");
+  const sentenceList = document.getElementById("sentenceList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() {
+    voices = synth.getVoices() || [];
+  }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      dummy.rate = 2.0;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderList() {
+    sentenceList.innerHTML = "";
+    rawBank.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "sentence-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-ko">${item.id}. ${item.icon} ${item.ko}</div>
+        <div class="item-bad">${item.bad}</div>
+        <div class="item-en">${item.en}</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+        startCycle();
+      });
+      sentenceList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".sentence-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    stepBadge.innerText = `Scene ${currentIndex + 1} / ${playlist.length}`;
+    currentKo.innerText = curr.ko;
+    currentBad.innerText = `피해야 할 섀도잉식: ${curr.bad}`;
+    currentEn.innerText = curr.en;
+    sceneIcon.innerText = curr.icon;
+
+    sceneIcon.className = "scene-icon";
+    void sceneIcon.offsetWidth;
+    sceneIcon.classList.add(curr.motion);
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakTextMobile(text, lang, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      utter.rate = rate;
+
+      if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+      if (voices.length > 0) {
+        if (lang.startsWith("ko")) {
+          const koVoice = voices.find(v => v.lang && (v.lang.includes("ko") || v.lang.includes("KR")));
+          if (koVoice) utter.voice = koVoice;
+        } else {
+          const enVoice = voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+          if (enVoice) utter.voice = enVoice;
+        }
+      }
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 5) * 1000 * (1 / rate) + 3500;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  async function playCycle(index) {
+    if (!isRunning) return;
+    const item = playlist[index];
+    const enSpeed = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 1단계: 상황 씬 제시
+    currentKo.classList.add("active");
+    currentEn.classList.remove("active");
+    repeatCounter.innerText = "🎬 [1/3] 장면 캡처";
+    statusText.innerText = "상황 묘사";
+    speakingStatus.classList.add("speaking");
+
+    await speakTextMobile(item.ko, "ko-KR", 1.0);
+    currentKo.classList.remove("active");
+    await sleep(350);
+
+    if (!isRunning) return;
+
+    // 2단계: 통역사식 3초 직결 영어 1회
+    currentEn.classList.add("active");
+    repeatCounter.innerText = "🇺🇸 [2/3] 통역사식 직결 영어 1회";
+    statusText.innerText = "영어 1회";
+    await speakTextMobile(item.en, "en-US", enSpeed);
+    await sleep(delay);
+
+    if (!isRunning) return;
+
+    // 3단계: 통역사식 3초 직결 영어 2회 (따라하기)
+    repeatCounter.innerText = "🔁 [3/3] 통역사식 직결 영어 2회 (따라 말하기)";
+    statusText.innerText = "영어 2회";
+    await speakTextMobile(item.en, "en-US", Math.max(0.75, enSpeed * 0.92));
+    currentEn.classList.remove("active");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "대기";
+    repeatCounter.innerText = "";
+    await sleep(delay);
+  }
+
+  async function startCycle() {
+    unlockAudio();
+    isRunning = true;
+    playPauseBtn.innerText = "⏸ 일시정지";
+    playPauseBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < playlist.length) {
+      updateUI();
+      await playCycle(currentIndex);
+      if (!isRunning) break;
+      if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+      } else {
+        if (isRandom) {
+          playlist = shuffle(rawBank);
+        }
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playPauseBtn.innerText = "▶ 전체 재생";
+    playPauseBtn.classList.add("btn-primary");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "정지";
+    repeatCounter.innerText = "";
+    currentKo.classList.remove("active");
+    currentEn.classList.remove("active");
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isRunning) stopPlayback();
+    else startCycle();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "#38bdf8" : "#fff";
+    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
