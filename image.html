@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1초 상황 짤: 침대에 털썩 쓰러지기</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    /* 1초 GIF 씬 스테이지 */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #0b1120;
+      border-radius: 1rem;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+      border: 1px solid #334155;
+    }
+    /* 바닥 & 침대 */
+    .floor {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40px;
+      background: #1e1b4b;
+    }
+    .bed {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      width: 190px;
+      height: 45px;
+      background: #38bdf8;
+      border-radius: 8px 8px 2px 2px;
+      box-shadow: inset 0 -6px 0 rgba(0,0,0,0.2);
+    }
+    .pillow {
+      position: absolute;
+      bottom: 60px;
+      right: 30px;
+      width: 40px;
+      height: 20px;
+      background: #f1f5f9;
+      border-radius: 6px;
+    }
+    /* 가방 내팽개치기 애니메이션 */
+    .bag {
+      position: absolute;
+      width: 32px;
+      height: 28px;
+      background: #f59e0b;
+      border-radius: 6px;
+      left: 60px;
+      bottom: 140px;
+      animation: dropBag 1s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+    @keyframes dropBag {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      15% { opacity: 1; }
+      45% { transform: translateY(105px) rotate(45deg); }
+      55% { transform: translateY(98px) rotate(40deg); }
+      65%, 100% { transform: translateY(105px) rotate(45deg); opacity: 1; }
+    }
+    /* 침대에 털썩 쓰러지는 사람 애니메이션 */
+    .person {
+      position: absolute;
+      bottom: 75px;
+      right: 50px;
+      transform-origin: bottom center;
+      animation: flopBed 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite;
+    }
+    .head {
+      width: 24px;
+      height: 24px;
+      background: #fed7aa;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+    .body {
+      width: 18px;
+      height: 45px;
+      background: #6366f1;
+      border-radius: 6px;
+      margin: 2px auto 0;
+      position: relative;
+    }
+    .arms {
+      position: absolute;
+      top: 10px;
+      left: -12px;
+      width: 42px;
+      height: 8px;
+      background: #818cf8;
+      border-radius: 4px;
+    }
+    .legs {
+      position: absolute;
+      bottom: -18px;
+      left: 1px;
+      width: 16px;
+      height: 20px;
+      border-left: 5px solid #1e293b;
+      border-right: 5px solid #1e293b;
+    }
+    @keyframes flopBed {
+      0% { transform: translate(-70px, -40px) rotate(-35deg); opacity: 0; }
+      20% { opacity: 1; }
+      50% { transform: translate(0, 5px) rotate(90deg); } /* 대자로 털썩 */
+      60% { transform: translate(0, 0px) rotate(90deg); } /* 살짝 튕김 바운스 */
+      70%, 100% { transform: translate(0, 3px) rotate(90deg); opacity: 1; }
+    }
+    .text-ko {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-bottom: 0.4rem;
+    }
+    .text-en {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.6rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="stage">
+    <div class="floor"></div>
+    <div class="pillow"></div>
+    <div class="bed"></div>
+    <div class="bag"></div>
+    <div class="person">
+      <div class="head"></div>
+      <div class="body">
+        <div class="arms"></div>
+        <div class="legs"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-ko">퇴근 후 침대에 대자로 털썩 쓰러지는 순간</div>
+  <div class="text-en">"I just crashed onto my bed."</div>
+  <button onclick="speak()">🔊 원어민 발음 듣기</button>
+</div>
+
+<script>
+  function speak() {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance("I just crashed onto my bed.");
+    utter.lang = "en-US";
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
+</script>
+
+</body>
+</html>
