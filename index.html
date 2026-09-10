@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ENGLISSI Lab | 내가 공부하려고 만든 영어 트레이닝 허브</title>
-  <meta name="description" content="한국어 개입을 차단하고 뇌 속 직결 회로를 뚫어주는 인터랙티브 영어 트레이너 포털">
+  <title>ENGLISSI Lab | 원어민식 직결 영어 & 토익스피킹 허브</title>
+  <meta name="description" content="한국어 개입을 차단하고 뇌 속 직결 회로와 토익스피킹 고득점 뼈대를 뚫어주는 인터랙티브 트레이너 포털">
   <style>
     :root {
       --bg: #090d16;
@@ -13,6 +13,7 @@
       --primary: #38bdf8;
       --primary-glow: rgba(56, 189, 248, 0.15);
       --accent: #818cf8;
+      --toeic-accent: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --border: #1e293b;
@@ -112,24 +113,27 @@
     .hero p {
       color: var(--text-muted);
       font-size: 0.98rem;
-      max-width: 660px;
+      max-width: 680px;
       margin: 0 auto 1.5rem;
       line-height: 1.6;
     }
 
     .hero-stats {
       display: inline-flex;
-      gap: 1.5rem;
+      gap: 1.2rem;
       background: var(--card-bg);
       border: 1px solid var(--border);
       padding: 0.6rem 1.4rem;
       border-radius: 9999px;
       font-size: 0.85rem;
       color: var(--text-muted);
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .hero-stats b { color: var(--primary); }
+    .hero-stats b.highlight { color: var(--toeic-accent); }
 
-    /* 툴바 (검색 및 카테고리) */
+    /* 툴바 (검색 및 토익스피킹 필터 포함) */
     .toolbar {
       max-width: 1120px;
       margin: 1.5rem auto 1.5rem;
@@ -183,6 +187,12 @@
       color: #090d16;
       border-color: var(--primary);
       font-weight: 700;
+    }
+
+    .filter-chip.special-chip.active {
+      background: var(--toeic-accent);
+      color: #090d16;
+      border-color: var(--toeic-accent);
     }
 
     /* 카드 그리드 */
@@ -265,6 +275,12 @@
       border: 1px solid rgba(56, 189, 248, 0.2);
     }
 
+    .card-badge.badge-toeic {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
     .card-title {
       font-size: 1.12rem;
       font-weight: 700;
@@ -293,6 +309,10 @@
     .meta-cat {
       font-weight: 600;
       color: var(--accent);
+    }
+
+    .meta-cat.cat-toeic {
+      color: var(--toeic-accent);
     }
 
     .meta-action {
@@ -328,26 +348,29 @@
       <div class="brand-logo">E</div>
       <span class="brand-name">ENGLISSI Lab</span>
     </a>
-    <span class="brand-tag">총 12개 코스 완비</span>
+    <span class="brand-tag">총 13개 코스 완비</span>
   </div>
 </header>
 
 <section class="hero">
-  <h1>내가 공부하려고 만든 영어 트레이닝 허브 </h1>
-  <p>모바일에서는 오른쪽 하단의 점 세개를 누르신 후 "다른브라우저로 열기"후 실행해주세요</p>
+  <h1>머릿속 번역기를 끄는 직결 영어 & 토스 연구소</h1>
+  <p>한국어 조사와 문법 번역을 걷어내고, 원어민의 인지 직결 회로와 토익스피킹 AL/AM 초고속 뼈대를 훈련하는 인터랙티브 스위트입니다.</p>
   <div class="hero-stats">
     <span>훈련 프로그램 <b>13개 코스</b></span>
     <span>•</span>
-    <span>총 수록 문장 <b>560+ 문항</b></span>
+    <span>토익스피킹 실전 <b>150+ 문항</b></span>
     <span>•</span>
-    <span>모바일 오디오 언락 완비</span>
+    <span>총 수록 문장 <b class="highlight">710+ 문항</b></span>
+    <span>•</span>
+    <span>실시간 음성 싱크 분석 탑재</span>
   </div>
 </section>
 
 <div class="toolbar">
-  <input type="text" class="search-input" id="searchInput" placeholder="훈련하고 싶은 트레이너나 키워드를 검색하세요 (예: english1, 아케이드, 동시 낭독, 쪼개기...)">
+  <input type="text" class="search-input" id="searchInput" placeholder="훈련하고 싶은 트레이너나 키워드를 검색하세요 (예: 토익스피킹, english13, PREP, 싱크, 아케이드...)">
   <div class="filter-group" id="filterGroup">
-    <button class="filter-chip active" data-cat="all">전체 코스 (11)</button>
+    <button class="filter-chip active" data-cat="all">전체 코스 (13)</button>
+    <button class="filter-chip special-chip" data-cat="toeic">🎯 토익스피킹 전용</button>
     <button class="filter-chip" data-cat="logic">논리/사고 전환</button>
     <button class="filter-chip" data-cat="verb">만능 기본 동사</button>
     <button class="filter-chip" data-cat="scene">장면 시각화</button>
@@ -360,12 +383,12 @@
 </main>
 
 <footer>
-  <p>© 2026 ENGLISSI Lab. All rights reserved. Direct-Mapping English Audio Suite.</p>
+  <p>© 2026 ENGLISSI Lab. All rights reserved. Direct-Mapping English & TOEIC Speaking Audio Suite.</p>
 </footer>
 
 <script>
   /* ======================================================================
-     📌 11개 트레이너 정식 파일명(english1.html ~ english13.html) 매핑
+     📌 전체 13개 트레이너 정식 파일명(english1.html ~ english13.html) 매핑
      ====================================================================== */
   const trainers = [
     {
@@ -470,20 +493,20 @@
     {
       id: 12,
       title: "생각의 뼈대(PREP) 남녀 티키타카 50",
-      desc: "남성 면접관의 질문에 여성 화자가 4단계 PREP 뼈대(Point-Reason-Example-Point)로 막힘없이 대답하는 롤플레잉 트레이너",
+      desc: "토익스피킹 면접관 질문에 여성 화자가 4단계 PREP(결론-이유-사례-마침표)로 1초 만에 받아치는 고득점 롤플레잉",
       path: "english12.html",
       icon: "👥",
-      cat: "logic",
-      count: "50문답 완비"
+      cat: "toeic",
+      count: "토스 50세트"
     },
     {
       id: 13,
-      title: "토스 1초 단문 페어링 & 싱크 트레이너 100",
-      desc: "질문 청취 후 접속사 없이 [결론 단문 + 팩트 단문]을 1초 만에 연타하고, 실시간 마이크 녹음으로 원어민 문장과의 음성 싱크로율(0~100%)을 검증하는 시험 대비 트레이너",
+      title: "토스 1초 단문 페어링 & 음성 싱크 트레이너",
+      desc: "접속사 없이 [결론 단문 + 팩트 단문]을 1초 만에 연타하고, 실시간 마이크 녹음으로 원어민 문장과의 음성 싱크로율(0~100%)을 정밀 측정",
       path: "english13.html",
-      icon: "🎯",
-      cat: "logic",
-      count: "100문항 완비"
+      icon: "🎙️",
+      cat: "toeic",
+      count: "토스 100세트"
     }
   ];
 
@@ -496,6 +519,7 @@
 
   function getCategoryName(cat) {
     switch(cat) {
+      case "toeic": return "토익스피킹";
       case "logic": return "논리/사고";
       case "verb": return "기본 동사";
       case "scene": return "장면 시각화";
@@ -511,7 +535,8 @@
       const matchesCat = activeFilter === "all" || item.cat === activeFilter;
       const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
                             item.desc.toLowerCase().includes(searchQuery) ||
-                            item.path.toLowerCase().includes(searchQuery);
+                            item.path.toLowerCase().includes(searchQuery) ||
+                            (item.cat === "toeic" && searchQuery.includes("토스"));
       return matchesCat && matchesSearch;
     });
 
@@ -530,20 +555,22 @@
       card.className = "trainer-card";
       card.href = item.path;
 
+      const isToeic = item.cat === "toeic";
+
       card.innerHTML = `
         <div>
           <div class="card-top">
             <div class="card-icon">${item.icon}</div>
             <div class="card-badges">
               <span class="file-badge">${item.path}</span>
-              <span class="card-badge">${item.count}</span>
+              <span class="card-badge ${isToeic ? 'badge-toeic' : ''}">${item.count}</span>
             </div>
           </div>
           <h2 class="card-title">${item.title}</h2>
           <p class="card-desc">${item.desc}</p>
         </div>
         <div class="card-meta">
-          <span class="meta-cat">${getCategoryName(item.cat)}</span>
+          <span class="meta-cat ${isToeic ? 'cat-toeic' : ''}">${getCategoryName(item.cat)}</span>
           <span class="meta-action">시작하기 →</span>
         </div>
       `;
