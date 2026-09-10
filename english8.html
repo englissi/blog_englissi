@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>동사 5총사 아케이드 트레이너</title>
+  <title>동사 5총사 아케이드 트레이너 (랜덤 셔플)</title>
   <style>
     :root {
       --bg: #0b0f19;
@@ -170,18 +170,19 @@
       transform: scale(1.06);
     }
 
-    /* 모드 전환 및 유틸 버튼 */
+    /* 조작 바 */
     .mode-bar {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     .sub-btn {
       background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 0.6rem 0.9rem;
+      padding: 0.6rem 0.8rem;
       border-radius: 0.6rem;
       font-size: 0.8rem;
       font-weight: 600;
@@ -193,7 +194,7 @@
       background: #0369a133;
     }
 
-    /* 하단 가이드 리스트 */
+    /* 리스트 */
     .list-wrapper {
       background: var(--card-bg);
       border-radius: 1rem;
@@ -208,6 +209,8 @@
       font-weight: 700;
       background: #0f172a;
       color: var(--muted);
+      display: flex;
+      justify-content: space-between;
     }
     .list-item {
       padding: 0.55rem 1rem;
@@ -236,101 +239,107 @@
       <div class="timer-bar" id="timerBar"></div>
     </div>
 
-    <div class="badge-category" id="hintCat">상태 변화/행동 즉시 낚아채기</div>
+    <div class="badge-category" id="hintCat">🔀 무작위 스피드 훈련 중</div>
     <div class="ko-prompt" id="koPrompt">문제를 불러오는 중...</div>
     <div class="feedback-bubble" id="feedback">어떤 만능 동사를 쓸까요?</div>
     <div class="en-result" id="enResult">_ _ _ _ _</div>
 
     <div class="verb-grid">
       <button class="verb-btn" data-verb="GET">GET<span>변화</span></button>
-      <button class="verb-btn" data-verb="TAKE">TAKE<span>소모/끌림</span></button>
+      <button class="verb-btn" data-verb="TAKE">TAKE<span>소모/취함</span></button>
       <button class="verb-btn" data-verb="HAVE">HAVE<span>상태보유</span></button>
-      <button class="verb-btn" data-verb="MAKE">MAKE<span>유발/참석</span></button>
+      <button class="verb-btn" data-verb="MAKE">MAKE<span>유발/성사</span></button>
       <button class="verb-btn" data-verb="PUT">PUT<span>위치놓음</span></button>
     </div>
   </div>
 
   <div class="mode-bar">
-    <button class="sub-btn active" id="timerToggleBtn">⏱ 타임어택: 켜짐</button>
-    <button class="sub-btn" id="nextQuizBtn">다음 문제 ⏭</button>
+    <button class="sub-btn active" id="randomToggleBtn">🔀 랜덤: ON</button>
+    <button class="sub-btn active" id="timerToggleBtn">⏱ 타임어택: ON</button>
+    <button class="sub-btn" id="nextQuizBtn">다음 ⏭</button>
     <button class="sub-btn" id="listenAgainBtn">🔊 다시 듣기</button>
   </div>
 
   <div class="list-wrapper">
-    <div class="list-header">50문장 전체 치트 시트</div>
+    <div class="list-header">
+      <span>50문장 전체 목록</span>
+      <span>터치 시 해당 문제로 이동</span>
+    </div>
     <div id="cheatList"></div>
   </div>
 </div>
 
 <script>
-  const bank = [
+  const rawBank = [
     // GET (1~10)
-    { verb: "GET", ko: "퇴근하고 완전 녹초가 됐어.", en: "I got so tired after work." },
-    { verb: "GET", ko: "길 잃어서 한참 헤맸잖아.", en: "I got lost on my way here." },
-    { verb: "GET", ko: "그 말 듣고 순간 욱했어.", en: "I got mad when I heard that." },
-    { verb: "GET", ko: "비 맞아서 옷이 다 젖었어.", en: "I got wet in the rain." },
-    { verb: "GET", ko: "이제야 그게 무슨 말인지 이해됐어.", en: "I finally got the point." },
-    { verb: "GET", ko: "날씨가 점점 쌀쌀해지네.", en: "It is getting colder outside." },
-    { verb: "GET", ko: "회의 끝나고 바로 연락할게.", en: "I will get back to you after the meeting." },
-    { verb: "GET", ko: "그 소식 듣고 깜짝 놀랐잖아.", en: "I got shocked by the news." },
-    { verb: "GET", ko: "버스에서 내리자마자 비가 쏟아졌어.", en: "I got off the bus, and it started raining." },
-    { verb: "GET", ko: "나 준비 다 끝났어, 나가자.", en: "I got ready, let's head out." },
+    { id: 1, verb: "GET", ko: "퇴근하고 완전 녹초가 됐어.", en: "I got so tired after work." },
+    { id: 2, verb: "GET", ko: "길 잃어서 한참 헤맸잖아.", en: "I got lost on my way here." },
+    { id: 3, verb: "GET", ko: "그 말 듣고 순간 욱했어.", en: "I got mad when I heard that." },
+    { id: 4, verb: "GET", ko: "비 맞아서 옷이 다 젖었어.", en: "I got wet in the rain." },
+    { id: 5, verb: "GET", ko: "이제야 그게 무슨 말인지 이해됐어.", en: "I finally got the point." },
+    { id: 6, verb: "GET", ko: "날씨가 점점 쌀쌀해지네.", en: "It is getting colder outside." },
+    { id: 7, verb: "GET", ko: "회의 끝나고 바로 연락할게.", en: "I will get back to you after the meeting." },
+    { id: 8, verb: "GET", ko: "그 소식 듣고 깜짝 놀랐잖아.", en: "I got shocked by the news." },
+    { id: 9, verb: "GET", ko: "버스에서 내리자마자 비가 쏟아졌어.", en: "I got off the bus, and it started raining." },
+    { id: 10, verb: "GET", ko: "나 준비 다 끝났어, 나가자.", en: "I got ready, let's head out." },
 
     // TAKE (11~20)
-    { verb: "TAKE", ko: "거기까지 가는 데 1시간 넘게 걸려.", en: "It takes over an hour to get there." },
-    { verb: "TAKE", ko: "늦을 것 같으면 그냥 택시 타.", en: "Just take a taxi if you are running late." },
-    { verb: "TAKE", ko: "머리 아프면 이 약 먹어봐.", en: "Take this pill for your headache." },
-    { verb: "TAKE", ko: "심호흡 크게 한 번 해봐.", en: "Take a deep breath and relax." },
-    { verb: "TAKE", ko: "서두르지 말고 천천히 해.", en: "Take your time, no rush." },
-    { verb: "TAKE", ko: "방이 너무 더워서 겉옷 벗었어.", en: "I took off my jacket because it was hot." },
-    { verb: "TAKE", ko: "우리 잠깐 10분만 쉬었다 하자.", en: "Let's take a short break." },
-    { verb: "TAKE", ko: "그 사람 말 너무 심각하게 받아들이지 마.", en: "Don't take it too seriously." },
-    { verb: "TAKE", ko: "오늘 점심은 포장해 와서 먹었어.", en: "I took out some lunch today." },
-    { verb: "TAKE", ko: "내가 그거 책임지고 처리할게.", en: "I will take care of that for you." },
+    { id: 11, verb: "TAKE", ko: "거기까지 가는 데 1시간 넘게 걸려.", en: "It takes over an hour to get there." },
+    { id: 12, verb: "TAKE", ko: "늦을 것 같으면 그냥 택시 타.", en: "Just take a taxi if you are running late." },
+    { id: 13, verb: "TAKE", ko: "머리 아프면 이 약 먹어봐.", en: "Take this pill for your headache." },
+    { id: 14, verb: "TAKE", ko: "심호흡 크게 한 번 해봐.", en: "Take a deep breath and relax." },
+    { id: 15, verb: "TAKE", ko: "서두르지 말고 천천히 해.", en: "Take your time, no rush." },
+    { id: 16, verb: "TAKE", ko: "방이 너무 더워서 겉옷 벗었어.", en: "I took off my jacket because it was hot." },
+    { id: 17, verb: "TAKE", ko: "우리 잠깐 10분만 쉬었다 하자.", en: "Let's take a short break." },
+    { id: 18, verb: "TAKE", ko: "그 사람 말 너무 심각하게 받아들이지 마.", en: "Don't take it too seriously." },
+    { id: 19, verb: "TAKE", ko: "오늘 점심은 포장해 와서 먹었어.", en: "I took out some lunch today." },
+    { id: 20, verb: "TAKE", ko: "내가 그거 책임지고 처리할게.", en: "I will take care of that for you." },
 
     // HAVE (21~30)
-    { verb: "HAVE", ko: "오늘 진짜 정신없이 바빴어.", en: "I had such a crazy day today." },
-    { verb: "HAVE", ko: "나 지금 골치 아픈 일이 좀 있어.", en: "I have a big problem right now." },
-    { verb: "HAVE", ko: "어제 친구들이랑 진짜 재밌게 놀았어.", en: "We had a great time yesterday." },
-    { verb: "HAVE", ko: "점심때 걔랑 잠깐 얘기 좀 나눴어.", en: "I had a quick chat with him." },
-    { verb: "HAVE", ko: "지금 결정하기엔 고민이 좀 필요해.", en: "I have some doubts about that." },
-    { verb: "HAVE", ko: "목이 너무 칼칼하고 아파.", en: "I have a sore throat today." },
-    { verb: "HAVE", ko: "오늘 오후에 치과 예약이 잡혀 있어.", en: "I have a dentist appointment this afternoon." },
-    { verb: "HAVE", ko: "요즘 잠을 통 깊게 못 자.", en: "I have trouble sleeping these days." },
-    { verb: "HAVE", ko: "그거에 대해 다른 생각이 좀 있어.", en: "I have a different idea on this." },
-    { verb: "HAVE", ko: "어젯밤에 진짜 이상한 꿈 꿨잖아.", en: "I had a really weird dream last night." },
+    { id: 21, verb: "HAVE", ko: "오늘 진짜 정신없이 바빴어.", en: "I had such a crazy day today." },
+    { id: 22, verb: "HAVE", ko: "나 지금 골치 아픈 일이 좀 있어.", en: "I have a big problem right now." },
+    { id: 23, verb: "HAVE", ko: "어제 친구들이랑 진짜 재밌게 놀았어.", en: "We had a great time yesterday." },
+    { id: 24, verb: "HAVE", ko: "점심때 걔랑 잠깐 얘기 좀 나눴어.", en: "I had a quick chat with him." },
+    { id: 25, verb: "HAVE", ko: "지금 결정하기엔 고민이 좀 필요해.", en: "I have some doubts about that." },
+    { id: 26, verb: "HAVE", ko: "목이 너무 칼칼하고 아파.", en: "I have a sore throat today." },
+    { id: 27, verb: "HAVE", ko: "오늘 오후에 치과 예약이 잡혀 있어.", en: "I have a dentist appointment this afternoon." },
+    { id: 28, verb: "HAVE", ko: "요즘 잠을 통 깊게 못 자.", en: "I have trouble sleeping these days." },
+    { id: 29, verb: "HAVE", ko: "그거에 대해 다른 생각이 좀 있어.", en: "I have a different idea on this." },
+    { id: 30, verb: "HAVE", ko: "어젯밤에 진짜 이상한 꿈 꿨잖아.", en: "I had a really weird dream last night." },
 
     // MAKE (31~40)
-    { verb: "MAKE", ko: "네 칭찬 덕분에 오늘 하루 기분 최고야.", en: "You just made my day." },
-    { verb: "MAKE", ko: "오늘 급한 일 생겨서 약속 못 갈 것 같아.", en: "I can't make it today." },
-    { verb: "MAKE", ko: "그 사람 말 때문에 완전 멘붕 왔어.", en: "His words made me panic." },
-    { verb: "MAKE", ko: "내가 서류 작성하다 실수를 좀 했어.", en: "I made a mistake on the document." },
-    { verb: "MAKE", ko: "그거 진짜 그럴듯하게 들리네.", en: "That makes a lot of sense." },
-    { verb: "MAKE", ko: "주말에 영화 볼 시간 좀 내보려고 해.", en: "I'll make time this weekend." },
-    { verb: "MAKE", ko: "둘 중에 하나 확실하게 결정해.", en: "Make up your mind soon." },
-    { verb: "MAKE", ko: "문 잠겼는지 다시 한번 확인해 봐.", en: "Make sure the door is locked." },
-    { verb: "MAKE", ko: "걔가 농담으로 날 웃게 만들었어.", en: "He made me laugh with his jokes." },
-    { verb: "MAKE", ko: "오늘 프로젝트 회의에서 좋은 성과 냈어.", en: "We made great progress today." },
+    { id: 31, verb: "MAKE", ko: "네 칭찬 덕분에 오늘 하루 기분 최고야.", en: "You just made my day." },
+    { id: 32, verb: "MAKE", ko: "오늘 급한 일 생겨서 약속 못 갈 것 같아.", en: "I can't make it today." },
+    { id: 33, verb: "MAKE", ko: "그 사람 말 때문에 완전 멘붕 왔어.", en: "His words made me panic." },
+    { id: 34, verb: "MAKE", ko: "내가 서류 작성하다 실수를 좀 했어.", en: "I made a mistake on the document." },
+    { id: 35, verb: "MAKE", ko: "그거 진짜 그럴듯하게 들리네.", en: "That makes a lot of sense." },
+    { id: 36, verb: "MAKE", ko: "주말에 영화 볼 시간 좀 내보려고 해.", en: "I'll make time this weekend." },
+    { id: 37, verb: "MAKE", ko: "둘 중에 하나 확실하게 결정해.", en: "Make up your mind soon." },
+    { id: 38, verb: "MAKE", ko: "문 잠겼는지 다시 한번 확인해 봐.", en: "Make sure the door is locked." },
+    { id: 39, verb: "MAKE", ko: "걔가 농담으로 날 웃게 만들었어.", en: "He made me laugh with his jokes." },
+    { id: 40, verb: "MAKE", ko: "오늘 프로젝트 회의에서 좋은 성과 냈어.", en: "We made great progress today." },
 
     // PUT (41~50)
-    { verb: "PUT", ko: "겉옷은 그냥 소파 위에 올려둬.", en: "Put your jacket on the sofa." },
-    { verb: "PUT", ko: "어떻게 설명해야 할지 말이 잘 안 나오네.", en: "How should I put this?" },
-    { verb: "PUT", ko: "가방 너무 무거우니까 바닥에 내려놔.", en: "Put down your heavy bag." },
-    { verb: "PUT", ko: "날씨 쌀쌀하니까 모자 쓰고 나가.", en: "Put on your warm hat." },
-    { verb: "PUT", ko: "그 일은 다음 주로 미루는 게 낫겠어.", en: "Let's put off the meeting till next week." },
-    { verb: "PUT", ko: "다른 사람 입장에서 한번 생각해 봐.", en: "Put yourself in his shoes." },
-    { verb: "PUT", ko: "스마트폰은 주머니에 다시 넣어둬.", en: "Put your phone back in your pocket." },
-    { verb: "PUT", ko: "이번 프로젝트에 시간과 공을 많이 들였어.", en: "I put a lot of effort into this." },
-    { verb: "PUT", ko: "남은 음식은 냉장고에 넣어둬.", en: "Put the leftovers in the fridge." },
-    { verb: "PUT", ko: "다 쓴 물건은 제자리에 갖다 놔.", en: "Put everything back where it was." }
+    { id: 41, verb: "PUT", ko: "겉옷은 그냥 소파 위에 올려둬.", en: "Put your jacket on the sofa." },
+    { id: 42, verb: "PUT", ko: "어떻게 설명해야 할지 말이 잘 안 나오네.", en: "How should I put this?" },
+    { id: 43, verb: "PUT", ko: "가방 너무 무거우니까 바닥에 내려놔.", en: "Put down your heavy bag." },
+    { id: 44, verb: "PUT", ko: "날씨 쌀쌀하니까 모자 쓰고 나가.", en: "Put on your warm hat." },
+    { id: 45, verb: "PUT", ko: "그 일은 다음 주로 미루는 게 낫겠어.", en: "Let's put off the meeting till next week." },
+    { id: 46, verb: "PUT", ko: "다른 사람 입장에서 한번 생각해 봐.", en: "Put yourself in his shoes." },
+    { id: 47, verb: "PUT", ko: "스마트폰은 주머니에 다시 넣어둬.", en: "Put your phone back in your pocket." },
+    { id: 48, verb: "PUT", ko: "이번 프로젝트에 시간과 공을 많이 들였어.", en: "I put a lot of effort into this." },
+    { id: 49, verb: "PUT", ko: "남은 음식은 냉장고에 넣어둬.", en: "Put the leftovers in the fridge." },
+    { id: 50, verb: "PUT", ko: "다 쓴 물건은 제자리에 갖다 놔.", en: "Put everything back where it was." }
   ];
 
+  let currentPlayList = [];
   let currentIndex = 0;
   let score = 0;
   let combo = 0;
+  let isRandom = true;
   let timerActive = true;
   let timerInterval = null;
-  let timeLeft = 100; // %
+  let timeLeft = 100;
   let synth = window.speechSynthesis;
   let isUnlocked = false;
 
@@ -344,11 +353,30 @@
   const timerBar = document.getElementById("timerBar");
   const cheatList = document.getElementById("cheatList");
   const timerToggleBtn = document.getElementById("timerToggleBtn");
+  const randomToggleBtn = document.getElementById("randomToggleBtn");
   const nextQuizBtn = document.getElementById("nextQuizBtn");
   const listenAgainBtn = document.getElementById("listenAgainBtn");
   const verbBtns = document.querySelectorAll(".verb-btn");
 
-  // 모바일 오디오 언락
+  // 피셔-예이츠 셔플 알고리즘
+  function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function resetPlayList() {
+    if (isRandom) {
+      currentPlayList = shuffleArray(rawBank);
+    } else {
+      currentPlayList = [...rawBank];
+    }
+    currentIndex = 0;
+  }
+
   function unlockAudio() {
     if (isUnlocked) return;
     try {
@@ -360,14 +388,21 @@
   }
 
   // 치트 리스트 렌더
-  bank.forEach((item, idx) => {
+  rawBank.forEach((item, idx) => {
     const d = document.createElement("div");
     d.className = "list-item";
-    d.id = `item-${idx}`;
-    d.innerHTML = `<span><b>[${item.verb}]</b> ${item.ko}</span><span>#${idx+1}</span>`;
+    d.id = `item-${item.id}`;
+    d.innerHTML = `<span><b>[${item.verb}]</b> ${item.ko}</span><span>#${item.id}</span>`;
     d.addEventListener("click", () => {
       unlockAudio();
-      loadQuestion(idx);
+      // 특정 문장 터치 시 해당 문장 바로 출제
+      const foundIdx = currentPlayList.findIndex(p => p.id === item.id);
+      if (foundIdx !== -1) {
+        currentIndex = foundIdx;
+      } else {
+        currentPlayList[currentIndex] = item;
+      }
+      loadQuestion(currentIndex);
     });
     cheatList.appendChild(d);
   });
@@ -401,32 +436,33 @@
   function onTimeOut() {
     combo = 0;
     comboVal.innerText = combo;
-    feedback.innerText = `⏳ 시간 초과! 정답 동사: [${bank[currentIndex].verb}]`;
+    feedback.innerText = `⏳ 시간 초과! 정답 동사: [${currentPlayList[currentIndex].verb}]`;
     feedback.className = "feedback-bubble wrong";
     showAnswer();
   }
 
   function loadQuestion(idx) {
     currentIndex = idx;
-    const item = bank[currentIndex];
-    progressVal.innerText = `${currentIndex + 1}/${bank.length}`;
+    const item = currentPlayList[currentIndex];
+    progressVal.innerText = `${currentIndex + 1}/${currentPlayList.length}`;
     koPrompt.innerText = item.ko;
     enResult.innerText = `_ _ _ (${item.verb.length}글자) ...`;
-    feedback.innerText = "3초 안에 직관적으로 선택하세요!";
+    feedback.innerText = isRandom ? "🔀 무작위! 직관적으로 고르세요!" : "3초 안에 직관적으로 선택하세요!";
     feedback.className = "feedback-bubble";
 
-    document.querySelectorAll(".list-item").forEach((el, i) => {
-      el.classList.toggle("selected", i === currentIndex);
-    });
-    const selectedEl = document.getElementById(`item-${currentIndex}`);
-    if (selectedEl) selectedEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    document.querySelectorAll(".list-item").forEach(el => el.classList.remove("selected"));
+    const selectedEl = document.getElementById(`item-${item.id}`);
+    if (selectedEl) {
+      selectedEl.classList.add("selected");
+      selectedEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
 
     verbBtns.forEach(btn => btn.classList.remove("hit"));
     startTimer();
   }
 
   function showAnswer() {
-    const item = bank[currentIndex];
+    const item = currentPlayList[currentIndex];
     enResult.innerText = item.en;
     speak(item.en);
   }
@@ -434,17 +470,15 @@
   function handleChoice(chosenVerb, targetBtn) {
     unlockAudio();
     clearInterval(timerInterval);
-    const item = bank[currentIndex];
+    const item = currentPlayList[currentIndex];
 
     if (chosenVerb === item.verb) {
-      // 정답
       combo++;
       score += 100 + (combo * 20);
       feedback.innerText = `🎯 PERFECT! (${chosenVerb})`;
       feedback.className = "feedback-bubble correct";
       targetBtn.classList.add("hit");
     } else {
-      // 오답
       combo = 0;
       feedback.innerText = `❌ 아쉬워요! 정답은 [${item.verb}]`;
       feedback.className = "feedback-bubble wrong";
@@ -455,35 +489,53 @@
     showAnswer();
   }
 
-  // 버튼 리스너
+  // 동사 버튼
   verbBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       handleChoice(btn.getAttribute("data-verb"), btn);
     });
   });
 
+  // 다음 문제
   nextQuizBtn.addEventListener("click", () => {
     unlockAudio();
-    if (currentIndex < bank.length - 1) {
+    if (currentIndex < currentPlayList.length - 1) {
       loadQuestion(currentIndex + 1);
     } else {
-      loadQuestion(0);
+      // 50문항 완주 시 자동 재셔플
+      feedback.innerText = "🎉 50문장 완료! 새로 섞어 다시 시작합니다!";
+      setTimeout(() => {
+        resetPlayList();
+        loadQuestion(0);
+      }, 1000);
     }
   });
 
+  // 다시 듣기
   listenAgainBtn.addEventListener("click", () => {
     unlockAudio();
-    speak(bank[currentIndex].en);
+    speak(currentPlayList[currentIndex].en);
   });
 
+  // 타이머 모드 토글
   timerToggleBtn.addEventListener("click", () => {
     timerActive = !timerActive;
-    timerToggleBtn.innerText = timerActive ? "⏱ 타임어택: 켜짐" : "⏱ 타임어택: 꺼짐";
+    timerToggleBtn.innerText = timerActive ? "⏱ 타임어택: ON" : "⏱ 타임어택: OFF";
     timerToggleBtn.classList.toggle("active", timerActive);
     startTimer();
   });
 
-  // 시작
+  // 랜덤 모드 토글
+  randomToggleBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomToggleBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔢 순서대로: ON";
+    randomToggleBtn.classList.toggle("active", isRandom);
+    resetPlayList();
+    loadQuestion(0);
+  });
+
+  // 최초 실행
+  resetPlayList();
   loadQuestion(0);
 </script>
 
