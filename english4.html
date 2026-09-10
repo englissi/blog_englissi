@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>시간 벌기 만능 필러(Filler) 트레이너 (50문장)</title>
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-hover: #047857;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #34d399;
+      --filler-tag: #fbbf24;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .display-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .step-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: #334155;
+      color: var(--accent);
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .speaking-status {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .speaking .dot {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .current-ko {
+      font-size: 1.35rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .current-ko.active {
+      color: #fff;
+      font-weight: 700;
+      transform: scale(1.02);
+    }
+
+    .filler-pill {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      color: var(--filler-tag);
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .current-en {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #64748b;
+      line-height: 1.4;
+      transition: all 0.2s;
+    }
+
+    .current-en.active {
+      color: var(--accent);
+      transform: scale(1.04);
+    }
+
+    .repeat-counter {
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+      color: var(--accent);
+      font-weight: 600;
+      min-height: 1.4rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.75rem 1.4rem;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #334155;
+    }
+
+    button.btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    button.btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .settings-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    select {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.35rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+    }
+
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .sentence-list {
+      list-style: none;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .sentence-item {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid #33415544;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-item:hover {
+      background: #33415555;
+    }
+
+    .sentence-item.playing {
+      background: #05966918;
+      border-left: 4px solid var(--primary);
+    }
+
+    .item-ko {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+      color: #cbd5e1;
+    }
+
+    .item-en {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #6ee7b7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>시간 벌기 만능 필러(Filler) 트레이너</h1>
+    <p>한국어 1회 제시 후 자연스러운 필러 표현을 2회 연속 낭독합니다.</p>
+  </header>
+
+  <div class="display-card" id="displayCard">
+    <div class="step-badge" id="stepBadge">대기 중</div>
+    <div class="speaking-status" id="speakingStatus">
+      <div class="dot"></div>
+      <span id="statusText">정지</span>
+    </div>
+
+    <div class="current-ko" id="currentKo">재생 버튼을 누르면 자동 낭독이 시작됩니다.</div>
+    <div class="filler-pill" id="fillerPill">핵심 필러 패턴 대기 중</div>
+    <div class="current-en" id="currentEn">Click Play to Start</div>
+    <div class="repeat-counter" id="repeatCounter"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전 문장</button>
+    <button class="btn-primary" id="playPauseBtn">▶ 전체 자동 재생</button>
+    <button id="nextBtn">다음 문장 ⏭</button>
+    <button id="stopBtn">⏹ 정지</button>
+  </div>
+
+  <div class="settings-panel">
+    <div class="setting-item">
+      <label for="speedSelect">영어 낭독 속도:</label>
+      <select id="speedSelect">
+        <option value="0.8">0.8x (천천히)</option>
+        <option value="0.95" selected>1.0x (표준)</option>
+        <option value="1.15">1.2x (빠르게)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">낭독 간 간격:</label>
+      <select id="intervalSelect">
+        <option value="600">0.6초 (빠른 진행)</option>
+        <option value="1200" selected>1.2초 (표준 간격)</option>
+        <option value="2000">2.0초 (충분히 따라 하기)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>필러 활용 50개 리스트</span>
+      <span>클릭 시 해당 문장 즉시 이동</span>
+    </div>
+    <ul class="sentence-list" id="sentenceList"></ul>
+  </div>
+</div>
+
+<script>
+  const sentences = [
+    { ko: "어떻게 말해야 할까... 그게 좀 복잡해.", filler: "How should I put this...", en: "How should I put this... it's a bit complicated." },
+    { ko: "실은 말이지, 내가 오늘 좀 바빠.", filler: "The thing is...", en: "The thing is, I'm a bit busy today." },
+    { ko: "있잖아, 나 오늘 너무 피곤해.", filler: "You know, kind of...", en: "You know, I'm kind of tired today." },
+    { ko: "뭐라고 해야 하지... 나 그거 별로 안 좋아해.", filler: "How should I put this...", en: "How should I put this... I don't really like it." },
+    { ko: "핵심은 내가 돈이 없다는 거야.", filler: "The thing is...", en: "The thing is, I don't have enough money." },
+    { ko: "있잖아, 그 사람 좀 특이해.", filler: "You know, kind of...", en: "He is, you know, kind of strange." },
+    { ko: "어떻게 설명하지... 그거 고장 났어.", filler: "How should I put this...", en: "How should I put this... it's broken." },
+    { ko: "실은 나 오늘 약속 갈 기분이 아니야.", filler: "The thing is...", en: "The thing is, I don't feel like going out." },
+    { ko: "뭐랄까, 날씨가 좀 춥네.", filler: "You know, kind of...", en: "It's, you know, kind of cold outside." },
+    { ko: "뭐라고 하지... 내 스타일은 아니야.", filler: "How should I put this...", en: "How should I put this... it's not my style." },
+    { ko: "실은 내가 길을 잃었어.", filler: "The thing is...", en: "The thing is, I got lost." },
+    { ko: "있잖아, 나 폰 배터리가 없어.", filler: "You know, kind of...", en: "You know, my battery is kind of low." },
+    { ko: "어떻게 말해야 할까... 너무 비싸.", filler: "How should I put this...", en: "How should I put this... it's too expensive." },
+    { ko: "핵심은 시간이 없다는 거야.", filler: "The thing is...", en: "The thing is, we don't have much time." },
+    { ko: "분위기가, 있잖아, 좀 어색해.", filler: "You know, kind of...", en: "The mood is, you know, kind of awkward." },
+    { ko: "뭐라고 해야 하지... 걔 말이 맞아.", filler: "How should I put this...", en: "How should I put this... she is actually right." },
+    { ko: "실은 내가 그 회의를 깜빡했어.", filler: "The thing is...", en: "The thing is, I forgot about the meeting." },
+    { ko: "음식 맛이, 있잖아, 좀 싱거워.", filler: "You know, kind of...", en: "It tastes, you know, kind of bland." },
+    { ko: "어떻게 설명할까... 계획이 바뀌었어.", filler: "How should I put this...", en: "How should I put this... the plan changed." },
+    { ko: "실은 내가 버스를 놓쳤거든.", filler: "The thing is...", en: "The thing is, I missed the bus." },
+    { ko: "방이, 있잖아, 좀 어두워.", filler: "You know, kind of...", en: "The room is, you know, kind of dark." },
+    { ko: "뭐라고 해야 할까... 나 배 안 고파.", filler: "How should I put this...", en: "How should I put this... I'm not really hungry." },
+    { ko: "핵심은 차가 너무 막힌다는 거야.", filler: "The thing is...", en: "The thing is, the traffic is terrible." },
+    { ko: "그 사람 목소리가, 있잖아, 좀 작아.", filler: "You know, kind of...", en: "His voice is, you know, kind of quiet." },
+    { ko: "어떻게 말하지... 내 잘못인 것 같아.", filler: "How should I put this...", en: "How should I put this... it might be my fault." },
+    { ko: "실은 나 지금 집에 가야 해.", filler: "The thing is...", en: "The thing is, I have to go home now." },
+    { ko: "옷이 나한테, 있잖아, 좀 작아.", filler: "You know, kind of...", en: "The shirt is, you know, kind of small for me." },
+    { ko: "뭐라고 표현할까... 너무 시끄러워.", filler: "How should I put this...", en: "How should I put this... it's way too loud here." },
+    { ko: "핵심은 내가 결정을 못 하겠다는 거야.", filler: "The thing is...", en: "The thing is, I can't decide." },
+    { ko: "영화가, 있잖아, 좀 지루했어.", filler: "You know, kind of...", en: "The movie was, you know, kind of boring." },
+    { ko: "어떻게 말해야 할까... 나 커피 끊었어.", filler: "How should I put this...", en: "How should I put this... I stopped drinking coffee." },
+    { ko: "실은 내가 감기 기운이 좀 있어.", filler: "The thing is...", en: "The thing is, I have a slight cold." },
+    { ko: "그 가방, 있잖아, 좀 무거워.", filler: "You know, kind of...", en: "That bag is, you know, kind of heavy." },
+    { ko: "뭐라고 할까... 그냥 쉬고 싶어.", filler: "How should I put this...", en: "How should I put this... I just want to rest." },
+    { ko: "핵심은 내일 비가 온다는 거야.", filler: "The thing is...", en: "The thing is, it's going to rain tomorrow." },
+    { ko: "걔 오늘, 있잖아, 기분이 좀 안 좋아 보여.", filler: "You know, kind of...", en: "She looks, you know, kind of upset today." },
+    { ko: "어떻게 설명해야 하지... 비밀번호를 까먹었어.", filler: "How should I put this...", en: "How should I put this... I forgot my password." },
+    { ko: "실은 나 운전면허가 없어.", filler: "The thing is...", en: "The thing is, I don't have a driver's license." },
+    { ko: "신발이, 있잖아, 좀 불편해.", filler: "You know, kind of...", en: "These shoes are, you know, kind of uncomfortable." },
+    { ko: "뭐라고 해야 할까... 오늘 만나긴 힘들 것 같아.", filler: "How should I put this...", en: "How should I put this... I can't make it today." },
+    { ko: "핵심은 우리가 예산이 부족하다는 거야.", filler: "The thing is...", en: "The thing is, our budget is too tight." },
+    { ko: "오늘따라, 있잖아, 좀 졸리네.", filler: "You know, kind of...", en: "I feel, you know, kind of sleepy today." },
+    { ko: "어떻게 말할까... 나 요리 진짜 못해.", filler: "How should I put this...", en: "How should I put this... I'm really bad at cooking." },
+    { ko: "실은 걔가 내 전화를 안 받아.", filler: "The thing is...", en: "The thing is, he is not answering my calls." },
+    { ko: "길이, 있잖아, 좀 미끄러워.", filler: "You know, kind of...", en: "The road is, you know, kind of slippery." },
+    { ko: "뭐라고 하지... 그거 좋은 생각은 아닌 것 같아.", filler: "How should I put this...", en: "How should I put this... that's not a great idea." },
+    { ko: "핵심은 열쇠가 방 안에 있다는 거야.", filler: "The thing is...", en: "The thing is, my key is locked inside." },
+    { ko: "물이, 있잖아, 좀 차가워.", filler: "You know, kind of...", en: "The water is, you know, kind of cold." },
+    { ko: "어떻게 설명할까... 나 그거 이미 다 끝냈어.", filler: "How should I put this...", en: "How should I put this... I already finished that." },
+    { ko: "실은 내가 영어를 잘 못 알아들었어.", filler: "The thing is...", en: "The thing is, I didn't catch what you said." }
+  ];
+
+  let currentIndex = 0;
+  let isRunning = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const currentKo = document.getElementById("currentKo");
+  const fillerPill = document.getElementById("fillerPill");
+  const currentEn = document.getElementById("currentEn");
+  const repeatCounter = document.getElementById("repeatCounter");
+  const stepBadge = document.getElementById("stepBadge");
+  const speakingStatus = document.getElementById("speakingStatus");
+  const statusText = document.getElementById("statusText");
+  const sentenceList = document.getElementById("sentenceList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function loadVoices() {
+    voices = synth.getVoices();
+  }
+  loadVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  // 리스트 렌더링
+  sentences.forEach((item, idx) => {
+    const li = document.createElement("li");
+    li.className = "sentence-item";
+    li.id = `item-${idx}`;
+    li.innerHTML = `
+      <div class="item-ko">${idx + 1}. ${item.ko}</div>
+      <div class="item-en">${item.en}</div>
+    `;
+    li.addEventListener("click", () => {
+      stopPlayback();
+      currentIndex = idx;
+      updateUI();
+      startCycle();
+    });
+    sentenceList.appendChild(li);
+  });
+
+  function updateUI() {
+    document.querySelectorAll(".sentence-item").forEach((el, i) => {
+      const isSelected = i === currentIndex;
+      el.classList.toggle("playing", isSelected);
+      if (isSelected) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+    const curr = sentences[currentIndex];
+    currentKo.innerText = curr.ko;
+    fillerPill.innerText = `활용 필러: ${curr.filler}`;
+    currentEn.innerText = curr.en;
+    stepBadge.innerText = `문장 ${currentIndex + 1} / ${sentences.length}`;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakText(text, lang, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      utter.rate = rate;
+
+      if (voices.length > 0) {
+        if (lang.startsWith("ko")) {
+          const koVoice = voices.find(v => v.lang.includes("ko") || v.lang.includes("KR"));
+          if (koVoice) utter.voice = koVoice;
+        } else {
+          const enVoice = voices.find(v => v.lang.includes("en-US") || v.lang.includes("en_US")) || voices.find(v => v.lang.startsWith("en"));
+          if (enVoice) utter.voice = enVoice;
+        }
+      }
+
+      utter.onend = () => resolve();
+      utter.onerror = () => resolve();
+      synth.speak(utter);
+    });
+  }
+
+  async function playSentenceCycle(index) {
+    if (!isRunning) return;
+    const item = sentences[index];
+    const enSpeed = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 1. 한국어 낭독
+    currentKo.classList.add("active");
+    currentEn.classList.remove("active");
+    repeatCounter.innerText = "🗣 [1/3] 한국어 상황 제시";
+    statusText.innerText = "한국어 읽는 중";
+    speakingStatus.classList.add("speaking");
+
+    await speakText(item.ko, "ko-KR", 1.0);
+    currentKo.classList.remove("active");
+    await sleep(400);
+
+    if (!isRunning) return;
+
+    // 2. 필러 영어 1회차 낭독
+    currentEn.classList.add("active");
+    repeatCounter.innerText = "🇺🇸 [2/3] 필러 활용 영어 1회차";
+    statusText.innerText = "영어 1회 읽는 중";
+    await speakText(item.en, "en-US", enSpeed);
+    await sleep(delay);
+
+    if (!isRunning) return;
+
+    // 3. 필러 영어 2회차 낭독 (따라하기)
+    repeatCounter.innerText = "🔁 [3/3] 필러 활용 영어 2회차 (소리 내어 따라 하세요)";
+    statusText.innerText = "영어 2회 읽는 중";
+    await speakText(item.en, "en-US", Math.max(0.75, enSpeed * 0.92));
+    currentEn.classList.remove("active");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "대기";
+    repeatCounter.innerText = "";
+    await sleep(delay);
+  }
+
+  async function startCycle() {
+    isRunning = true;
+    playPauseBtn.innerText = "⏸ 일시정지";
+    playPauseBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < sentences.length) {
+      updateUI();
+      await playSentenceCycle(currentIndex);
+      if (!isRunning) break;
+      if (currentIndex < sentences.length - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playPauseBtn.innerText = "▶ 전체 자동 재생";
+    playPauseBtn.classList.add("btn-primary");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "정지";
+    repeatCounter.innerText = "";
+    currentKo.classList.remove("active");
+    currentEn.classList.remove("active");
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isRunning) {
+      stopPlayback();
+    } else {
+      startCycle();
+    }
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < sentences.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  updateUI();
+</script>
+
+</body>
+</html>
