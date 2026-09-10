@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>이미지 연상 영어 트레이너 (50문장 GIF 모션)</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #0b0f19;
+      --card-bg: #151d2f;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --badge-bg: rgba(99, 102, 241, 0.2);
+      --border: #243049;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem 0.75rem 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* 메인 디스플레이 */
+    .display-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.75rem 1rem 1.5rem;
+      text-align: center;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .step-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .speaking-status {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .speaking .dot {
+      background: #38bdf8;
+      box-shadow: 0 0 8px #38bdf8;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* 1초 GIF 씬 캔버스 */
+    .scene-stage {
+      width: 140px;
+      height: 120px;
+      background: #090d16;
+      border-radius: 1rem;
+      border: 1px solid #2d3b55;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene-icon {
+      font-size: 2.8rem;
+      display: inline-block;
+      transform-origin: center bottom;
+    }
+
+    /* 모션 애니메이션 클래스 */
+    .motion-crash { animation: animCrash 1.1s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
+    .motion-pulse { animation: animPulse 1s ease-in-out infinite; }
+    .motion-drop { animation: animDrop 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+    .motion-shake { animation: animShake 0.8s ease-in-out infinite; }
+    .motion-spin { animation: animSpin 1.4s linear infinite; }
+    .motion-slide { animation: animSlide 1.2s ease-in-out infinite; }
+
+    @keyframes animCrash {
+      0% { transform: translateY(-30px) rotate(-20deg); opacity: 0; }
+      40% { transform: translateY(5px) rotate(85deg); opacity: 1; }
+      55% { transform: translateY(0px) rotate(85deg); }
+      70%, 100% { transform: translateY(2px) rotate(85deg); }
+    }
+    @keyframes animPulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 10px #f87171); }
+    }
+    @keyframes animDrop {
+      0% { transform: translateY(-25px); opacity: 0; }
+      50% { transform: translateY(12px); opacity: 1; }
+      60% { transform: translateY(8px); }
+      70%, 100% { transform: translateY(12px); opacity: 0.8; }
+    }
+    @keyframes animShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px) rotate(-8deg); }
+      40% { transform: translateX(6px) rotate(8deg); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    @keyframes animSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes animSlide {
+      0% { transform: translateX(-25px); opacity: 0; }
+      50% { transform: translateX(5px); opacity: 1; }
+      100% { transform: translateX(25px); opacity: 0; }
+    }
+
+    .focus-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--badge-bg);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .current-ko {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      transition: color 0.2s;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .current-ko.active {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .current-en {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #64748b;
+      line-height: 1.35;
+      transition: color 0.2s;
+      word-break: keep-all;
+    }
+
+    .current-en.active {
+      color: var(--accent);
+    }
+
+    .repeat-counter {
+      margin-top: 0.85rem;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      font-weight: 600;
+      min-height: 1.2rem;
+    }
+
+    /* 조작 바 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 1rem;
+      border-radius: 0.6rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      user-select: none;
+    }
+
+    button:active {
+      transform: scale(0.98);
+      background: #1e293b;
+    }
+
+    button.btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    button.btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .settings-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #090d16;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 문장 목록 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .sentence-list {
+      list-style: none;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .sentence-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #24304944;
+      cursor: pointer;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-item.playing {
+      background: rgba(99, 102, 241, 0.15);
+      border-left: 4px solid var(--primary);
+    }
+
+    .item-ko {
+      font-size: 0.85rem;
+      margin-bottom: 0.2rem;
+      color: #cbd5e1;
+    }
+
+    .item-focus {
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-en {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #bae6fd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>이미지 연상 영어 트레이너</h1>
+    <p>글자를 번역하지 말고 1초 상황 짤을 보며 입으로 뱉으세요.</p>
+  </header>
+
+  <div class="display-card" id="displayCard">
+    <div class="step-badge" id="stepBadge">대기 중</div>
+    <div class="speaking-status" id="speakingStatus">
+      <div class="dot"></div>
+      <span id="statusText">정지</span>
+    </div>
+
+    <div class="scene-stage">
+      <div class="scene-icon" id="sceneIcon">🎬</div>
+    </div>
+
+    <div class="focus-badge" id="focusBadge">연상 초점: 화면 중앙 관찰</div>
+    <div class="current-ko" id="currentKo">재생 버튼을 터치해 이미지 훈련을 시작하세요.</div>
+    <div class="current-en" id="currentEn">Tap Play to Start</div>
+    <div class="repeat-counter" id="repeatCounter"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playPauseBtn">▶ 전체 재생</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="stopBtn">⏹ 정지</button>
+  </div>
+
+  <div class="settings-panel">
+    <div class="setting-item">
+      <label for="speedSelect">영어 속도:</label>
+      <select id="speedSelect">
+        <option value="0.85">0.85x</option>
+        <option value="0.95" selected>1.0x (표준)</option>
+        <option value="1.1">1.1x</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">문장 간 간격:</label>
+      <select id="intervalSelect">
+        <option value="600">0.6초</option>
+        <option value="1200" selected>1.2초 (표준)</option>
+        <option value="2000">2.0초 (따라하기)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>50개 이미지 연상 문장</span>
+      <span>터치 시 해당 씬으로 이동</span>
+    </div>
+    <ul class="sentence-list" id="sentenceList"></ul>
+  </div>
+</div>
+
+<script>
+  const sentences = [
+    { ko: "퇴근 후 가방 던지고 침대에 대자로 쓰러지는 장면", focus: "몸이 침대에 닿는 순간", icon: "🛏️", motion: "motion-crash", en: "I just crashed onto my bed." },
+    { ko: "도로에 빨간 브레이크등이 빽빽하게 멈춰 선 장면", focus: "차들이 꼼짝 못 함", icon: "🚗", motion: "motion-pulse", en: "Cars are barely moving out here." },
+    { ko: "테이블 위에 컵이 툭 부딪혀 커피가 왈칵 쏟아지는 장면", focus: "액체가 번져나감", icon: "☕", motion: "motion-shake", en: "Coffee is all over the table." },
+    { ko: "폰 화면이 툭 꺼지며 검은 화면만 남은 장면", focus: "까만 화면", icon: "📱", motion: "motion-pulse", en: "My screen just went totally black." },
+    { ko: "양손으로 주머니를 뒤지는데 아무것도 안 잡히는 장면", focus: "빈 주머니", icon: "👖", motion: "motion-shake", en: "My pockets are completely empty." },
+    { ko: "눈을 떴는데 창밖이 이미 대낮처럼 환한 장면", focus: "햇빛 + 늦잠", icon: "☀️", motion: "motion-pulse", en: "The sun is already up." },
+    { ko: "양손에 무거운 장바구니를 들고 팔이 축 늘어진 장면", focus: "손잡이가 손가락을 죔", icon: "🛍️", motion: "motion-drop", en: "These bags are pulling my arms down." },
+    { ko: "엘리베이터 문 앞에 '점검 중' 노란 팻말이 서 있는 장면", focus: "닫힌 문", icon: "🚫", motion: "motion-pulse", en: "The elevator is shut down today." },
+    { ko: "비를 맞아 머리카락과 소매 끝에서 물이 뚝뚝 떨어지는 장면", focus: "물방울 낙하", icon: "🌧️", motion: "motion-drop", en: "Water is dripping from my clothes." },
+    { ko: "식당 문이 굳게 닫혀 있고 불이 다 꺼진 장면", focus: "어두운 실내", icon: "🔒", motion: "motion-pulse", en: "The lights are off and doors are locked." },
+    { ko: "커피 한 모금 넘기자마자 눈이 번쩍 뜨이는 장면", focus: "따뜻한 머그잔", icon: "☕", motion: "motion-pulse", en: "This coffee is waking me up." },
+    { ko: "유리컵이 바닥에 떨어져 조각조각 튀는 장면", focus: "깨진 유리 파편", icon: "💥", motion: "motion-crash", en: "The glass shattered into pieces." },
+    { ko: "지갑을 열었는데 영수증만 있고 지폐가 없는 장면", focus: "텅 빈 지갑", icon: "👛", motion: "motion-shake", en: "There is no cash in my wallet." },
+    { ko: "버스 뒷모습이 연기를 뿜으며 멀어져 가는 장면", focus: "멀어지는 버스", icon: "🚌", motion: "motion-slide", en: "The bus is pulling away." },
+    { ko: "발뒤꿈치에 빨갛게 물집이 잡혀 걷기 힘든 장면", focus: "꽉 끼는 신발", icon: "👟", motion: "motion-shake", en: "These shoes are killing my feet." },
+    { ko: "문고리를 잡고 세게 돌렸는데 덜컹거리며 안 열리는 장면", focus: "잠긴 손잡이", icon: "🚪", motion: "motion-shake", en: "The door won't open at all." },
+    { ko: "창문 틈으로 차가운 칼바람이 쌩 들어오는 장면", focus: "덜컹거리는 창문", icon: "💨", motion: "motion-slide", en: "Cold air is leaking through the window." },
+    { ko: "바람에 모자가 휙 날아가 공중에서 회전하는 장면", focus: "날아가는 모자", icon: "🧢", motion: "motion-spin", en: "My hat just flew off." },
+    { ko: "바닥에 얼음이 얼어 발이 미끄덩 뒤로 빠지는 장면", focus: "삐끗하는 발", icon: "🧊", motion: "motion-crash", en: "The ground is super slippery." },
+    { ko: "시계 초침이 정각을 지나 빠르게 흘러가는 장면", focus: "촉박한 시계", icon: "⏱️", motion: "motion-spin", en: "Time is ticking away." },
+    { ko: "두꺼운 패딩을 벗고 시원한 공기를 들이마시는 장면", focus: "지퍼 내리기", icon: "🧥", motion: "motion-drop", en: "I finally took off my heavy jacket." },
+    { ko: "음식에서 김이 모락모락 피어오르고 군침이 도는 장면", focus: "뜨거운 김", icon: "🍲", motion: "motion-pulse", en: "The food is piping hot." },
+    { ko: "귀를 손으로 꽉 막아도 쿵쾅거리는 소음이 들리는 장면", focus: "시끄러운 소음", icon: "🔊", motion: "motion-shake", en: "The noise is shaking the whole room." },
+    { ko: "노트북 화면에 뱅글뱅글 도는 로딩 아이콘만 뜬 장면", focus: "멈춘 화면", icon: "💻", motion: "motion-spin", en: "The page is stuck on loading." },
+    { ko: "계단 끝에서 발을 헛디뎌 엉덩방아를 찧는 장면", focus: "엉덩방아 충격", icon: "🪜", motion: "motion-crash", en: "I lost my footing on the stairs." },
+    { ko: "지하철 문이 닫히며 엉뚱한 정차역 이름이 스쳐 가는 장면", focus: "잘못 탄 플랫폼", icon: "🚇", motion: "motion-slide", en: "I'm heading in the wrong direction." },
+    { ko: "셔츠 앞섶에 빨간 떡볶이 국물이 톡 튄 장면", focus: "빨간 얼룩", icon: "👔", motion: "motion-pulse", en: "A red stain popped on my shirt." },
+    { ko: "물병을 입에 대고 꿀꺽꿀꺽 끝까지 들이켜는 장면", focus: "빈 플라스틱 병", icon: "💧", motion: "motion-drop", en: "I swallowed the whole bottle down." },
+    { ko: "방바닥에 옷가지와 책이 어지럽게 널브러진 장면", focus: "발 디딜 틈 없는 방", icon: "📦", motion: "motion-shake", en: "Clothes are piled up everywhere." },
+    { ko: "안경을 벗었더니 세상이 뿌옇게 뭉개져 보이는 장면", focus: "흐릿한 시야", icon: "👓", motion: "motion-pulse", en: "Everything is completely blurry." },
+    { ko: "소파 깊숙이 푹 파묻혀 리모컨만 쥐고 있는 장면", focus: "늘어진 몸", icon: "🛋️", motion: "motion-drop", en: "I'm glued to the sofa." },
+    { ko: "충전기 선을 꽂아도 번개 표시가 안 뜨는 장면", focus: "먹통인 단자", icon: "🔌", motion: "motion-shake", en: "It won't charge no matter what." },
+    { ko: "찬 바람에 목이 간질간질하며 기침이 터지는 장면", focus: "목을 감싸 쥠", icon: "🧣", motion: "motion-pulse", en: "A dry cough keeps coming up." },
+    { ko: "손에 든 우산 살이 바람에 뒤집혀 꺾이는 장면", focus: "뒤집힌 우산", icon: "☂️", motion: "motion-crash", en: "The wind turned my umbrella inside out." },
+    { ko: "모니터를 멍하니 보며 눈꺼풀이 천근만근 감기는 장면", focus: "무거운 눈꺼풀", icon: "🥱", motion: "motion-drop", en: "My eyelids are dropping heavily." },
+    { ko: "열쇠를 가방 바닥에서 손가락으로 낚아채는 장면", focus: "짤랑거리는 쇠", icon: "🔑", motion: "motion-shake", en: "I finally grabbed the keys." },
+    { ko: "신발 끈이 풀려 바닥에 길게 끌리는 장면", focus: "밟히는 신발 끈", icon: "👟", motion: "motion-slide", en: "My shoelace is dragging on the ground." },
+    { ko: "배에서 꼬르륵 소리가 크게 울려 손을 얹는 장면", focus: "빈 속의 요동", icon: "🍽️", motion: "motion-shake", en: "My stomach is growling like crazy." },
+    { ko: "지도 앱의 파란 화살표가 엉뚱한 골목을 가리키는 장면", focus: "미로 같은 골목", icon: "🗺️", motion: "motion-spin", en: "The map has led me into an alley." },
+    { ko: "가방 지퍼가 반쯤 열린 채 종이가 삐져나온 장면", focus: "열린 지퍼", icon: "🎒", motion: "motion-pulse", en: "My backpack is wide open." },
+    { ko: "창밖으로 굵은 빗방울이 유리창을 세게 때리는 장면", focus: "유리에 튀는 물방울", icon: "🌧️", motion: "motion-drop", en: "Rain is pounding against the glass." },
+    { ko: "모기 한 마리가 귓가에서 앵앵거리며 맴도는 장면", focus: "손을 휘저음", icon: "🦟", motion: "motion-spin", en: "A bug is buzzing around my ears." },
+    { ko: "계란 후라이가 팬 위에서 지글지글 익어가는 장면", focus: "기름 튀는 소리", icon: "🍳", motion: "motion-shake", en: "Eggs are sizzling in the pan." },
+    { ko: "두꺼운 책을 탁 덮고 기지개를 길게 켜는 장면", focus: "펴지는 등 근육", icon: "📖", motion: "motion-pulse", en: "I slammed the book shut and stretched." },
+    { ko: "차 창문을 내리자 시원한 바람이 머리를 헝클어뜨리는 장면", focus: "흩날리는 머리", icon: "🌬️", motion: "motion-slide", en: "The cool wind is blowing through." },
+    { ko: "서랍을 열고 이리저리 물건을 헤집는 장면", focus: "뒤섞인 물건", icon: "🗄️", motion: "motion-shake", en: "I'm digging through this mess." },
+    { ko: "뜨거운 차 한 모금에 언 손과 몸이 풀리는 장면", focus: "모락모락 김", icon: "🍵", motion: "motion-pulse", en: "The hot tea is warming my hands." },
+    { ko: "꽉 찬 쓰레기봉투를 묶어 문밖에 내놓는 장면", focus: "묶인 봉투 매듭", icon: "🗑️", motion: "motion-drop", en: "The trash bag is packed to the top." },
+    { ko: "횡단보도 깜빡이는 초록 불을 보고 전력 질주하는 장면", focus: "헐떡이는 숨", icon: "🚦", motion: "motion-pulse", en: "I'm sprinting for the green light." },
+    { ko: "침대 조명을 끄자 방 안이 순식간에 칠흑같이 어두워지는 장면", focus: "캄캄한 방", icon: "💡", motion: "motion-pulse", en: "The room went pitch black instantly." }
+  ];
+
+  let currentIndex = 0;
+  let isRunning = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const currentKo = document.getElementById("currentKo");
+  const sceneIcon = document.getElementById("sceneIcon");
+  const focusBadge = document.getElementById("focusBadge");
+  const currentEn = document.getElementById("currentEn");
+  const repeatCounter = document.getElementById("repeatCounter");
+  const stepBadge = document.getElementById("stepBadge");
+  const speakingStatus = document.getElementById("speakingStatus");
+  const statusText = document.getElementById("statusText");
+  const sentenceList = document.getElementById("sentenceList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() {
+    voices = synth.getVoices() || [];
+  }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function unlockMobileAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      dummy.rate = 2.0;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch (e) {
+      console.warn("Audio unlock failed", e);
+    }
+  }
+
+  sentences.forEach((item, idx) => {
+    const li = document.createElement("li");
+    li.className = "sentence-item";
+    li.id = `item-${idx}`;
+    li.innerHTML = `
+      <div class="item-ko">${idx + 1}. ${item.icon} ${item.ko}</div>
+      <div class="item-focus">초점: ${item.focus}</div>
+      <div class="item-en">${item.en}</div>
+    `;
+    li.addEventListener("click", () => {
+      unlockMobileAudio();
+      stopPlayback();
+      currentIndex = idx;
+      updateUI();
+      startCycle();
+    });
+    sentenceList.appendChild(li);
+  });
+
+  function updateUI() {
+    document.querySelectorAll(".sentence-item").forEach((el, i) => {
+      const isSelected = i === currentIndex;
+      el.classList.toggle("playing", isSelected);
+      if (isSelected) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+    const curr = sentences[currentIndex];
+    currentKo.innerText = curr.ko;
+    focusBadge.innerText = `💡 연상 초점: ${curr.focus}`;
+    sceneIcon.innerText = curr.icon;
+    
+    // 모션 클래스 리셋 및 적용
+    sceneIcon.className = "scene-icon";
+    void sceneIcon.offsetWidth; // 리플로우 강제
+    sceneIcon.classList.add(curr.motion);
+
+    currentEn.innerText = curr.en;
+    stepBadge.innerText = `Scene ${currentIndex + 1} / ${sentences.length}`;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakTextMobile(text, lang, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      utter.rate = rate;
+
+      if (!voices || voices.length === 0) {
+        voices = synth.getVoices() || [];
+      }
+
+      if (voices.length > 0) {
+        if (lang.startsWith("ko")) {
+          const koVoice = voices.find(v => v.lang && (v.lang.includes("ko") || v.lang.includes("KR")));
+          if (koVoice) utter.voice = koVoice;
+        } else {
+          const enVoice = voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+          if (enVoice) utter.voice = enVoice;
+        }
+      }
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(safetyTimeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const expectedDuration = (text.length / 5) * 1000 * (1 / rate) + 3500;
+      const safetyTimeout = setTimeout(() => {
+        finish();
+      }, expectedDuration);
+
+      try {
+        synth.speak(utter);
+      } catch (e) {
+        finish();
+      }
+    });
+  }
+
+  async function playSentenceCycle(index) {
+    if (!isRunning) return;
+    const item = sentences[index];
+    const enSpeed = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    // 1. 한국어 상황 제시
+    currentKo.classList.add("active");
+    currentEn.classList.remove("active");
+    repeatCounter.innerText = "🗣 [1/3] 장면 상상하기";
+    statusText.innerText = "상황 제시";
+    speakingStatus.classList.add("speaking");
+
+    await speakTextMobile(item.ko, "ko-KR", 1.0);
+    currentKo.classList.remove("active");
+    await sleep(350);
+
+    if (!isRunning) return;
+
+    // 2. 영어 1회차 낭독
+    currentEn.classList.add("active");
+    repeatCounter.innerText = "🇺🇸 [2/3] 직관 묘사 영어 1회";
+    statusText.innerText = "영어 1회";
+    await speakTextMobile(item.en, "en-US", enSpeed);
+    await sleep(delay);
+
+    if (!isRunning) return;
+
+    // 3. 영어 2회차 (따라하기)
+    repeatCounter.innerText = "🔁 [3/3] 직관 묘사 영어 2회 (따라 말하기)";
+    statusText.innerText = "영어 2회";
+    await speakTextMobile(item.en, "en-US", Math.max(0.75, enSpeed * 0.92));
+    currentEn.classList.remove("active");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "대기";
+    repeatCounter.innerText = "";
+    await sleep(delay);
+  }
+
+  async function startCycle() {
+    unlockMobileAudio();
+    isRunning = true;
+    playPauseBtn.innerText = "⏸ 일시정지";
+    playPauseBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < sentences.length) {
+      updateUI();
+      await playSentenceCycle(currentIndex);
+      if (!isRunning) break;
+      if (currentIndex < sentences.length - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playPauseBtn.innerText = "▶ 전체 재생";
+    playPauseBtn.classList.add("btn-primary");
+    speakingStatus.classList.remove("speaking");
+    statusText.innerText = "정지";
+    repeatCounter.innerText = "";
+    currentKo.classList.remove("active");
+    currentEn.classList.remove("active");
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isRunning) {
+      stopPlayback();
+    } else {
+      startCycle();
+    }
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < sentences.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  updateUI();
+</script>
+
+</body>
+</html>
