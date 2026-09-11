@@ -31,7 +31,7 @@
 
     html, body {
       width: 100%;
-      overflow-x: hidden; /* 가로 스크롤 삐져나옴 원천 차단 */
+      overflow-x: hidden;
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -143,7 +143,7 @@
     .hero-stats b { color: var(--primary); }
     .hero-stats b.highlight { color: var(--toeic-accent); }
 
-    /* 툴바 (검색창 & 필터 가로 스크롤 모바일 최적화) */
+    /* 툴바 */
     .toolbar {
       width: 100%;
       max-width: 1120px;
@@ -178,7 +178,7 @@
       gap: 0.45rem;
       overflow-x: auto;
       padding-bottom: 0.35rem;
-      -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스와이프 */
+      -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
     .filter-group::-webkit-scrollbar { display: none; }
@@ -193,7 +193,7 @@
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      flex-shrink: 0; /* 모바일에서 찌그러지지 않고 좌우로 스와이프 */
+      flex-shrink: 0;
       transition: all 0.2s;
     }
 
@@ -220,7 +220,6 @@
 
     .card-grid {
       display: grid;
-      /* 화면 폭에 맞춰 100% 자동 유연 적응 */
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
       gap: 1rem;
     }
@@ -236,7 +235,7 @@
       text-decoration: none;
       color: inherit;
       transition: all 0.2s ease;
-      min-width: 0; /* flex 자식 넘침 방지 */
+      min-width: 0;
     }
 
     .trainer-card:hover {
@@ -377,7 +376,7 @@
       <div class="brand-logo">E</div>
       <span class="brand-name">ENGLISSI Lab</span>
     </a>
-    <span class="brand-tag">총 15개 코스</span>
+    <span class="brand-tag">총 16개 코스</span>
   </div>
 </header>
 
@@ -385,18 +384,18 @@
   <h1>내가 공부하려고 만든 영어 트레이닝 허브</h1>
   <p>모바일에서 접속 시 오른쪽 하단의 점 세 개를 누르시고, "다른 브라우저로 열기"</p>
   <div class="hero-stats">
-    <span>훈련 코스 <b>15개</b></span>
+    <span>훈련 코스 <b>16개</b></span>
     <span>•</span>
     <span>토스 실전 <b class="highlight">350+ 문항</b></span>
     <span>•</span>
-    <span>총 수록 <b class="highlight">960+ 문항</b></span>
+    <span>총 수록 <b class="highlight">1060+ 문항</b></span>
   </div>
 </section>
 
 <div class="toolbar">
-  <input type="text" class="search-input" id="searchInput" placeholder="트레이너 이름 또는 키워드 검색 (예: 토스, english15, 쉐도잉...)">
+  <input type="text" class="search-input" id="searchInput" placeholder="트레이너 이름 또는 키워드 검색 (예: 토스, english16, 모녀, 쉐도잉...)">
   <div class="filter-group" id="filterGroup">
-    <button class="filter-chip active" data-cat="all">전체 (15)</button>
+    <button class="filter-chip active" data-cat="all">전체 (16)</button>
     <button class="filter-chip special-chip" data-cat="toeic">🎯 토익스피킹</button>
     <button class="filter-chip" data-cat="logic">논리/사고</button>
     <button class="filter-chip" data-cat="verb">만능 동사</button>
@@ -549,6 +548,15 @@
       icon: "🔁",
       cat: "toeic",
       count: "만능 200문장"
+    },
+    {
+      id: 16,
+      title: "모녀 실전 티키타카 100 (엄마 & 15세 딸)",
+      desc: "사춘기 딸과 엄마의 일상 100문답! [엄마 롤플레잉 / 딸 롤플레잉 / 모녀 전체 듣기] 3가지 모드 지원",
+      path: "english16.html",
+      icon: "👩‍👧",
+      cat: "flow",
+      count: "100세트 완비"
     }
   ];
 
