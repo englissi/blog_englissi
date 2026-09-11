@@ -107,6 +107,12 @@
       border: 1px solid #22324f;
       border-radius: 0.9rem;
       padding: 0.9rem 1rem;
+      transition: all 0.2s;
+    }
+    .scene-box.active-ko {
+      border-color: var(--cue);
+      background: rgba(245, 158, 11, 0.1);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
     }
 
     .scene-title {
@@ -123,7 +129,7 @@
       line-height: 1.4;
     }
 
-    /* 쉐도잉 타깃 영문 */
+    /* 쉐도잉 타깃 영문 박스 */
     .shadow-target-box {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -136,14 +142,20 @@
       transition: all 0.25s;
     }
 
-    .shadow-target-box.active {
+    .shadow-target-box.active-en1 {
       border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.08);
+      background: rgba(56, 189, 248, 0.1);
       box-shadow: 0 0 18px var(--accent-glow);
     }
 
+    .shadow-target-box.active-en2 {
+      border-color: var(--success);
+      background: rgba(52, 211, 153, 0.1);
+      box-shadow: 0 0 18px rgba(52, 211, 153, 0.25);
+    }
+
     .shadow-step-cue {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-weight: 800;
       color: var(--accent);
       letter-spacing: 0.05em;
@@ -158,7 +170,8 @@
       transition: color 0.2s;
     }
 
-    .shadow-target-box.active .target-en {
+    .shadow-target-box.active-en1 .target-en,
+    .shadow-target-box.active-en2 .target-en {
       color: #fff;
     }
 
@@ -233,7 +246,7 @@
       word-break: keep-all;
     }
 
-    /* 조작 버튼 */
+    /* 조작 컨트롤 */
     .controls {
       display: flex;
       justify-content: center;
@@ -344,7 +357,7 @@
 <div class="container">
   <header>
     <h1>워킹맘·직장인 1초 쉐도잉 트레이너 50</h1>
-    <p>원어민 소리를 듣고 0.3초 뒤에 혀로 따라붙으며 내 발화 싱크로율을 확인하세요.</p>
+    <p>한국어 1회 ➔ 원어민 영어 2회 반복! 50문장 전체 연속 낭독을 지원합니다.</p>
   </header>
 
   <div class="stage-card">
@@ -354,7 +367,7 @@
     </div>
 
     <!-- 상황 & 한국어 입버릇 -->
-    <div class="scene-box">
+    <div class="scene-box" id="sceneBox">
       <div class="scene-title" id="sceneTitle">상황: 아침 알람이 울린 순간</div>
       <div class="scene-ko" id="sceneKo">"아, 5분만 더 자고 싶다."</div>
     </div>
@@ -376,29 +389,30 @@
           음성 싱크로율: <span class="sync-score-num" id="syncScoreNum">--%</span>
         </div>
       </div>
-      <div class="heard-text" id="heardText">🎙️ '녹음 & 싱크 분석' 버튼을 누르고 문장을 소리 내어 읽어보세요.</div>
+      <div class="heard-text" id="heardText">🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 문장을 소리 내어 읽어보세요.</div>
     </div>
   </div>
 
   <div class="controls">
     <button id="prevBtn">⏮ 이전</button>
-    <button class="btn-primary" id="playNativeBtn">▶ 원어민 쉐도잉 듣기</button>
-    <button class="btn-record" id="recordSyncBtn">🔴 녹음 & 싱크 분석</button>
+    <button class="btn-primary" id="playAllBtn">▶ 전체 50문장 자동 연속 낭독</button>
+    <button id="stopBtn">⏹ 정지</button>
+    <button class="btn-record" id="recordSyncBtn">🔴 답변 녹음 & 싱크 분석</button>
     <button id="nextBtn">다음 ⏭</button>
     <button id="randomBtn">🔀 랜덤: OFF</button>
   </div>
 
   <div class="settings-bar">
     <div class="setting-item">
-      <label for="speedSelect">원어민 속도:</label>
+      <label for="speedSelect">낭독 속도:</label>
       <select id="speedSelect">
         <option value="0.85">0.85x (입풀기)</option>
-        <option value="0.95" selected>1.0x (표준)</option>
-        <option value="1.1">1.1x (실전 고속)</option>
+        <option value="1.0" selected>1.0x (표준)</option>
+        <option value="1.15">1.15x (실전 고속)</option>
       </select>
     </div>
     <div class="setting-item">
-      <label for="intervalSelect">문장 대기 시간:</label>
+      <label for="intervalSelect">문장 간격:</label>
       <select id="intervalSelect">
         <option value="800">0.8초 (스피드)</option>
         <option value="1400" selected>1.4초 (표준)</option>
@@ -479,7 +493,7 @@
 
   let playlist = [...rawBank];
   let currentIndex = 0;
-  let isPlaying = false;
+  let isPlayingAll = false;
   let isRandom = false;
   let isRecording = false;
   let synth = window.speechSynthesis;
@@ -495,13 +509,15 @@
     recognition.lang = "en-US";
   }
 
-  const playNativeBtn = document.getElementById("playNativeBtn");
+  const playAllBtn = document.getElementById("playAllBtn");
+  const stopBtn = document.getElementById("stopBtn");
   const recordSyncBtn = document.getElementById("recordSyncBtn");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const randomBtn = document.getElementById("randomBtn");
   const metaBadge = document.getElementById("metaBadge");
   const partTag = document.getElementById("partTag");
+  const sceneBox = document.getElementById("sceneBox");
   const sceneTitle = document.getElementById("sceneTitle");
   const sceneKo = document.getElementById("sceneKo");
   const shadowBox = document.getElementById("shadowBox");
@@ -521,9 +537,13 @@
     speechSynthesis.onvoiceschanged = initVoices;
   }
 
-  function getEnVoice() {
+  function getVoice(langCode) {
     if (!voices || voices.length === 0) voices = synth.getVoices() || [];
-    return voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+    if (langCode.startsWith("ko")) {
+      return voices.find(v => v.lang && (v.lang.includes("ko") || v.lang.includes("KR")));
+    } else {
+      return voices.find(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US"))) || voices.find(v => v.lang && v.lang.startsWith("en"));
+    }
   }
 
   function unlockAudio() {
@@ -609,28 +629,33 @@
     sceneTitle.innerText = `상황: ${curr.title}`;
     sceneKo.innerText = `"${curr.ko}"`;
     targetEn.innerText = curr.en;
-    stepCue.innerText = "준비 (READY)";
+    stepCue.innerText = "대기 중 (READY)";
 
-    shadowBox.classList.remove("active");
+    clearHighlights();
     syncScoreNum.innerText = "--%";
     syncScoreNum.style.color = "var(--success)";
-    heardText.innerText = "🎙️ '녹음 & 싱크 분석' 버튼을 누르고 문장을 소리 내어 읽어보세요.";
+    heardText.innerText = "🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 문장을 소리 내어 읽어보세요.";
+  }
+
+  function clearHighlights() {
+    sceneBox.classList.remove("active-ko");
+    shadowBox.classList.remove("active-en1", "active-en2");
   }
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function speakText(text, rate = 1.0) {
+  function speakText(text, lang, rate = 1.0) {
     return new Promise((resolve) => {
-      if (!isPlaying) return resolve();
+      if (!isPlayingAll) return resolve();
       synth.cancel();
 
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "en-US";
+      utter.lang = lang;
       utter.rate = rate;
 
-      const voice = getEnVoice();
+      const voice = getVoice(lang);
       if (voice) utter.voice = voice;
 
       let isDone = false;
@@ -645,7 +670,7 @@
       utter.onend = finish;
       utter.onerror = finish;
 
-      const dur = (text.length / 5) * 1000 * (1 / rate) + 3600;
+      const dur = (text.length / 4) * 1000 * (1 / rate) + 3600;
       const timeout = setTimeout(finish, dur);
 
       try {
@@ -656,45 +681,115 @@
     });
   }
 
-  async function playShadowingCycle() {
-    unlockAudio();
-    if (isPlaying) {
-      stopPlayback();
-      return;
-    }
-    isPlaying = true;
-    playNativeBtn.innerText = "⏸ 멈춤";
-
-    const curr = playlist[currentIndex];
+  // [한글 1회 ➔ 원어민 영어 1회 ➔ 원어민 영어 2회(쉐도잉)] 사이클
+  async function playSentenceCycle(index) {
+    if (!isPlayingAll) return;
+    const curr = playlist[index];
     const spd = parseFloat(speedSelect.value);
     const delay = parseInt(intervalSelect.value);
 
-    // 1단계: 청취 모드
-    shadowBox.classList.remove("active");
-    stepCue.innerText = "👂 1. 먼저 원어민 소리를 들으세요";
-    await speakText(curr.en, spd);
+    // 1단계: 한국어 1회 낭독
+    clearHighlights();
+    sceneBox.classList.add("active-ko");
+    stepCue.innerText = "🇰🇷 1. 한국어 상황 인지";
+    await speakText(curr.ko, "ko-KR", 1.0);
+    sceneBox.classList.remove("active-ko");
 
-    if (!isPlaying) return;
+    if (!isPlayingAll) return;
     await sleep(400);
 
-    // 2단계: 0.3초 딜레이 쉐도잉 큐
-    stepCue.innerText = "🎙️ 2. 따라붙으세요! (SHADOWING NOW)";
-    shadowBox.classList.add("active");
-    await speakText(curr.en, Math.max(0.75, spd * 0.95));
+    // 2단계: 영어 1차 낭독 (귀로 집중 청취)
+    shadowBox.classList.add("active-en1");
+    stepCue.innerText = "👂 2. 원어민 발음 청취 (1차)";
+    await speakText(curr.en, "en-US", spd);
+    shadowBox.classList.remove("active-en1");
 
+    if (!isPlayingAll) return;
+    await sleep(600);
+
+    // 3단계: 영어 2차 낭독 (입으로 따라붙는 쉐도잉)
+    shadowBox.classList.add("active-en2");
+    stepCue.innerText = "🎙️ 3. 쉐도잉 낭독 (2차 - 따라하기)";
+    await speakText(curr.en, "en-US", spd);
+    shadowBox.classList.remove("active-en2");
+
+    if (!isPlayingAll) return;
+    stepCue.innerText = "숨고르기 (Breathe)";
     await sleep(delay);
-    stopPlayback();
+  }
+
+  // 전체 자동 연속 재생 루프
+  async function startAllPlayback() {
+    unlockAudio();
+    isPlayingAll = true;
+    playAllBtn.innerText = "⏸ 일시정지";
+    playAllBtn.classList.remove("btn-primary");
+
+    while (isPlayingAll && currentIndex < playlist.length) {
+      updateUI();
+      await playSentenceCycle(currentIndex);
+      if (!isPlayingAll) break;
+
+      if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+      } else {
+        if (isRandom) playlist = shuffle(rawBank);
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isPlayingAll) {
+      stopPlayback();
+    }
   }
 
   function stopPlayback() {
-    isPlaying = false;
+    isPlayingAll = false;
     synth.cancel();
-    playNativeBtn.innerText = "▶ 원어민 쉐도잉 듣기";
-    shadowBox.classList.remove("active");
-    stepCue.innerText = "준비 (READY)";
+    playAllBtn.innerText = "▶ 전체 50문장 자동 연속 낭독";
+    playAllBtn.classList.add("btn-primary");
+    clearHighlights();
+    stepCue.innerText = "정지 (Stopped)";
   }
 
-  // 발음 녹음 & 싱크로율 판정
+  playAllBtn.addEventListener("click", () => {
+    if (isPlayingAll) stopPlayback();
+    else startAllPlayback();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isPlayingAll;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startAllPlayback();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isPlayingAll;
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startAllPlayback();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "var(--accent)" : "#fff";
+    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  // 개별 문장 음성 싱크 분석
   function startRecordingSync() {
     if (!recognition) {
       alert("현재 브라우저는 Web Speech API 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 이용해 주세요.");
@@ -742,35 +837,13 @@
     recognition.onend = () => {
       isRecording = false;
       recordSyncBtn.classList.remove("recording");
-      recordSyncBtn.innerText = "🔴 녹음 & 싱크 분석";
+      recordSyncBtn.innerText = "🔴 답변 녹음 & 싱크 분석";
       recIndicator.classList.remove("recording");
       recStatusText.innerText = "분석 완료";
     };
   }
 
-  playNativeBtn.addEventListener("click", playShadowingCycle);
   recordSyncBtn.addEventListener("click", startRecordingSync);
-
-  prevBtn.addEventListener("click", () => {
-    stopPlayback();
-    if (currentIndex > 0) currentIndex--;
-    updateUI();
-  });
-
-  nextBtn.addEventListener("click", () => {
-    stopPlayback();
-    if (currentIndex < playlist.length - 1) currentIndex++;
-    updateUI();
-  });
-
-  randomBtn.addEventListener("click", () => {
-    isRandom = !isRandom;
-    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
-    randomBtn.style.color = isRandom ? "var(--accent)" : "#fff";
-    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
-    currentIndex = 0;
-    updateUI();
-  });
 
   renderList();
   updateUI();
