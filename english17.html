@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>공항 입국심사 1초 생존 시뮬레이터 (Immigration Simulator)</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: #0f172a;
+      --accent: #38bdf8;
+      --officer-color: #f59e0b;
+      --traveler-color: #34d399;
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --danger: #f87171;
+      --gold: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0.8rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.3rem 0;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* 입국심사대 시뮬레이션 메인 카드 */
+    .stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.1rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+    }
+
+    .top-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .meta-badge {
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .counter-badge {
+      color: var(--gold);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* 심사관 질문 박스 (Officer) */
+    .officer-box {
+      background: #090d16;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 0.95rem;
+      padding: 0.95rem 1rem;
+      transition: all 0.25s;
+    }
+
+    .officer-box.active {
+      border-color: var(--officer-color);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+      transform: scale(1.01);
+    }
+
+    .box-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .label-officer { color: var(--officer-color); }
+    .label-traveler { color: var(--traveler-color); }
+
+    .q-text-en {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #fed7aa;
+      line-height: 1.35;
+      margin-bottom: 0.25rem;
+    }
+
+    .q-text-ko {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* 여행자 생존 가이드 대답 박스 (Traveler Response) */
+    .answer-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 0.95rem;
+      padding: 0.95rem 1rem;
+      transition: all 0.25s;
+    }
+
+    .answer-box.active {
+      border-color: var(--traveler-color);
+      background: rgba(52, 211, 153, 0.08);
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.25);
+      transform: scale(1.01);
+    }
+
+    .ans-text-en {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #6ee7b7;
+      line-height: 1.35;
+      margin-bottom: 0.25rem;
+    }
+
+    .ans-text-ko {
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .survival-tip {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      margin-top: 0.4rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 0.35rem;
+    }
+
+    /* 녹음 & 싱크로율 판정 보드 */
+    .sync-board {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 0.85rem;
+      padding: 0.8rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .sync-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rec-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .rec-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .rec-indicator.recording .rec-dot {
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation: pulseRec 1s infinite;
+    }
+
+    .rec-indicator.recording { color: var(--danger); }
+
+    @keyframes pulseRec {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .sync-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .sync-score-num {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--traveler-color);
+    }
+
+    .heard-text {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+      padding: 0.45rem 0.65rem;
+      border-radius: 0.5rem;
+      min-height: 2.2rem;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    /* 조작 컨트롤 바 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button:active { transform: scale(0.96); }
+    button.btn-primary { background: var(--primary); border-color: var(--primary); }
+    button.btn-record { background: #991b1b; border-color: #ef4444; color: #fff; }
+    button.btn-record.recording { background: #dc2626; animation: pulseRec 1.2s infinite; }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 30문항 심사 목록 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .immig-list {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .immig-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+
+    .immig-item:last-child { border-bottom: none; }
+
+    .immig-item.playing {
+      background: rgba(245, 158, 11, 0.12);
+      border-left: 4px solid var(--officer-color);
+    }
+
+    .item-q {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fed7aa;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-ans {
+      font-size: 0.78rem;
+      color: #6ee7b7;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>공항 입국심사 1초 생존 시뮬레이터</h1>
+    <p>심사관 질문을 듣고 1초 만에 튕겨내기! 가이드 대답을 보고 소리 내어 말해보세요.</p>
+  </header>
+
+  <div class="stage-card">
+    <div class="top-meta-bar">
+      <div class="meta-badge" id="metaBadge">Question 1 / 30</div>
+      <div class="counter-badge">👮 IMMIGRATION DESK</div>
+    </div>
+
+    <!-- 심사관 질문 박스 -->
+    <div class="officer-box" id="officerBox">
+      <div class="box-label label-officer">🛂 IMMIGRATION OFFICER (심사관 질문)</div>
+      <div class="q-text-en" id="qEn">What is the purpose of your visit?</div>
+      <div class="q-text-ko" id="qKo">"방문 목적이 무엇입니까?"</div>
+    </div>
+
+    <!-- 여행자 1초 가이드 대답 박스 -->
+    <div class="answer-box" id="answerBox">
+      <div class="box-label label-traveler">🗣️ SURVIVAL ANSWER (1초 생존 가이드 대답)</div>
+      <div class="ans-text-en" id="ansEn">Sightseeing. With my family.</div>
+      <div class="ans-text-ko" id="ansKo">"관광이요. 가족이랑 왔습니다."</div>
+      <div class="survival-tip" id="survivalTip">💡 팁: 긴 문장 금지! 'Sightseeing(관광)' 단어 하나만 던져도 즉시 통과합니다.</div>
+    </div>
+
+    <!-- 음성 싱크로율 분석기 -->
+    <div class="sync-board">
+      <div class="sync-top">
+        <div class="rec-indicator" id="recIndicator">
+          <div class="rec-dot"></div>
+          <span id="recStatusText">마이크 대기 중</span>
+        </div>
+        <div class="sync-score-wrap">
+          발화 싱크로율: <span class="sync-score-num" id="syncScoreNum">--%</span>
+        </div>
+      </div>
+      <div class="heard-text" id="heardText">🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 위 가이드 영어를 말씀하세요.</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playSimBtn">▶ 심사관 질문 듣기</button>
+    <button class="btn-record" id="recordSyncBtn">🔴 답변 녹음 & 싱크 분석</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">심사관 속도:</label>
+      <select id="speedSelect">
+        <option value="0.9">0.9x (초보자)</option>
+        <option value="1.0" selected>1.0x (실전 표준)</option>
+        <option value="1.15">1.15x (현지 체감)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="ansSpeedSelect">가이드 낭독:</label>
+      <select id="ansSpeedSelect">
+        <option value="yes" selected>대답도 함께 듣기</option>
+        <option value="no">질문만 듣고 내가 말하기</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>입국심사 기출 30문항</span>
+      <span>터치 시 해당 질문으로 즉시 이동</span>
+    </div>
+    <ul class="immig-list" id="immigList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawBank = [
+    // 1. 방문 목적 & 동행자
+    { id: 1, qEn: "What is the purpose of your visit?", qKo: "방문 목적이 무엇입니까?", ansEn: "Sightseeing. With my family.", ansKo: "관광이요. 가족이랑 왔습니다.", tip: "문장 금지! 'Sightseeing' 단어 하나만 툭 던져도 1초 통과입니다." },
+    { id: 2, qEn: "Are you traveling alone or with someone?", qKo: "혼자 여행 오셨나요, 일행이 있나요?", ansEn: "With my family. Four of us.", ansKo: "가족이랑요. 저희 총 4명입니다.", tip: "가족을 가리키며 'With my family' 뒤에 인원수만 붙이세요." },
+    { id: 3, qEn: "Is this your first time visiting this country?", qKo: "이 나라 방문이 처음이신가요?", ansEn: "Yes, it is our first time.", ansKo: "네, 이번이 처음 방문입니다.", tip: "간단히 'Yes, first time'으로 줄여 말해도 완벽합니다." },
+
+    // 2. 체류 기간
+    { id: 4, qEn: "How long are you planning to stay?", qKo: "얼마나 머무를 계획이신가요?", ansEn: "Five days. We leave on Sunday.", ansKo: "5일이요. 일요일에 떠납니다.", tip: "'For 5 days'처럼 숫자와 일수만 툭 던지면 끝납니다." },
+    { id: 5, qEn: "When are you going back to Korea?", qKo: "한국으로 언제 돌아가시나요?", ansEn: "Next Monday. Here is my return ticket.", ansKo: "다음 주 월요일이요. 여기 귀국 항공권입니다.", tip: "말문 막힐 땐 휴대폰 속 귀국편 e-티켓 화면을 보여주세요." },
+
+    // 3. 숙소 & 체류 장소
+    { id: 6, qEn: "Where will you be staying?", qKo: "어디에 머무르실 예정인가요?", ansEn: "At Hilton Hotel downtown.", ansKo: "시내 힐튼 호텔에 머뭅니다.", tip: "호텔 이름을 대거나 호텔 예약 바우처 종이를 여권과 함께 건네세요." },
+    { id: 7, qEn: "Do you have hotel reservation documents?", qKo: "호텔 예약 서류가 있으신가요?", ansEn: "Yes, right here on my phone.", ansKo: "네, 여기 휴대폰에 바로 있습니다.", tip: "'Right here' 하면서 화면을 보여주면 질문이 바로 끝납니다." },
+
+    // 4. 직업
+    { id: 8, qEn: "What do you do for a living?", qKo: "직업이 어떻게 되시나요?", ansEn: "I work at an office in Seoul.", ansKo: "서울에서 직장 생활(회사원)하고 있습니다.", tip: "복잡하게 직무 설명하지 말고 'Office worker' 한마디면 됩니다." },
+    { id: 9, qEn: "What is your profession?", qKo: "본인 직업이 무엇인가요?", ansEn: "I am an office worker.", ansKo: "회사원입니다.", tip: "선생님은 'Teacher', 자영업은 'Business owner'로 단답하세요." },
+
+    // 5. 여행 일정 & 방문지
+    { id: 10, qEn: "What cities will you visit?", qKo: "어느 도시들을 방문하실 건가요?", ansEn: "Just New York and Boston.", ansKo: "뉴욕이랑 보스턴만 갈 겁니다.", tip: "계획한 메인 도시 1~2개 이름만 대면 충분합니다." },
+    { id: 11, qEn: "Do you have any friends or family here?", qKo: "이곳에 친구나 친척이 있나요?", ansEn: "No, nobody. Just family trip.", ansKo: "아뇨, 아무도 없습니다. 그냥 가족 여행이에요.", tip: "불법체류 의심을 피하려면 지인이 없다고 'No'로 답하는 게 안전합니다." },
+
+    // 6. 소지품 & 경비
+    { id: 12, qEn: "How much cash do you have with you?", qKo: "현금을 얼마나 소지하고 계신가요?", ansEn: "About one thousand dollars in cash and cards.", ansKo: "현금 1,000달러 정도랑 신용카드 있습니다.", tip: "대략적인 금액(About 1,000 dollars)만 말하고 카드가 있다고 덧붙이세요." },
+    { id: 13, qEn: "Do you have any food or fruits in your bag?", qKo: "가방에 음식이나 과일이 있나요?", ansEn: "No food, no fruits. Nothing.", ansKo: "음식이나 과일 없습니다. 아무것도 없어요.", tip: "과일·육포는 절대 반입 불가입니다. 단호하게 'No' 하세요." },
+    { id: 14, qEn: "Do you have anything to declare?", qKo: "세관에 신고할 물품이 있으신가요?", ansEn: "No, nothing to declare.", ansKo: "아닙니다, 신고할 물건 없습니다.", tip: "머뭇거리면 가방 검사대로 보냅니다. 0.5초 만에 'Nothing' 하세요." },
+
+    // 7. 지문 등록 & 사진 촬영
+    { id: 15, qEn: "Please place your right index finger on the scanner.", qKo: "오른쪽 검지손가락을 스캐너에 올려주세요.", ansEn: "Like this? Okay, got it.", ansKo: "이렇게요? 네, 알겠습니다.", tip: "질문이 아니라 지시입니다. 손가락을 올리며 'Like this?' 하세요." },
+    { id: 16, qEn: "Look directly into the camera, please.", qKo: "카메라 정면을 똑바로 바라봐 주세요.", ansEn: "Okay, looking at the lens.", ansKo: "네, 카메라 렌즈 보겠습니다.", tip: "모자와 마스크를 벗고 카메라 렌즈를 응시하세요." },
+    { id: 17, qEn: "Please remove your eyeglasses and hat.", qKo: "안경과 모자를 벗어주세요.", ansEn: "Sure, taking them off now.", ansKo: "네, 지금 바로 벗겠습니다.", tip: "즉시 벗으면서 'Sure' 하고 눈을 맞춥니다." },
+
+    // 8. 항공권 & 귀국 확인
+    { id: 18, qEn: "Can I see your return ticket, please?", qKo: "귀국 항공권을 보여주시겠습니까?", ansEn: "Here is my e-ticket on the phone.", ansKo: "여기 휴대폰에 있는 e-티켓입니다.", tip: "종이 출력물이나 모바일 항공권 캡처본을 내미세요." },
+    { id: 19, qEn: "Where are you flying to after this?", qKo: "여기 다음에는 어디로 비행기 타고 가시나요?", ansEn: "Straight back to Incheon, Korea.", ansKo: "한국 인천으로 바로 돌아갑니다.", tip: "'Directly back to Korea'라고 명확히 귀국 의사를 밝히세요." },
+
+    // 9. 추가 꼬리 질문 (비즈니스/연락처)
+    { id: 20, qEn: "Are you attending any business meetings here?", qKo: "여기서 어떤 비즈니스 미팅에 참석하시나요?", ansEn: "No, strictly vacation.", ansKo: "아닙니다, 순수 휴가 여행입니다.", tip: "관광비자로 입국 시엔 무조건 'Strictly vacation'이어야 합니다." },
+    { id: 21, qEn: "Who booked this flight and hotel?", qKo: "이 항공권과 숙소는 누가 예약했나요?", ansEn: "I booked everything myself online.", ansKo: "제가 직접 온라인으로 다 예약했습니다.", tip: "'I booked online'으로 자립성을 보여주면 의심이 사라집니다." },
+    { id: 22, qEn: "Can you confirm your hotel address?", qKo: "호텔 주소를 확인할 수 있습니까?", ansEn: "It is written right here on the voucher.", ansKo: "여기 바우처에 주소가 바로 적혀 있습니다.", tip: "주소를 굳이 외우지 말고 예약증의 주소 부분을 짚어주세요." },
+    { id: 23, qEn: "Do you have travel insurance?", qKo: "여행자 보험에 가입하셨습니까?", ansEn: "Yes, we have family travel insurance.", ansKo: "네, 가족 여행자 보험 있습니다.", tip: "유럽 입국 시 가끔 묻습니다. 'Yes, I have it' 하시면 됩니다." },
+    { id: 24, qEn: "What places will you visit in the city?", qKo: "도시 안에서 어떤 장소들을 둘러보실 건가요?", ansEn: "Museums, parks, and famous restaurants.", ansKo: "박물관, 공원, 그리고 유명한 맛집들이요.", tip: "관광지 키워드 2~3개만 툭 던지세요." },
+    { id: 25, qEn: "Have you ever been denied entry to any country?", qKo: "다른 나라에서 입국 거부를 당한 적이 있나요?", ansEn: "No, never.", ansKo: "아니요, 절대 없습니다.", tip: "단호하게 'No, never'로 0.1초 만에 마침표를 찍으세요." },
+
+    // 10. 마무리 승인 및 패스
+    { id: 26, qEn: "Please step back behind the yellow line.", qKo: "노란선 뒤로 물러서서 대기해 주세요.", ansEn: "Sorry, stepping back now.", ansKo: "죄송합니다, 뒤로 물러나겠습니다.", tip: "가족이라도 심사관이 부르기 전엔 선을 넘지 마세요." },
+    { id: 27, qEn: "Can the whole family come forward together?", qKo: "가족 전체가 다 함께 앞으로 나와주시겠어요?", ansEn: "Yes, we are all together here.", ansKo: "네, 저희 다 같이 여기 있습니다.", tip: "가족 동반 입국 시 다 함께 심사대 앞으로 다가가세요." },
+    { id: 28, qEn: "Is all this luggage belonging to your family?", qKo: "이 짐들이 전부 가족분들 짐인가요?", ansEn: "Yes, all of them are ours.", ansKo: "네, 전부 다 저희 짐입니다.", tip: "다른 사람 부탁으로 짐을 들어준 적 없음을 명확히 하세요." },
+    { id: 29, qEn: "Do you have any medicine in your baggage?", qKo: "수하물 안에 어떤 의약품이 있나요?", ansEn: "Just simple personal cold medicine.", ansKo: "그냥 개인용 간단한 감기약만 있습니다.", tip: "마약류 오해를 방지하기 위해 'Personal medicine'이라고 하세요." },
+    { id: 30, qEn: "All set. Enjoy your trip!", qKo: "다 끝났습니다. 즐거운 여행 되세요!", ansEn: "Thank you so much! Have a good day.", ansKo: "정말 감사합니다! 좋은 하루 보내세요.", tip: "도장을 쾅 찍어주면 미소 지으며 'Thank you!' 하고 여권을 챙기세요." }
+  ];
+
+  let playlist = [...rawBank];
+  let currentIndex = 0;
+  let isPlaying = false;
+  let isRandom = false;
+  let isRecording = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+  }
+
+  const playSimBtn = document.getElementById("playSimBtn");
+  const recordSyncBtn = document.getElementById("recordSyncBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const metaBadge = document.getElementById("metaBadge");
+  const officerBox = document.getElementById("officerBox");
+  const answerBox = document.getElementById("answerBox");
+  const qEn = document.getElementById("qEn");
+  const qKo = document.getElementById("qKo");
+  const ansEn = document.getElementById("ansEn");
+  const ansKo = document.getElementById("ansKo");
+  const survivalTip = document.getElementById("survivalTip");
+  const recIndicator = document.getElementById("recIndicator");
+  const recStatusText = document.getElementById("recStatusText");
+  const syncScoreNum = document.getElementById("syncScoreNum");
+  const heardText = document.getElementById("heardText");
+  const immigList = document.getElementById("immigList");
+  const speedSelect = document.getElementById("speedSelect");
+  const ansSpeedSelect = document.getElementById("ansSpeedSelect");
+
+  function initVoices() { voices = synth.getVoices() || []; }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function getEnVoice(isOfficer = true) {
+    if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+    const enVoices = voices.filter(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US") || v.lang.startsWith("en")));
+    if (enVoices.length === 0) return null;
+
+    if (isOfficer) {
+      // 낮고 엄격한 심사관 음성
+      return enVoices.find(v => v.name.toLowerCase().includes("david") || v.name.toLowerCase().includes("male") || v.name.toLowerCase().includes("alex")) || enVoices[0];
+    } else {
+      // 부드러운 여행자 안내 음성
+      return enVoices.find(v => v.name.toLowerCase().includes("samantha") || v.name.toLowerCase().includes("female") || v.name.toLowerCase().includes("karen")) || enVoices[enVoices.length - 1];
+    }
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function calculateSimilarity(str1, str2) {
+    const s1 = str1.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    const s2 = str2.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    if (s1 === s2) return 100;
+    if (s1.length === 0 || s2.length === 0) return 0;
+
+    const matrix = [];
+    for (let i = 0; i <= s2.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= s1.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= s2.length; i++) {
+      for (let j = 1; j <= s1.length; j++) {
+        if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    const distance = matrix[s2.length][s1.length];
+    const maxLen = Math.max(s1.length, s2.length);
+    const score = Math.round(((maxLen - distance) / maxLen) * 100);
+    return Math.max(0, score);
+  }
+
+  function renderList() {
+    immigList.innerHTML = "";
+    rawBank.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "immig-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-q">${item.id}. 👮 ${item.qEn}</div>
+        <div class="item-ans">🗣️ ${item.ansEn} (${item.ansKo})</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+      });
+      immigList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".immig-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    metaBadge.innerText = `Question ${currentIndex + 1} / ${playlist.length}`;
+    qEn.innerText = curr.qEn;
+    qKo.innerText = `"${curr.qKo}"`;
+    ansEn.innerText = curr.ansEn;
+    ansKo.innerText = `"${curr.ansKo}"`;
+    survivalTip.innerText = `💡 팁: ${curr.tip}`;
+
+    clearHighlights();
+    syncScoreNum.innerText = "--%";
+    syncScoreNum.style.color = "var(--traveler-color)";
+    heardText.innerText = "🎙️ '답변 녹음 & 싱크 분석' 버튼을 누르고 위 가이드 영어를 말씀하세요.";
+  }
+
+  function clearHighlights() {
+    officerBox.classList.remove("active");
+    answerBox.classList.remove("active");
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakRole(text, isOfficer = true, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isPlaying) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      const voice = getEnVoice(isOfficer);
+      if (voice) utter.voice = voice;
+      utter.pitch = isOfficer ? 0.9 : 1.1;
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 4.5) * 1000 * (1 / rate) + 3600;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  // 심뮬레이션 재생 루프
+  async function playSimulation() {
+    unlockAudio();
+    if (isPlaying) {
+      stopPlayback();
+      return;
+    }
+    isPlaying = true;
+    playSimBtn.innerText = "⏸ 멈춤";
+    clearHighlights();
+
+    const curr = playlist[currentIndex];
+    const spd = parseFloat(speedSelect.value);
+    const readAns = ansSpeedSelect.value === "yes";
+
+    // 1단계: 심사관 질문 낭독 (엄격한 톤)
+    officerBox.classList.add("active");
+    await speakRole(curr.qEn, true, spd);
+    officerBox.classList.remove("active");
+
+    if (!isPlaying) return;
+
+    if (readAns) {
+      // 2단계: 가이드 대답 낭독 (따라하기)
+      await sleep(500);
+      answerBox.classList.add("active");
+      await speakRole(curr.ansEn, false, spd * 0.95);
+      answerBox.classList.remove("active");
+    } else {
+      // 질문만 듣고 내가 소리 내어 답하는 2.5초 대기 큐
+      answerBox.classList.add("active");
+      await sleep(2500);
+      answerBox.classList.remove("active");
+    }
+
+    stopPlayback();
+  }
+
+  function stopPlayback() {
+    isPlaying = false;
+    synth.cancel();
+    playSimBtn.innerText = "▶ 심사관 질문 듣기";
+    clearHighlights();
+  }
+
+  // 발화 녹음 & 싱크로율 판정
+  function startRecordingSync() {
+    if (!recognition) {
+      alert("현재 브라우저는 Web Speech API 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 이용해 주세요.");
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+
+    stopPlayback();
+    isRecording = true;
+    recordSyncBtn.classList.add("recording");
+    recordSyncBtn.innerText = "⏹ 녹음 완료 (분석 중...)";
+    recIndicator.classList.add("recording");
+    recStatusText.innerText = "음성 청취 중... (지금 발화하세요)";
+    heardText.innerText = "듣고 있습니다... 발화가 끝나면 마이크가 자동으로 꺼집니다.";
+    syncScoreNum.innerText = "...";
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      heardText.innerText = `🗣️ 내 발화: "${transcript}"`;
+
+      const curr = playlist[currentIndex];
+      const score = calculateSimilarity(transcript, curr.ansEn);
+
+      syncScoreNum.innerText = `${score}%`;
+      if (score >= 75) {
+        syncScoreNum.style.color = "var(--traveler-color)";
+      } else if (score >= 45) {
+        syncScoreNum.style.color = "var(--gold)";
+      } else {
+        syncScoreNum.style.color = "var(--danger)";
+      }
+    };
+
+    recognition.onerror = (event) => {
+      recStatusText.innerText = "인식 오류 (" + event.error + ")";
+      heardText.innerText = "마이크 입력을 확인하지 못했습니다. 다시 시도해 주세요.";
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      recordSyncBtn.classList.remove("recording");
+      recordSyncBtn.innerText = "🔴 답변 녹음 & 싱크 분석";
+      recIndicator.classList.remove("recording");
+      recStatusText.innerText = "분석 완료";
+    };
+  }
+
+  playSimBtn.addEventListener("click", playSimulation);
+  recordSyncBtn.addEventListener("click", startRecordingSync);
+
+  prevBtn.addEventListener("click", () => {
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "var(--accent)" : "#fff";
+    playlist = isRandom ? shuffle(rawBank) : [...rawBank];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
