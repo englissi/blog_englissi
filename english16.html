@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>모녀 실전 티키타카 100 (엄마 & 15세 딸)</title>
+  <title>모녀 실전 티키타카 100 (한글/영문 동시 표기)</title>
   <style>
     :root {
       --bg: #090d16;
@@ -79,9 +79,9 @@
       background: transparent;
       border: none;
       color: var(--muted);
-      padding: 0.6rem 0.4rem;
+      padding: 0.6rem 0.3rem;
       border-radius: 0.55rem;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -136,9 +136,9 @@
       font-weight: 600;
     }
 
-    /* 발화 큐 알림창 */
+    /* 진행 알림 바 */
     .cue-banner {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid #334155;
       border-radius: 0.6rem;
       padding: 0.45rem 0.8rem;
@@ -146,29 +146,28 @@
       font-size: 0.82rem;
       font-weight: 800;
       color: var(--cue);
-      min-height: 2.1rem;
+      min-height: 2.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      letter-spacing: -0.01em;
     }
 
-    /* 엄마 & 딸 말풍선 */
+    /* 말풍선 컨테이너 */
     .dialogue-box {
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.75rem;
     }
 
     .bubble {
-      border-radius: 0.9rem;
-      padding: 0.85rem 1rem;
+      border-radius: 0.95rem;
+      padding: 0.9rem 1rem;
       border: 1px solid rgba(255, 255, 255, 0.05);
       background: rgba(15, 23, 42, 0.5);
       transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.35rem;
     }
 
     .bubble.active {
@@ -178,17 +177,17 @@
     .bubble-mom.active {
       background: rgba(244, 114, 182, 0.12);
       border-color: var(--mom-color);
-      box-shadow: 0 0 15px rgba(244, 114, 182, 0.25);
+      box-shadow: 0 0 16px rgba(244, 114, 182, 0.25);
     }
 
     .bubble-daughter.active {
       background: rgba(56, 189, 248, 0.12);
       border-color: var(--daughter-color);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
     }
 
     .speaker-tag {
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -198,12 +197,25 @@
     .speaker-tag.mom { color: var(--mom-color); }
     .speaker-tag.daughter { color: var(--daughter-color); }
 
-    .speech-en {
-      font-size: 1.05rem;
-      font-weight: 800;
+    /* 한글 텍스트 */
+    .speech-ko {
+      font-size: 0.88rem;
+      font-weight: 700;
       color: #94a3b8;
-      line-height: 1.4;
+      line-height: 1.35;
+    }
+    .bubble.active .speech-ko {
+      color: #e2e8f0;
+    }
+
+    /* 영문 텍스트 */
+    .speech-en {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #64748b;
+      line-height: 1.38;
       word-break: keep-all;
+      transition: color 0.2s;
     }
 
     .bubble.active .speech-en {
@@ -212,10 +224,13 @@
 
     .point-tip {
       font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
+      color: #64748b;
+      margin-top: 0.15rem;
       border-top: 1px dashed rgba(255, 255, 255, 0.08);
       padding-top: 0.35rem;
+    }
+    .bubble.active .point-tip {
+      color: var(--accent);
     }
 
     /* 조작 컨트롤 */
@@ -311,14 +326,14 @@
     .item-scene {
       font-size: 0.76rem;
       color: var(--cue);
-      margin-bottom: 0.15rem;
+      margin-bottom: 0.2rem;
       font-weight: 700;
     }
 
-    .item-en {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #bae6fd;
+    .item-text {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -327,7 +342,7 @@
 <div class="container">
   <header>
     <h1>모녀 실전 티키타카 100</h1>
-    <p>조사 떼고 1초 만에 툭! 엄마와 15세 중학생 딸의 100문답 스피킹</p>
+    <p>한글 뜻을 보고 영어로 툭! 엄마와 15세 중학생 딸의 100문답 스피킹</p>
   </header>
 
   <!-- 3개 모드 선택 바 -->
@@ -349,25 +364,27 @@
   <div class="stage-card">
     <div class="top-meta-bar">
       <div class="meta-badge" id="metaBadge">Set 1 / 100</div>
-      <div class="scene-badge" id="sceneBadge">Part 1. 아침 기상 & 등교</div>
+      <div class="scene-badge" id="sceneBadge">[아침 기상 깨우기]</div>
     </div>
 
     <!-- 진행 상황 알림창 -->
     <div class="cue-banner" id="cueBanner">준비 버튼을 눌러 모녀 대화를 시작하세요.</div>
 
     <div class="dialogue-box">
-      <!-- 엄마 발화 박스 -->
+      <!-- 엄마 발화 박스 (한글 + 영문) -->
       <div class="bubble bubble-mom" id="momBubble">
         <div class="speaker-tag mom">👩 MOM (엄마)</div>
-        <div class="speech-en" id="momText">Time to get up. You'll be late for school.</div>
+        <div class="speech-ko" id="momKo">"일어날 시간이야. 학교 늦겠다!"</div>
+        <div class="speech-en" id="momEn">Time to get up. You'll be late for school.</div>
         <div class="point-tip" id="momTip">💡 포인트: [get up] 바로 던지기 / [late for school] 상태 직결</div>
       </div>
 
-      <!-- 딸 발화 박스 -->
+      <!-- 딸 발화 박스 (한글 + 영문) -->
       <div class="bubble bubble-daughter" id="daughterBubble">
         <div class="speaker-tag daughter">👧 DAUGHTER (15세 딸)</div>
-        <div class="speech-en" id="daughterText">Five more minutes. My eyes won't open.</div>
-        <div class="point-tip" id="daughterTip">💡 포인트: [Five more minutes] 숫자 단문 / [eyes won't open] 무생물 주어</div>
+        <div class="speech-ko" id="daughterKo">"5분만 더요. 눈이 안 떠져요."</div>
+        <div class="speech-en" id="daughterEn">Five more minutes. My eyes won't open.</div>
+        <div class="point-tip" id="daughterTip">💡 딸 팁: [Five more minutes] 숫자 단문 / [eyes won't open] 무생물 주어</div>
       </div>
     </div>
   </div>
@@ -393,8 +410,8 @@
       <label for="intervalSelect">턴 대기 시간:</label>
       <select id="intervalSelect">
         <option value="1200">1.2초 (빠른 호흡)</option>
-        <option value="2000" selected>2.0초 (표준 말하기)</option>
-        <option value="3000">3.0초 (여유 있는 발화)</option>
+        <option value="2200" selected>2.2초 (표준 말하기)</option>
+        <option value="3200">3.2초 (여유 있는 발화)</option>
       </select>
     </div>
   </div>
@@ -411,117 +428,117 @@
 <script>
   const rawData = [
     // Part 1. 아침 기상, 등교 & 외출 준비 (01 ~ 25)
-    { id: 1, part: "Part 1. 아침 기상 & 등교", scene: "아침 기상 깨우기", mom: "Time to get up. You'll be late for school.", daughter: "Five more minutes. My eyes won't open.", tip: "[get up] 바로 던지기 / [eyes won't open] 무생물 주어" },
-    { id: 2, part: "Part 1. 아침 기상 & 등교", scene: "아침 식사 챙기기", mom: "Eat some toast. You need brain power today.", daughter: "I have zero appetite. Just give me water.", tip: "[Eat toast] 툭 치기 / [zero appetite] 명사 직결" },
-    { id: 3, part: "Part 1. 아침 기상 & 등교", scene: "교복 겉옷 지적", mom: "Zip up your jacket. It's freezing outside.", daughter: "It looks so uncool. I'm totally fine.", tip: "[Zip up] 동작 먼저 / [looks uncool] 느낌 직결" },
-    { id: 4, part: "Part 1. 아침 기상 & 등교", scene: "머리 손질 지체", mom: "Hurry up in the bathroom. Your bus is coming.", daughter: "I need to fix my bangs. Just one second.", tip: "[Hurry up] 마침표 / [fix my bangs] 앞머리 고정" },
-    { id: 5, part: "Part 1. 아침 기상 & 등교", scene: "가방 소지품 확인", mom: "Did you pack your iPad? Don't forget your charger.", daughter: "Already in my bag. Stop nagging, Mom.", tip: "[pack iPad] 동사+명사 / [Stop nagging] 단호한 단문" },
-    { id: 6, part: "Part 1. 아침 기상 & 등교", scene: "신발 신고 나가기", mom: "Put your sneakers on right now. Run!", daughter: "I can't find my shoes. Oh, here they are.", tip: "[Put sneakers on] 만능동사 Put / [can't find] 즉시 발화" },
-    { id: 7, part: "Part 1. 아침 기상 & 등교", scene: "현관문 나서며 인사", mom: "Have a great day, sweetie! Do well on your quiz.", daughter: "See you later. Wish me luck today!", tip: "[Have a great day] 통문장 / [Wish me luck] 관용 직결" },
-    { id: 8, part: "Part 1. 아침 기상 & 등교", scene: "텀블러 챙겨주기", mom: "Take this water bottle. Stay hydrated today.", daughter: "Thanks, Mom. I'll drink it during break.", tip: "[Take bottle] Take 활용 / [Stay hydrated] 결과 제시" },
-    { id: 9, part: "Part 1. 아침 기상 & 등교", scene: "비 올 것 같은 날씨", mom: "Grab an umbrella. The sky looks very dark.", daughter: "It won't rain. Carrying an umbrella is annoying.", tip: "[Grab umbrella] Grab 던지기 / [annoying] 감정 직결" },
-    { id: 10, part: "Part 1. 아침 기상 & 등교", scene: "립밤/선크림 바르기", mom: "Put on some sunscreen. Your face looks dry.", daughter: "I already put on lip balm. I'm good.", tip: "[Put on] 바르다 퉁치기 / [I'm good] 거절 만능패턴" },
-    { id: 11, part: "Part 1. 아침 기상 & 등교", scene: "버스 시간 알림", mom: "Your bus arrives in three minutes. Move it!", daughter: "I'm sprinting right now. Bye!", tip: "[Move it!] 1초 컷 / [I'm sprinting] 생생한 현재진행" },
-    { id: 12, part: "Part 1. 아침 기상 & 등교", scene: "지갑/교통카드 확인", mom: "Where is your transit card? Check your pocket.", daughter: "Tapped it already. It has enough balance.", tip: "[Check pocket] 명령조 / [Tapped it] 탭 동작 직결" },
-    { id: 13, part: "Part 1. 아침 기상 & 등교", scene: "아침 세수 재촉", mom: "Wash your face with cold water. Wake up!", daughter: "I'm half asleep. I need coffee like you.", tip: "[Wash face] 명사+동사 / [half asleep] 상태 묘사" },
-    { id: 14, part: "Part 1. 아침 기상 & 등교", scene: "방 불 끄고 나오기", mom: "Turn off your bedroom light before leaving.", daughter: "Did it already! I'm not a baby anymore.", tip: "[Turn off light] / [not a baby] 자아 표현" },
-    { id: 15, part: "Part 1. 아침 기상 & 등교", scene: "안경 찾기", mom: "Wear your glasses today. Your eyes look red.", daughter: "I want to wear contacts. Glasses look nerdy.", tip: "[Wear glasses] / [look nerdy] 10대 말투" },
-    { id: 16, part: "Part 1. 아침 기상 & 등교", scene: "간식 챙겨주기", mom: "Put this cereal bar in your pocket.", daughter: "Yum, thanks! I'll eat it after math class.", tip: "[Put bar in pocket] / [Yum] 감탄사 즉답" },
-    { id: 17, part: "Part 1. 아침 기상 & 등교", scene: "엘리베이터 잡기", mom: "Hold the elevator! Don't let the door close.", daughter: "Pressed the button. Hurry, it's going down.", tip: "[Hold elevator] / [Pressed button] 동작 즉결" },
-    { id: 18, part: "Part 1. 아침 기상 & 등교", scene: "준비물 출력 확인", mom: "Did you print your science report last night?", daughter: "Oops, I forgot. Can I print it at school?", tip: "[print report] / [Oops, I forgot] 0.5초 반사" },
-    { id: 19, part: "Part 1. 아침 기상 & 등교", scene: "걸음걸이 재촉", mom: "Walk faster! We are running out of time.", daughter: "My backpack is killing my shoulders.", tip: "[Walk faster] / [backpack is killing] 의인화" },
-    { id: 20, part: "Part 1. 아침 기상 & 등교", scene: "모자 쓰기", mom: "Put on your beanie. The wind is brutal.", daughter: "It messes up my hair! Absolutely not.", tip: "[Put on beanie] / [messes up hair] 동작 결과" },
-    { id: 21, part: "Part 1. 아침 기상 & 등교", scene: "아침 약 챙겨 먹기", mom: "Take this allergy pill right now.", daughter: "Tastes so bitter! Give me juice quickly.", tip: "[Take pill] / [Tastes bitter] 미각 직결" },
-    { id: 22, part: "Part 1. 아침 기상 & 등교", scene: "양말 짝짝이", mom: "Look at your socks. They don't match at all.", daughter: "It's a new trend, Mom. You don't get it.", tip: "[don't match] / [You don't get it] 10대 방어" },
-    { id: 23, part: "Part 1. 아침 기상 & 등교", scene: "친구와 등교 약속", mom: "Is Minji waiting for you at the corner?", daughter: "Yeah, she just texted me. Gotta run!", tip: "[waiting at corner] / [Gotta run] 1초 마무리" },
-    { id: 24, part: "Part 1. 아침 기상 & 등교", scene: "급식 메뉴 확인", mom: "Check your school lunch menu today.", daughter: "It's tonkatsu today! My favorite day of the week.", tip: "[Check menu] / [favorite day] 감정 연결" },
-    { id: 25, part: "Part 1. 아침 기상 & 등교", scene: "등교 직전 마지막 당부", mom: "Pay attention in class today. No dozing off!", daughter: "I'll try my best. See you at dinner!", tip: "[Pay attention] / [No dozing off] 금지 표현" },
+    { id: 1, part: "Part 1. 아침 기상 & 등교", scene: "아침 기상 깨우기", momKo: "일어날 시간이야. 학교 늦겠다!", momEn: "Time to get up. You'll be late for school.", daughterKo: "5분만 더요. 눈이 안 떠져요.", daughterEn: "Five more minutes. My eyes won't open.", tip: "[get up] 바로 던지기 / [eyes won't open] 무생물 주어" },
+    { id: 2, part: "Part 1. 아침 기상 & 등교", scene: "아침 식사 챙기기", momKo: "토스트 좀 먹어. 오늘 머리 쓰려면 든든해야 해.", momEn: "Eat some toast. You need brain power today.", daughterKo: "입맛 전혀 없어요. 그냥 물만 주세요.", daughterEn: "I have zero appetite. Just give me water.", tip: "[Eat toast] 툭 치기 / [zero appetite] 명사 직결" },
+    { id: 3, part: "Part 1. 아침 기상 & 등교", scene: "교복 겉옷 지적", momKo: "겉옷 지퍼 올려. 밖이 꽁꽁 얼었어.", momEn: "Zip up your jacket. It's freezing outside.", daughterKo: "지퍼 올리면 핏이 안 살아요. 전 진짜 괜찮아요.", daughterEn: "It looks so uncool. I'm totally fine.", tip: "[Zip up] 동작 먼저 / [looks uncool] 느낌 직결" },
+    { id: 4, part: "Part 1. 아침 기상 & 등교", scene: "머리 손질 지체", momKo: "화장실에서 얼른 나와. 버스 금방 와!", momEn: "Hurry up in the bathroom. Your bus is coming.", daughterKo: "앞머리 손질해야 해요. 딱 1초만요!", daughterEn: "I need to fix my bangs. Just one second.", tip: "[Hurry up] 마침표 / [fix my bangs] 앞머리 고정" },
+    { id: 5, part: "Part 1. 아침 기상 & 등교", scene: "가방 소지품 확인", momKo: "아이패드 챙겼어? 충전기 잊지 말고.", momEn: "Did you pack your iPad? Don't forget your charger.", daughterKo: "가방에 벌써 넣었어요. 엄마 잔소리 그만~", daughterEn: "Already in my bag. Stop nagging, Mom.", tip: "[pack iPad] 동사+명사 / [Stop nagging] 단호한 단문" },
+    { id: 6, part: "Part 1. 아침 기상 & 등교", scene: "신발 신고 나가기", momKo: "지금 당장 운동화 신어. 뛰어!", momEn: "Put your sneakers on right now. Run!", daughterKo: "신발을 못 찾겠어요. 아, 여기 있네.", daughterEn: "I can't find my shoes. Oh, here they are.", tip: "[Put sneakers on] 만능동사 Put / [can't find] 즉시 발화" },
+    { id: 7, part: "Part 1. 아침 기상 & 등교", scene: "현관문 나서며 인사", momKo: "오늘 하루 잘 보내 우리 딸! 쪽지시험 잘 보고.", momEn: "Have a great day, sweetie! Do well on your quiz.", daughterKo: "다녀올게요. 오늘 시험 대박 나게 빌어줘요!", daughterEn: "See you later. Wish me luck today!", tip: "[Have a great day] 통문장 / [Wish me luck] 관용 직결" },
+    { id: 8, part: "Part 1. 아침 기상 & 등교", scene: "텀블러 챙겨주기", momKo: "이 물병 가져가. 물 자주 마시고.", momEn: "Take this water bottle. Stay hydrated today.", daughterKo: "고마워요 엄마. 쉬는 시간에 마실게요.", daughterEn: "Thanks, Mom. I'll drink it during break.", tip: "[Take bottle] Take 활용 / [Stay hydrated] 결과 제시" },
+    { id: 9, part: "Part 1. 아침 기상 & 등교", scene: "비 올 것 같은 날씨", momKo: "우산 챙겨. 하늘이 너무 어두컴컴해.", momEn: "Grab an umbrella. The sky looks very dark.", daughterKo: "비 안 와요. 우산 들고 다니기 귀찮단 말이에요.", daughterEn: "It won't rain. Carrying an umbrella is annoying.", tip: "[Grab umbrella] Grab 던지기 / [annoying] 감정 직결" },
+    { id: 10, part: "Part 1. 아침 기상 & 등교", scene: "립밤/선크림 바르기", momKo: "선크림 좀 발라. 얼굴이 너무 건조해 보여.", momEn: "Put on some sunscreen. Your face looks dry.", daughterKo: "립밤은 벌써 발랐어요. 이 정도면 충분해요.", daughterEn: "I already put on lip balm. I'm good.", tip: "[Put on] 바르다 퉁치기 / [I'm good] 거절 만능패턴" },
+    { id: 11, part: "Part 1. 아침 기상 & 등교", scene: "버스 시간 알림", momKo: "버스 3분 뒤에 도착해. 빨리 움직여!", momEn: "Your bus arrives in three minutes. Move it!", daughterKo: "지금 전력 질주 중이에요. 다녀올게요!", daughterEn: "I'm sprinting right now. Bye!", tip: "[Move it!] 1초 컷 / [I'm sprinting] 생생한 현재진행" },
+    { id: 12, part: "Part 1. 아침 기상 & 등교", scene: "지갑/교통카드 확인", momKo: "교통카드 어디 있어? 주머니 확인해 봐.", momEn: "Where is your transit card? Check your pocket.", daughterKo: "벌써 찍었어요. 잔액도 넉넉해요.", daughterEn: "Tapped it already. It has enough balance.", tip: "[Check pocket] 명령조 / [Tapped it] 탭 동작 직결" },
+    { id: 13, part: "Part 1. 아침 기상 & 등교", scene: "아침 세수 재촉", momKo: "찬물로 세수하고 잠 좀 깨렴!", momEn: "Wash your face with cold water. Wake up!", daughterKo: "아직 반쯤 자고 있어요. 엄마처럼 커피가 필요해.", daughterEn: "I'm half asleep. I need coffee like you.", tip: "[Wash face] 명사+동사 / [half asleep] 상태 묘사" },
+    { id: 14, part: "Part 1. 아침 기상 & 등교", scene: "방 불 끄고 나오기", momKo: "나가기 전에 방 불 끄는 거 잊지 마.", momEn: "Turn off your bedroom light before leaving.", daughterKo: "벌써 껐거든요! 저 이제 어린애 아니에요.", daughterEn: "Did it already! I'm not a baby anymore.", tip: "[Turn off light] / [not a baby] 자아 표현" },
+    { id: 15, part: "Part 1. 아침 기상 & 등교", scene: "안경 찾기", momKo: "오늘은 안경 쓰고 가. 눈이 빨갛잖아.", momEn: "Wear your glasses today. Your eyes look red.", daughterKo: "렌즈 끼고 싶어요. 안경 쓰면 범생이 같단 말이에요.", daughterEn: "I want to wear contacts. Glasses look nerdy.", tip: "[Wear glasses] / [look nerdy] 10대 말투" },
+    { id: 16, part: "Part 1. 아침 기상 & 등교", scene: "간식 챙겨주기", momKo: "주머니에 이 에너지바 챙겨 넣어.", momEn: "Put this cereal bar in your pocket.", daughterKo: "맛있겠다, 고마워요! 수학 끝나고 먹을게요.", daughterEn: "Yum, thanks! I'll eat it after math class.", tip: "[Put bar in pocket] / [Yum] 감탄사 즉답" },
+    { id: 17, part: "Part 1. 아침 기상 & 등교", scene: "엘리베이터 잡기", momKo: "엘리베이터 잡아! 문 닫히지 않게.", momEn: "Hold the elevator! Don't let the door close.", daughterKo: "버튼 눌렀어요. 빨리 타요, 내려가요!", daughterEn: "Pressed the button. Hurry, it's going down.", tip: "[Hold elevator] / [Pressed button] 동작 즉결" },
+    { id: 18, part: "Part 1. 아침 기상 & 등교", scene: "준비물 출력 확인", momKo: "어젯밤에 과학 보고서 프린트했어?", momEn: "Did you print your science report last night?", daughterKo: "앗, 깜빡했다. 학교 가서 인쇄해도 돼요?", daughterEn: "Oops, I forgot. Can I print it at school?", tip: "[print report] / [Oops, I forgot] 0.5초 반사" },
+    { id: 19, part: "Part 1. 아침 기상 & 등교", scene: "걸음걸이 재촉", momKo: "좀 더 빨리 걸어! 우리 시간 없어.", momEn: "Walk faster! We are running out of time.", daughterKo: "가방이 너무 무거워서 어깨 빠질 것 같아요.", daughterEn: "My backpack is killing my shoulders.", tip: "[Walk faster] / [backpack is killing] 의인화" },
+    { id: 20, part: "Part 1. 아침 기상 & 등교", scene: "모자 쓰기", momKo: "비니 써. 바람이 너무 매섭다.", momEn: "Put on your beanie. The wind is brutal.", daughterKo: "머리 다 망가져요! 절대 안 써요.", daughterEn: "It messes up my hair! Absolutely not.", tip: "[Put on beanie] / [messes up hair] 동작 결과" },
+    { id: 21, part: "Part 1. 아침 기상 & 등교", scene: "비염약 챙겨 먹기", momKo: "이 알레르기 비염약 지금 바로 삼켜.", momEn: "Take this allergy pill right now.", daughterKo: "너무 써요! 빨리 주스 좀 줘요.", daughterEn: "Tastes so bitter! Give me juice quickly.", tip: "[Take pill] / [Tastes bitter] 미각 직결" },
+    { id: 22, part: "Part 1. 아침 기상 & 등교", scene: "양말 짝짝이", momKo: "양말 좀 봐. 완전 짝짝이잖아.", momEn: "Look at your socks. They don't match at all.", daughterKo: "요즘 유행이란 말이에요, 엄마는 몰라요.", daughterEn: "It's a new trend, Mom. You don't get it.", tip: "[don't match] / [You don't get it] 10대 방어" },
+    { id: 23, part: "Part 1. 아침 기상 & 등교", scene: "친구와 등교 약속", momKo: "민지가 모퉁이에서 기다리고 있어?", momEn: "Is Minji waiting for you at the corner?", daughterKo: "네, 방금 문자 왔어요. 저 먼저 가요!", daughterEn: "Yeah, she just texted me. Gotta run!", tip: "[waiting at corner] / [Gotta run] 1초 마무리" },
+    { id: 24, part: "Part 1. 아침 기상 & 등교", scene: "급식 메뉴 확인", momKo: "오늘 학교 급식 메뉴 확인해 봐.", momEn: "Check your school lunch menu today.", daughterKo: "오늘 돈가스 나오는 날이에요! 일주일 중 제일 좋아.", daughterEn: "It's tonkatsu today! My favorite day of the week.", tip: "[Check menu] / [favorite day] 감정 연결" },
+    { id: 25, part: "Part 1. 아침 기상 & 등교", scene: "등교 직전 당부", momKo: "수업 집중해서 잘 들어. 졸지 말고!", momEn: "Pay attention in class today. No dozing off!", daughterKo: "노력해 볼게요. 저녁때 만나요!", daughterEn: "I'll try my best. See you at dinner!", tip: "[Pay attention] / [No dozing off] 금지 표현" },
 
     // Part 2. 방과 후 하교, 학원 & 스마트폰 (26 ~ 50)
-    { id: 26, part: "Part 2. 하교 & 스마트폰", scene: "집에 돌아왔을 때", mom: "Welcome home! How was your day at school?", daughter: "Exhausting. Middle school is so stressful.", tip: "[How was your day] / [Exhausting] 형용사 단문" },
-    { id: 27, part: "Part 2. 하교 & 스마트폰", scene: "가방 바닥에 던짐", mom: "Don't drop your heavy bag in the hallway.", daughter: "My arms have no power left. Let me rest.", tip: "[Don't drop bag] / [no power left]" },
-    { id: 28, part: "Part 2. 하교 & 스마트폰", scene: "손 씻기 잔소리", mom: "Wash your hands with soap before touching snacks.", daughter: "Doing it now! What snack do we have?", tip: "[Wash hands] / [Doing it now] 현재진행 즉답" },
-    { id: 29, part: "Part 2. 하교 & 스마트폰", scene: "간식 요청 (떡볶이)", mom: "I made some fruit salad for you.", daughter: "Can we order spicy tteokbokki instead?", tip: "[made salad] / [order spicy tteokbokki]" },
-    { id: 30, part: "Part 2. 하교 & 스마트폰", scene: "릴스 중독 지적", mom: "Put your phone down. You've been scrolling for an hour.", daughter: "Just one more video! The algorithm is crazy.", tip: "[Put phone down] / [algorithm is crazy]" },
-    { id: 31, part: "Part 2. 하교 & 스마트폰", scene: "학원 시간 알림", mom: "Your math academy starts at five. Get ready.", daughter: "Already? Time flies way too fast.", tip: "[starts at five] / [Time flies] 관용 단문" },
-    { id: 32, part: "Part 2. 하교 & 스마트폰", scene: "학원 숙제 확인", mom: "Did you finish your English homework?", daughter: "Almost done. Just two reading passages left.", tip: "[finish homework] / [two passages left]" },
-    { id: 33, part: "Part 2. 하교 & 스마트폰", scene: "시험 결과 확인", mom: "Did you get your history test score back?", daughter: "Don't be mad... The test was super tricky.", tip: "[get score back] / [Don't be mad] 방어막" },
-    { id: 34, part: "Part 2. 하교 & 스마트폰", scene: "학원 라이딩 문의", mom: "Do you need a ride to your academy today?", daughter: "Yes please, Mom! It's raining too hard.", tip: "[need a ride] 픽업 표현 / [Yes please]" },
-    { id: 35, part: "Part 2. 하교 & 스마트폰", scene: "친구 생일 선물", mom: "Whose birthday is it this weekend?", daughter: "Soyun's! Can I get her a cute tumbler?", tip: "[Whose birthday] / [get her tumbler]" },
-    { id: 36, part: "Part 2. 하교 & 스마트폰", scene: "폰 충전기 싸움", mom: "Did you take my phone charger again?", daughter: "Mine is broken! I'll give it back soon.", tip: "[take charger] / [Mine is broken]" },
-    { id: 37, part: "Part 2. 하교 & 스마트폰", scene: "방 정리 상태", mom: "Look at your desk. It looks like a tornado hit.", daughter: "I know where everything is. It's organized chaos.", tip: "[looks like tornado] / [organized chaos] 위트" },
-    { id: 38, part: "Part 2. 하교 & 스마트폰", scene: "이어폰 끼고 못 들음", mom: "Take off your earbuds when I'm talking.", daughter: "Sorry, I couldn't hear you. What did you say?", tip: "[Take off earbuds] / [couldn't hear you]" },
-    { id: 39, part: "Part 2. 하교 & 스마트폰", scene: "친구 관계 고민", mom: "You look a bit down. Did something happen with Yuna?", daughter: "We had a small argument. I feel awkward.", tip: "[look down] 표정 인지 / [feel awkward] 감정 직결" },
-    { id: 40, part: "Part 2. 하교 & 스마트폰", scene: "학원 가기 싫을 때", mom: "Don't skip academy. Consistency is key.", daughter: "I just have a headache today. Please, Mom?", tip: "[Don't skip] / [have headache] 핑계 단문" },
-    { id: 41, part: "Part 2. 하교 & 스마트폰", scene: "배달 음식 추천", mom: "What should we eat tonight? Mom is tired.", daughter: "Maratang! Mild spice with extra beef, please!", tip: "[Mom is tired] / [Mild spice] 구체적 옵션" },
-    { id: 42, part: "Part 2. 하교 & 스마트폰", scene: "옷 쇼핑 조르기", mom: "You bought a hoodie just two weeks ago.", daughter: "This oversized zip-up is trending right now!", tip: "[bought hoodie] / [trending right now] 트렌드" },
-    { id: 43, part: "Part 2. 하교 & 스마트폰", scene: "귀가 시간 약속", mom: "Come straight home after academy. It gets dark early.", daughter: "I'll be home by eight thirty. Don't worry.", tip: "[Come straight home] / [home by eight thirty]" },
-    { id: 44, part: "Part 2. 하교 & 스마트폰", scene: "로그인 비번 문의", mom: "What's the Netflix password again? It logged out.", daughter: "It's my birthday numbers. Let me type it.", tip: "[logged out] / [Let me type it] 주도권" },
-    { id: 45, part: "Part 2. 하교 & 스마트폰", scene: "수행평가 스트레스", mom: "How is your group project presentation going?", daughter: "Terrible. My group members aren't doing anything.", tip: "[presentation going] / [aren't doing anything]" },
-    { id: 46, part: "Part 2. 하교 & 스마트폰", scene: "간식비 요청", mom: "Here is some cash for your convenience store snack.", daughter: "Thanks, Mom! You're the best in the world.", tip: "[Here is cash] / [You're the best] 칭찬 폭격" },
-    { id: 47, part: "Part 2. 하교 & 스마트폰", scene: "신조어 물어보기", mom: "What does that slang mean? Kids say it a lot.", daughter: "You're so boomer, Mom! It means something cool.", tip: "[slang mean] / [so boomer] 10대 유머" },
-    { id: 48, part: "Part 2. 하교 & 스마트폰", scene: "침대 위 뒹굴거림", mom: "Stop lying down like a potato. Go sit at your desk.", daughter: "My body is glued to this mattress.", tip: "[lying down like potato] / [glued to mattress]" },
-    { id: 49, part: "Part 2. 하교 & 스마트폰", scene: "폰 진동 소음", mom: "Your phone keeps vibrating like crazy. Who is texting?", daughter: "Just our class group chat. It never stops.", tip: "[keeps vibrating] / [never stops] 현상 설명" },
-    { id: 50, part: "Part 2. 하교 & 스마트폰", scene: "미술 과제 칭찬", mom: "I saw your art project. The colors look fantastic.", daughter: "Really? I worked on that for three straight days!", tip: "[colors look fantastic] / [worked for three days]" },
+    { id: 26, part: "Part 2. 하교 & 스마트폰", scene: "집에 돌아왔을 때", momKo: "어서 와! 오늘 학교 어땠어?", momEn: "Welcome home! How was your day at school?", daughterKo: "완전 녹초예요. 중학교 생활 너무 힘들어요.", daughterEn: "Exhausting. Middle school is so stressful.", tip: "[How was your day] / [Exhausting] 형용사 단문" },
+    { id: 27, part: "Part 2. 하교 & 스마트폰", scene: "가방 바닥에 던짐", momKo: "현관 복도에 무거운 가방 던져두지 마.", momEn: "Don't drop your heavy bag in the hallway.", daughterKo: "팔에 힘이 하나도 없어요. 좀 쉬게 해줘요.", daughterEn: "My arms have no power left. Let me rest.", tip: "[Don't drop bag] / [no power left]" },
+    { id: 28, part: "Part 2. 하교 & 스마트폰", scene: "손 씻기 잔소리", momKo: "간식 먹기 전에 비누로 손부터 씻어.", momEn: "Wash your hands with soap before touching snacks.", daughterKo: "씻고 있어요! 간식 뭐 있어요?", daughterEn: "Doing it now! What snack do we have?", tip: "[Wash hands] / [Doing it now] 현재진행 즉답" },
+    { id: 29, part: "Part 2. 하교 & 스마트폰", scene: "간식 요청 (떡볶이)", momKo: "과일 샐러드 만들어 뒀단다.", momEn: "I made some fruit salad for you.", daughterKo: "그거 말고 매운 떡볶이 시켜 먹으면 안 돼요?", daughterEn: "Can we order spicy tteokbokki instead?", tip: "[made salad] / [order spicy tteokbokki]" },
+    { id: 30, part: "Part 2. 하교 & 스마트폰", scene: "릴스 중독 지적", momKo: "폰 좀 내려놔. 벌써 1시간째 보고 있잖니.", momEn: "Put your phone down. You've been scrolling for an hour.", daughterKo: "딱 한 편만요! 알고리즘이 미쳤단 말이에요.", daughterEn: "Just one more video! The algorithm is crazy.", tip: "[Put phone down] / [algorithm is crazy]" },
+    { id: 31, part: "Part 2. 하교 & 스마트폰", scene: "학원 시간 알림", momKo: "수학 학원 5시에 시작해. 준비해라.", momEn: "Your math academy starts at five. Get ready.", daughterKo: "벌써요? 시간 진짜 너무 빨리 가네요.", daughterEn: "Already? Time flies way too fast.", tip: "[starts at five] / [Time flies] 관용 단문" },
+    { id: 32, part: "Part 2. 하교 & 스마트폰", scene: "학원 숙제 확인", momKo: "영어 학원 숙제는 다 끝냈어?", momEn: "Did you finish your English homework?", daughterKo: "거의 다 했어요. 독해 딱 두 지문 남았어요.", daughterEn: "Almost done. Just two reading passages left.", tip: "[finish homework] / [two passages left]" },
+    { id: 33, part: "Part 2. 하교 & 스마트폰", scene: "시험 결과 확인", momKo: "역사 시험 점수표 나왔어?", momEn: "Did you get your history test score back?", daughterKo: "엄마 화내지 마요... 시험이 진짜 꼬아서 나왔어요.", daughterEn: "Don't be mad... The test was super tricky.", tip: "[get score back] / [Don't be mad] 방어막" },
+    { id: 34, part: "Part 2. 하교 & 스마트폰", scene: "학원 라이딩 문의", momKo: "오늘 학원까지 차로 태워다 줄까?", momEn: "Do you need a ride to your academy today?", daughterKo: "네 엄마 부탁해요! 비가 너무 많이 와요.", daughterEn: "Yes please, Mom! It's raining too hard.", tip: "[need a ride] 픽업 표현 / [Yes please]" },
+    { id: 35, part: "Part 2. 하교 & 스마트폰", scene: "친구 생일 선물", momKo: "이번 주말에 누구 생일이야?", momEn: "Whose birthday is it this weekend?", daughterKo: "소윤이요! 귀여운 텀블러 하나 사줘도 돼요?", daughterEn: "Soyun's! Can I get her a cute tumbler?", tip: "[Whose birthday] / [get her tumbler]" },
+    { id: 36, part: "Part 2. 하교 & 스마트폰", scene: "폰 충전기 싸움", momKo: "내 휴대폰 충전기 또 가져갔지?", momEn: "Did you take my phone charger again?", daughterKo: "제 거 고장 났단 말이에요! 금방 돌려줄게요.", daughterEn: "Mine is broken! I'll give it back soon.", tip: "[take charger] / [Mine is broken]" },
+    { id: 37, part: "Part 2. 하교 & 스마트폰", scene: "방 정리 상태", momKo: "책상 좀 봐. 토네이도라도 지나간 것 같네.", momEn: "Look at your desk. It looks like a tornado hit.", daughterKo: "뭐가 어디 있는지 다 알아요. 질서 있는 혼돈이에요.", daughterEn: "I know where everything is. It's organized chaos.", tip: "[looks like tornado] / [organized chaos] 위트" },
+    { id: 38, part: "Part 2. 하교 & 스마트폰", scene: "이어폰 끼고 못 들음", momKo: "엄마가 말할 때는 이어폰 좀 빼렴.", momEn: "Take off your earbuds when I'm talking.", daughterKo: "죄송해요, 못 들었어요. 뭐라고 하셨어요?", daughterEn: "Sorry, I couldn't hear you. What did you say?", tip: "[Take off earbuds] / [couldn't hear you]" },
+    { id: 39, part: "Part 2. 하교 & 스마트폰", scene: "친구 관계 고민", momKo: "기운이 없어 보이네. 유나랑 무슨 일 있었어?", momEn: "You look a bit down. Did something happen with Yuna?", daughterKo: "조금 말다툼했어요. 사이가 좀 어색해요.", daughterEn: "We had a small argument. I feel awkward.", tip: "[look down] 표정 인지 / [feel awkward] 감정 직결" },
+    { id: 40, part: "Part 2. 하교 & 스마트폰", scene: "학원 가기 싫을 때", momKo: "학원 빼먹지 마. 꾸준함이 제일 중요해.", momEn: "Don't skip academy. Consistency is key.", daughterKo: "오늘 그냥 머리가 너무 지끈거려요. 제발요 엄마~", daughterEn: "I just have a headache today. Please, Mom?", tip: "[Don't skip] / [have headache] 핑계 단문" },
+    { id: 41, part: "Part 2. 하교 & 스마트폰", scene: "배달 음식 추천", momKo: "오늘 저녁 뭐 먹을까? 엄마 너무 피곤해.", momEn: "What should we eat tonight? Mom is tired.", daughterKo: "마라탕이요! 순한맛에 소고기 추가해서요!", daughterEn: "Maratang! Mild spice with extra beef, please!", tip: "[Mom is tired] / [Mild spice] 구체적 옵션" },
+    { id: 42, part: "Part 2. 하교 & 스마트폰", scene: "옷 쇼핑 조르기", momKo: "너 후드티 산 지 2주밖에 안 됐잖아.", momEn: "You bought a hoodie just two weeks ago.", daughterKo: "이 오버핏 집업이 요즘 완전 대세란 말이에요!", daughterEn: "This oversized zip-up is trending right now!", tip: "[bought hoodie] / [trending right now] 트렌드" },
+    { id: 43, part: "Part 2. 하교 & 스마트폰", scene: "귀가 시간 약속", momKo: "학원 끝나고 바로 와. 날 일찍 저문다.", momEn: "Come straight home after academy. It gets dark early.", daughterKo: "8시 반까지는 들어올게요. 걱정 마세요.", daughterEn: "I'll be home by eight thirty. Don't worry.", tip: "[Come straight home] / [home by eight thirty]" },
+    { id: 44, part: "Part 2. 하교 & 스마트폰", scene: "로그인 비번 문의", momKo: "넷플릭스 비번이 뭐였지? 로그아웃됐네.", momEn: "What's the Netflix password again? It logged out.", daughterKo: "제 생일 숫자예요. 제가 쳐드릴게요.", daughterEn: "It's my birthday numbers. Let me type it.", tip: "[logged out] / [Let me type it] 주도권" },
+    { id: 45, part: "Part 2. 하교 & 스마트폰", scene: "수행평가 스트레스", momKo: "모둠 발표 과제는 잘 진행되고 있어?", momEn: "How is your group project presentation going?", daughterKo: "최악이에요. 조원들이 아무것도 안 해요.", daughterEn: "Terrible. My group members aren't doing anything.", tip: "[presentation going] / [aren't doing anything]" },
+    { id: 46, part: "Part 2. 하교 & 스마트폰", scene: "간식비 요청", momKo: "여기 편의점에서 사 먹을 간식비야.", momEn: "Here is some cash for your convenience store snack.", daughterKo: "고마워요 엄마! 우리 엄마가 세상에서 제일 최고야.", daughterEn: "Thanks, Mom! You're the best in the world.", tip: "[Here is cash] / [You're the best] 칭찬 폭격" },
+    { id: 47, part: "Part 2. 하교 & 스마트폰", scene: "신조어 물어보기", momKo: "그 유행어 무슨 뜻이야? 애들이 자주 쓰던데.", momEn: "What does that slang mean? Kids say it a lot.", daughterKo: "엄마 완전 꼰대야! 멋지다는 뜻이에요.", daughterEn: "You're so boomer, Mom! It means something cool.", tip: "[slang mean] / [so boomer] 10대 유머" },
+    { id: 48, part: "Part 2. 하교 & 스마트폰", scene: "침대 위 뒹굴거림", momKo: "감자처럼 누워있지만 말고 책상에 앉아라.", momEn: "Stop lying down like a potato. Go sit at your desk.", daughterKo: "몸이 매트리스에 딱 붙어버렸어요.", daughterEn: "My body is glued to this mattress.", tip: "[lying down like potato] / [glued to mattress]" },
+    { id: 49, part: "Part 2. 하교 & 스마트폰", scene: "폰 진동 소음", momKo: "폰이 미친 듯이 울리네. 누가 문자 하는 거니?", momEn: "Your phone keeps vibrating like crazy. Who is texting?", daughterKo: "그냥 반 단톡방이에요. 끝이 안 나요.", daughterEn: "Just our class group chat. It never stops.", tip: "[keeps vibrating] / [never stops] 현상 설명" },
+    { id: 50, part: "Part 2. 하교 & 스마트폰", scene: "미술 과제 칭찬", momKo: "너 미술 과제 봤는데 색감이 아주 훌륭하더라.", momEn: "I saw your art project. The colors look fantastic.", daughterKo: "진짜요? 저 그거 꼬박 사흘 동안 공들였어요!", daughterEn: "Really? I worked on that for three straight days!", tip: "[colors look fantastic] / [worked for three days]" },
 
     // Part 3. 저녁 식사, 집안일 & 일상 수다 (51 ~ 75)
-    { id: 51, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 세팅 돕기", mom: "Set the table, please. Put spoons and chopsticks out.", daughter: "Setting it now! What's for dinner tonight?", tip: "[Set the table] / [What's for dinner] 단문 콤보" },
-    { id: 52, part: "Part 3. 저녁 식사 & 수다", scene: "반찬 골고루 먹기", mom: "Eat your broccoli. Vitamins keep your skin clear.", daughter: "Broccoli tastes like grass. Can I eat kimchi instead?", tip: "[tastes like grass] 비유 / [instead] 대체" },
-    { id: 53, part: "Part 3. 저녁 식사 & 수다", scene: "물 쏟았을 때", mom: "Be careful! Grab a kitchen towel and wipe it.", daughter: "My bad! My elbow accidentally knocked it over.", tip: "[Grab towel and wipe] / [My bad] 0.1초 사과" },
-    { id: 54, part: "Part 3. 저녁 식사 & 수다", scene: "선생님 이야기", mom: "Tell me about your new English teacher.", daughter: "She is super funny and tells cool travel stories.", tip: "[Tell me about] / [super funny] 즉각 수식" },
-    { id: 55, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 폰 사용 금지", mom: "No phones at the dinner table. Family time first.", daughter: "Just checking this one text from Minji!", tip: "[No phones at table] / [checking one text]" },
-    { id: 56, part: "Part 3. 저녁 식사 & 수다", scene: "설거지 분담", mom: "Can you put the empty bowls in the sink?", daughter: "Done! Can I get dessert now?", tip: "[put bowls in sink] / [Done!] 1초 마침표" },
-    { id: 57, part: "Part 3. 저녁 식사 & 수다", scene: "과일 깎아주기", mom: "I sliced some sweet apples for dessert.", daughter: "Apples are my absolute favorite. Thank you, Mom.", tip: "[sliced sweet apples] / [absolute favorite]" },
-    { id: 58, part: "Part 3. 저녁 식사 & 수다", scene: "아이돌 토크", mom: "Who is that singer on your wallpaper?", daughter: "Mom, that's NewJeans! How do you not know them?", tip: "[singer on wallpaper] / [How do you not know]" },
-    { id: 59, part: "Part 3. 저녁 식사 & 수다", scene: "빨래통에 옷 넣기", mom: "Put your dirty gym clothes in the laundry basket.", daughter: "I threw them in already. Can you wash them today?", tip: "[Put clothes in basket] / [Can you wash]" },
-    { id: 60, part: "Part 3. 저녁 식사 & 수다", scene: "치과 다녀온 날", mom: "Did your dentist appointment hurt today?", daughter: "My teeth feel sore. I can only chew soft things.", tip: "[dentist hurt] / [feel sore / chew soft things]" },
-    { id: 61, part: "Part 3. 저녁 식사 & 수다", scene: "엄마의 하루 공유", mom: "Mom had three crazy meetings at work today.", daughter: "Poor Mom. You should take a hot bath tonight.", tip: "[three crazy meetings] / [Poor Mom] 공감 척추" },
-    { id: 62, part: "Part 3. 저녁 식사 & 수다", scene: "남은 피자 정리", mom: "Wrap this leftover pizza and put it in the fridge.", daughter: "I'll eat that as a midnight snack later!", tip: "[Wrap leftover pizza] / [midnight snack]" },
-    { id: 63, part: "Part 3. 저녁 식사 & 수다", scene: "주말 영화 계획", mom: "Want to watch a movie together this Saturday?", daughter: "Yes! Can we watch that new animated film?", tip: "[watch movie together] / [animated film]" },
-    { id: 64, part: "Part 3. 저녁 식사 & 수다", scene: "자세 교정 지적", mom: "Sit up straight. Your back is curving like a shrimp.", daughter: "My chair is so uncomfortable! We need a new one.", tip: "[Sit up straight] / [curving like shrimp]" },
-    { id: 65, part: "Part 3. 저녁 식사 & 수다", scene: "배부름 표현", mom: "Have one more bite. There's only a little left.", daughter: "I'm stuffed! My stomach is going to explode.", tip: "[Have one more bite] / [I'm stuffed] 포만감 직결" },
-    { id: 66, part: "Part 3. 저녁 식사 & 수다", scene: "바디미스트 향기", mom: "What is that strong smell? Did you spray something?", daughter: "It's peach body mist! My friend gave it to me.", tip: "[strong smell] / [spray something] 동작 인지" },
-    { id: 67, part: "Part 3. 저녁 식사 & 수다", scene: "친구 고민 털기", mom: "Don't let mean classmates bother you too much.", daughter: "I know, but her words really hurt my feelings.", tip: "[Don't let them bother] / [hurt my feelings]" },
-    { id: 68, part: "Part 3. 저녁 식사 & 수다", scene: "방 청소 검사", mom: "Pick up those clothes scattered all over your floor.", daughter: "I'll clean my whole room this Sunday, promise!", tip: "[scattered on floor] / [clean this Sunday]" },
-    { id: 69, part: "Part 3. 저녁 식사 & 수다", scene: "생선구이 타협", mom: "At least finish half of the grilled fish.", daughter: "Deal. Only if I get an ice cream after this.", tip: "[finish half] / [Deal] 협상 즉각 종결" },
-    { id: 70, part: "Part 3. 저녁 식사 & 수다", scene: "된장찌개 칭찬", mom: "How does the soybean paste stew taste?", daughter: "Chef's kiss! You should open a restaurant, Mom.", tip: "[How does it taste] / [Chef's kiss] 위트 칭찬" },
-    { id: 71, part: "Part 3. 저녁 식사 & 수다", scene: "물병 세척 요청", mom: "Did you bring your dirty water bottle from your bag?", daughter: "Here it is. Can you rinse it with hot water?", tip: "[bring dirty bottle] / [rinse with hot water]" },
-    { id: 72, part: "Part 3. 저녁 식사 & 수다", scene: "용돈 인상 요구", mom: "Why do you need more allowance this month?", daughter: "Stationery items and photo booths are so expensive now.", tip: "[need more allowance] / [so expensive now]" },
-    { id: 73, part: "Part 3. 저녁 식사 & 수다", scene: "손톱 물어뜯기", mom: "Stop biting your fingernails. It ruins your fingers.", daughter: "It's a nervous habit. I'm trying to stop.", tip: "[Stop biting nails] / [nervous habit] 현상 설명" },
-    { id: 74, part: "Part 3. 저녁 식사 & 수다", scene: "주말 홍대 외출", mom: "Who are you going to Hongdae with this Saturday?", daughter: "Just Minji and Soyun. We'll only visit cute cafes.", tip: "[Who are you going with] / [visit cute cafes]" },
-    { id: 75, part: "Part 3. 저녁 식사 & 수다", scene: "택배 상자 언박싱", mom: "Your new sneakers arrived by courier today.", daughter: "OMG! Let me unbox it right now!", tip: "[sneakers arrived] / [unbox it] 신조어 결합" },
+    { id: 51, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 세팅 돕기", momKo: "수저 좀 놓아주련. 밥 먹자.", momEn: "Set the table, please. Put spoons and chopsticks out.", daughterKo: "지금 놔요! 오늘 저녁 메뉴는 뭐예요?", daughterEn: "Setting it now! What's for dinner tonight?", tip: "[Set the table] / [What's for dinner] 단문 콤보" },
+    { id: 52, part: "Part 3. 저녁 식사 & 수다", scene: "반찬 골고루 먹기", momKo: "브로콜리도 먹어. 비타민이 피부를 맑게 해.", momEn: "Eat your broccoli. Vitamins keep your skin clear.", daughterKo: "브로콜리는 풀 맛 나요. 대신 김치 먹으면 안 돼요?", daughterEn: "Broccoli tastes like grass. Can I eat kimchi instead?", tip: "[tastes like grass] 비유 / [instead] 대체" },
+    { id: 53, part: "Part 3. 저녁 식사 & 수다", scene: "물 쏟았을 때", momKo: "조심해야지! 행주 가져와서 닦으렴.", momEn: "Be careful! Grab a kitchen towel and wipe it.", daughterKo: "제 실수예요! 팔꿈치로 툭 쳐버렸어요.", daughterEn: "My bad! My elbow accidentally knocked it over.", tip: "[Grab towel and wipe] / [My bad] 0.1초 사과" },
+    { id: 54, part: "Part 3. 저녁 식사 & 수다", scene: "선생님 이야기", momKo: "새로 오신 영어 선생님 이야기 좀 해줘 봐.", momEn: "Tell me about your new English teacher.", daughterKo: "엄청 웃기시고 재미있는 여행 이야기 많이 해주세요.", daughterEn: "She is super funny and tells cool travel stories.", tip: "[Tell me about] / [super funny] 즉각 수식" },
+    { id: 55, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 폰 사용 금지", momKo: "밥 먹을 때 폰 보지 마. 가족 식사 시간이 먼저야.", momEn: "No phones at the dinner table. Family time first.", daughterKo: "민지 문자 딱 하나만 확인하고요!", daughterEn: "Just checking this one text from Minji!", tip: "[No phones at table] / [checking one text]" },
+    { id: 56, part: "Part 3. 저녁 식사 & 수다", scene: "설거지 분담", momKo: "다 먹은 밥그릇 싱크대에 넣어줄래?", momEn: "Can you put the empty bowls in the sink?", daughterKo: "완료! 이제 후식 먹어도 돼요?", daughterEn: "Done! Can I get dessert now?", tip: "[put bowls in sink] / [Done!] 1초 마침표" },
+    { id: 57, part: "Part 3. 저녁 식사 & 수다", scene: "과일 깎아주기", momKo: "후식으로 달콤한 사과 깎아뒀어.", momEn: "I sliced some sweet apples for dessert.", daughterKo: "사과 제일 좋아하는데! 고마워요 엄마.", daughterEn: "Apples are my absolute favorite. Thank you, Mom.", tip: "[sliced sweet apples] / [absolute favorite]" },
+    { id: 58, part: "Part 3. 저녁 식사 & 수다", scene: "아이돌 토크", momKo: "네 폰 배경화면에 있는 저 가수는 누구야?", momEn: "Who is that singer on your wallpaper?", daughterKo: "엄마, 뉴진스잖아요! 어떻게 몰라요?", daughterEn: "Mom, that's NewJeans! How do you not know them?", tip: "[singer on wallpaper] / [How do you not know]" },
+    { id: 59, part: "Part 3. 저녁 식사 & 수다", scene: "빨래통에 옷 넣기", momKo: "더러워진 체육복 빨래통에 집어넣어.", momEn: "Put your dirty gym clothes in the laundry basket.", daughterKo: "벌써 넣었어요. 오늘 바로 빨아주실 수 있어요?", daughterEn: "I threw them in already. Can you wash them today?", tip: "[Put clothes in basket] / [Can you wash]" },
+    { id: 60, part: "Part 3. 저녁 식사 & 수다", scene: "치과 다녀온 날", momKo: "오늘 치과 치료 아팠니?", momEn: "Did your dentist appointment hurt today?", daughterKo: "치아가 욱신거려요. 부드러운 것만 씹을 수 있어요.", daughterEn: "My teeth feel sore. I can only chew soft things.", tip: "[dentist hurt] / [feel sore / chew soft things]" },
+    { id: 61, part: "Part 3. 저녁 식사 & 수다", scene: "엄마의 하루 공유", momKo: "엄마 오늘 회사에서 정신없는 회의가 세 개나 있었어.", momEn: "Mom had three crazy meetings at work today.", daughterKo: "엄마 불쌍해라. 오늘 밤에 따뜻한 물로 목욕해요.", daughterEn: "Poor Mom. You should take a hot bath tonight.", tip: "[three crazy meetings] / [Poor Mom] 공감 척추" },
+    { id: 62, part: "Part 3. 저녁 식사 & 수다", scene: "남은 피자 정리", momKo: "남은 피자 랩 씌워서 냉장고에 넣어둬.", momEn: "Wrap this leftover pizza and put it in the fridge.", daughterKo: "이따 야식으로 제가 다 먹을게요!", daughterEn: "I'll eat that as a midnight snack later!", tip: "[Wrap leftover pizza] / [midnight snack]" },
+    { id: 63, part: "Part 3. 저녁 식사 & 수다", scene: "주말 영화 계획", momKo: "이번 주 토요일에 영화 한 편 같이 볼까?", momEn: "Want to watch a movie together this Saturday?", daughterKo: "좋아요! 새로 나온 애니메이션 보면 안 돼요?", daughterEn: "Yes! Can we watch that new animated film?", tip: "[watch movie together] / [animated film]" },
+    { id: 64, part: "Part 3. 저녁 식사 & 수다", scene: "자세 교정 지적", momKo: "허리 똑바로 펴. 등이 새우처럼 굽었잖니.", momEn: "Sit up straight. Your back is curving like a shrimp.", daughterKo: "제 의자가 너무 불편해서 그래요! 새 의자 사줘요.", daughterEn: "My chair is so uncomfortable! We need a new one.", tip: "[Sit up straight] / [curving like shrimp]" },
+    { id: 65, part: "Part 3. 저녁 식사 & 수다", scene: "배부름 표현", momKo: "한 입만 더 먹어. 얼마 안 남았어.", momEn: "Have one more bite. There's only a little left.", daughterKo: "완전 배불러요! 배 터질 것 같아요.", daughterEn: "I'm stuffed! My stomach is going to explode.", tip: "[Have one more bite] / [I'm stuffed] 포만감 직결" },
+    { id: 66, part: "Part 3. 저녁 식사 & 수다", scene: "바디미스트 향기", momKo: "이 강한 냄새는 뭐야? 뭐 뿌렸어?", momEn: "What is that strong smell? Did you spray something?", daughterKo: "복숭아 바디미스트예요! 친구가 선물해 줬어요.", daughterEn: "It's peach body mist! My friend gave it to me.", tip: "[strong smell] / [spray something] 동작 인지" },
+    { id: 67, part: "Part 3. 저녁 식사 & 수다", scene: "친구 고민 털기", momKo: "못되게 구는 반 친구 때문에 너무 속상해하지 마.", momEn: "Don't let mean classmates bother you too much.", daughterKo: "알아요, 하지만 걔 말이 마음에 큰 상처가 돼요.", daughterEn: "I know, but her words really hurt my feelings.", tip: "[Don't let them bother] / [hurt my feelings]" },
+    { id: 68, part: "Part 3. 저녁 식사 & 수다", scene: "방 청소 검사", momKo: "바닥에 널브러진 옷들 좀 주워 담으렴.", momEn: "Pick up those clothes scattered all over your floor.", daughterKo: "이번 주 일요일에 방 전체 청소할게요, 약속!", daughterEn: "I'll clean my whole room this Sunday, promise!", tip: "[scattered on floor] / [clean this Sunday]" },
+    { id: 69, part: "Part 3. 저녁 식사 & 수다", scene: "생선구이 타협", momKo: "생선구이 딱 절반만이라도 먹어.", momEn: "At least finish half of the grilled fish.", daughterKo: "콜. 대신 다 먹고 아이스크림 주셔야 해요.", daughterEn: "Deal. Only if I get an ice cream after this.", tip: "[finish half] / [Deal] 협상 즉각 종결" },
+    { id: 70, part: "Part 3. 저녁 식사 & 수다", scene: "된장찌개 칭찬", momKo: "된장찌개 맛이 어때?", momEn: "How does the soybean paste stew taste?", daughterKo: "완전 예술이에요! 엄마 식당 차려도 되겠어요.", daughterEn: "Chef's kiss! You should open a restaurant, Mom.", tip: "[How does it taste] / [Chef's kiss] 위트 칭찬" },
+    { id: 71, part: "Part 3. 저녁 식사 & 수다", scene: "물병 세척 요청", momKo: "가방에서 물병 꺼내왔니?", momEn: "Did you bring your dirty water bottle from your bag?", daughterKo: "여기요. 뜨거운 물로 한 번 헹궈주실 수 있어요?", daughterEn: "Here it is. Can you rinse it with hot water?", tip: "[bring dirty bottle] / [rinse with hot water]" },
+    { id: 72, part: "Part 3. 저녁 식사 & 수다", scene: "용돈 인상 요구", momKo: "이번 달에 용돈이 왜 더 필요해?", momEn: "Why do you need more allowance this month?", daughterKo: "문구류랑 인생네컷 사진 찍는 게 너무 비싸졌어요.", daughterEn: "Stationery items and photo booths are so expensive now.", tip: "[need more allowance] / [so expensive now]" },
+    { id: 73, part: "Part 3. 저녁 식사 & 수다", scene: "손톱 물어뜯기", momKo: "손톱 좀 그만 물어뜯어. 손 다 망가진다.", momEn: "Stop biting your fingernails. It ruins your fingers.", daughterKo: "불안할 때 나오는 습관이에요. 고치려고 노력 중이에요.", daughterEn: "It's a nervous habit. I'm trying to stop.", tip: "[Stop biting nails] / [nervous habit] 현상 설명" },
+    { id: 74, part: "Part 3. 저녁 식사 & 수다", scene: "주말 홍대 외출", momKo: "이번 토요일에 누구랑 홍대 가는 거야?", momEn: "Who are you going to Hongdae with this Saturday?", daughterKo: "민지랑 소윤이요. 그냥 예쁜 카페만 갈 거예요.", daughterEn: "Just Minji and Soyun. We'll only visit cute cafes.", tip: "[Who are you going with] / [visit cute cafes]" },
+    { id: 75, part: "Part 3. 저녁 식사 & 수다", scene: "택배 상자 언박싱", momKo: "주문한 새 운동화 택배로 왔더라.", momEn: "Your new sneakers arrived by courier today.", daughterKo: "대박! 지금 바로 뜯어볼래요!", daughterEn: "OMG! Let me unbox it right now!", tip: "[sneakers arrived] / [unbox it] 신조어 결합" },
 
     // Part 4. 밤 공부, 취침 & 마음 터놓기 (76 ~ 100)
-    { id: 76, part: "Part 4. 밤 공부 & 취침", scene: "야식 챙겨주기", mom: "Do you want some warm milk or toast while studying?", daughter: "Can I get sliced bananas with peanut butter?", tip: "[warm milk while studying] / [sliced bananas]" },
-    { id: 77, part: "Part 4. 밤 공부 & 취침", scene: "시험공부 격려", mom: "Don't stress too much about test scores. Health first.", daughter: "I want to get an A this time. Math is so hard.", tip: "[Health first] 가치관 / [Math is hard] 단문 연결" },
-    { id: 78, part: "Part 4. 밤 공부 & 취침", scene: "졸려서 졸 때", mom: "You are nodding off. Wash your face and reset.", daughter: "My eyelids feel like lead weights right now.", tip: "[nodding off] / [eyelids feel like lead] 비유" },
-    { id: 79, part: "Part 4. 밤 공부 & 취침", scene: "샤워 순서 정하기", mom: "Take a quick shower first so I can wash up.", daughter: "Can I go in five minutes? Finishing this chapter.", tip: "[Take shower first] / [Finishing this chapter]" },
-    { id: 80, part: "Part 4. 밤 공부 & 취침", scene: "드라이기 소음", mom: "Dry your wet hair completely before going to bed.", daughter: "The hairdryer is too loud. I'll just towel-dry it.", tip: "[Dry wet hair] / [towel-dry it] 만능 합성어" },
-    { id: 81, part: "Part 4. 밤 공부 & 취침", scene: "방 온도 조절", mom: "Is your bedroom too chilly? Should I turn on heat?", daughter: "No, it's perfect. I like sleeping under thick blankets.", tip: "[bedroom chilly] / [sleeping under blankets]" },
-    { id: 82, part: "Part 4. 밤 공부 & 취침", scene: "새벽 공부 말리기", mom: "It's past midnight. Wrap it up and sleep.", daughter: "Just ten more minutes. Almost done with history notes.", tip: "[past midnight] / [Wrap it up] 끝내다" },
-    { id: 83, part: "Part 4. 밤 공부 & 취침", scene: "체육복 건조 확인", mom: "Do you need gym uniform tomorrow?", daughter: "Yes! Is it completely dry from the dryer?", tip: "[gym uniform] / [completely dry] 상태 확인" },
-    { id: 84, part: "Part 4. 밤 공부 & 취침", scene: "모기 잡기", mom: "There's a mosquito buzzing around your desk.", daughter: "Where? Catch it, Mom! I hate bug bites.", tip: "[mosquito buzzing] / [Catch it] 단호한 명령" },
-    { id: 85, part: "Part 4. 밤 공부 & 취침", scene: "알람 맞추기 확인", mom: "Did you set your morning alarm on your phone?", daughter: "Set it for six forty. Hope I wake up easily.", tip: "[set morning alarm] / [Set it for 6:40]" },
-    { id: 86, part: "Part 4. 밤 공부 & 취침", scene: "겨울 수면잠옷", mom: "Change into your cozy winter pajamas.", daughter: "Already wearing them. They are so fluffy.", tip: "[Change into pajamas] / [so fluffy] 촉감 직결" },
-    { id: 87, part: "Part 4. 밤 공부 & 취침", scene: "스킨케어 잔소리", mom: "Put moisturizer on your nose. It's peeling.", daughter: "Already patted it down. Look at my glowing skin!", tip: "[moisturizer on nose] / [glowing skin] 유머" },
-    { id: 88, part: "Part 4. 밤 공부 & 취침", scene: "독서 권유", mom: "Read ten pages of this novel before sleep.", daughter: "Reading makes me sleepy instantly. Good night!", tip: "[Read ten pages] / [makes me sleepy] 인과 단문" },
-    { id: 89, part: "Part 4. 밤 공부 & 취침", scene: "관심 과목 토크", mom: "What subject do you find most interesting these days?", daughter: "I really like biology and graphic design.", tip: "[most interesting] / [biology and design]" },
-    { id: 90, part: "Part 4. 밤 공부 & 취침", scene: "파티 끝나는 시간", mom: "What time does Soyun's birthday party finish?", daughter: "Around six PM. I'll call you before leaving.", tip: "[party finish] / [call you before leaving]" },
-    { id: 91, part: "Part 4. 밤 공부 & 취침", scene: "침대 속 폰 금지", mom: "Put your phone away on your desk. Don't scroll in bed.", daughter: "It's charging right here! I won't touch it.", tip: "[Put phone away] / [won't touch it]" },
-    { id: 92, part: "Part 4. 밤 공부 & 취침", scene: "내일 아침 메뉴", mom: "What do you want for breakfast tomorrow morning?", daughter: "Simple egg toast and cold milk would be great.", tip: "[want for breakfast] / [egg toast and milk]" },
-    { id: 93, part: "Part 4. 밤 공부 & 취침", scene: "방 불 끄기", mom: "I'm turning off your ceiling light. Good night.", daughter: "Leave the nightlight on, please. It's too dark.", tip: "[turning off light] / [Leave nightlight on]" },
-    { id: 94, part: "Part 4. 밤 공부 & 취침", scene: "주말 늦잠 약속", mom: "We have no morning plans tomorrow. Sleep in!", daughter: "Yay! I'm not waking up until noon!", tip: "[Sleep in!] 늦잠 표현 / [not waking up until noon]" },
-    { id: 95, part: "Part 4. 밤 공부 & 취침", scene: "포옹과 사랑 표현", mom: "Give Mom a big warm hug. I love you, sweetie.", daughter: "I love you too, Mom. Even when you nag me.", tip: "[Give Mom a hug] / [Even when you nag] 솔직함" },
-    { id: 96, part: "Part 4. 밤 공부 & 취침", scene: "엄마의 응원", mom: "You can tell Mom anything. I'm always on your side.", daughter: "Thanks, Mom. It really comforts my heart.", tip: "[always on your side] / [comforts my heart]" },
-    { id: 97, part: "Part 4. 밤 공부 & 취침", scene: "이불 덮어주기", mom: "Pull the blanket up to your neck. Don't catch a cold.", daughter: "Tucked in completely. Warm and cozy.", tip: "[Pull blanket up] / [Tucked in] 쏙 들어가다" },
-    { id: 98, part: "Part 4. 밤 공부 & 취침", scene: "내일 날씨 예보", mom: "The forecast says it will be super windy tomorrow.", daughter: "Then I'll wear my padded jacket. Thanks for telling me.", tip: "[forecast says] / [wear padded jacket]" },
-    { id: 99, part: "Part 4. 밤 공부 & 취침", scene: "발표 전 마인드컨트롤", mom: "Stop overthinking about tomorrow's presentation.", daughter: "I practiced five times. I'll crush it tomorrow.", tip: "[Stop overthinking] / [I'll crush it] 자신감" },
-    { id: 100, part: "Part 4. 밤 공부 & 취침", scene: "하루의 마지막 인사", mom: "Sweet dreams, my lovely daughter. Rest well.", daughter: "Good night, Mom. See you in the morning!", tip: "[Sweet dreams] / [See you in the morning]" }
+    { id: 76, part: "Part 4. 밤 공부 & 취침", scene: "야식 챙겨주기", momKo: "공부하면서 따뜻한 우유나 토스트 좀 먹을래?", momEn: "Do you want some warm milk or toast while studying?", daughterKo: "바나나 썰어서 땅콩버터 발라주시면 안 돼요?", daughterEn: "Can I get sliced bananas with peanut butter?", tip: "[warm milk while studying] / [sliced bananas]" },
+    { id: 77, part: "Part 4. 밤 공부 & 취침", scene: "시험공부 격려", momKo: "시험 성적에 너무 스트레스받지 마. 건강이 먼저야.", momEn: "Don't stress too much about test scores. Health first.", daughterKo: "이번엔 A 받고 싶단 말이에요. 수학이 너무 어려워요.", daughterEn: "I want to get an A this time. Math is so hard.", tip: "[Health first] 가치관 / [Math is hard] 단문 연결" },
+    { id: 78, part: "Part 4. 밤 공부 & 취침", scene: "졸려서 졸 때", momKo: "너 꾸벅꾸벅 조네. 세수하고 정신 차리렴.", momEn: "You are nodding off. Wash your face and reset.", daughterKo: "지금 눈꺼풀이 납덩이처럼 무거워요.", daughterEn: "My eyelids feel like lead weights right now.", tip: "[nodding off] / [eyelids feel like lead] 비유" },
+    { id: 79, part: "Part 4. 밤 공부 & 취침", scene: "샤워 순서 정하기", momKo: "엄마 씻게 네가 먼저 샤워 얼른 해라.", momEn: "Take a quick shower first so I can wash up.", daughterKo: "5분 뒤에 가도 돼요? 이 챕터만 끝내고요.", daughterEn: "Can I go in five minutes? Finishing this chapter.", tip: "[Take shower first] / [Finishing this chapter]" },
+    { id: 80, part: "Part 4. 밤 공부 & 취침", scene: "드라이기 소음", momKo: "자기 전에 젖은 머리 바짝 말리고 자.", momEn: "Dry your wet hair completely before going to bed.", daughterKo: "드라이기 소리가 너무 시끄러워요. 수건으로만 털게요.", daughterEn: "The hairdryer is too loud. I'll just towel-dry it.", tip: "[Dry wet hair] / [towel-dry it] 만능 합성어" },
+    { id: 81, part: "Part 4. 밤 공부 & 취침", scene: "방 온도 조절", momKo: "방이 너무 쌀쌀하니? 보일러 틀어줄까?", momEn: "Is your bedroom too chilly? Should I turn on heat?", daughterKo: "아뇨, 딱 좋아요. 두꺼운 이불 덮고 자는 게 좋아요.", daughterEn: "No, it's perfect. I like sleeping under thick blankets.", tip: "[bedroom chilly] / [sleeping under blankets]" },
+    { id: 82, part: "Part 4. 밤 공부 & 취침", scene: "새벽 공부 말리기", momKo: "자정 넘었다. 이제 그만 정리하고 자렴.", momEn: "It's past midnight. Wrap it up and sleep.", daughterKo: "딱 10분만요. 역사 필기 거의 다 끝났어요.", daughterEn: "Just ten more minutes. Almost done with history notes.", tip: "[past midnight] / [Wrap it up] 끝내다" },
+    { id: 83, part: "Part 4. 밤 공부 & 취침", scene: "체육복 건조 확인", momKo: "내일 체육복 가져가야 하니?", momEn: "Do you need gym uniform tomorrow?", daughterKo: "네! 건조기에서 다 말랐어요?", daughterEn: "Yes! Is it completely dry from the dryer?", tip: "[gym uniform] / [completely dry] 상태 확인" },
+    { id: 84, part: "Part 4. 밤 공부 & 취침", scene: "모기 잡기", momKo: "네 책상 주위에 모기 한 마리 윙윙거리네.", momEn: "There's a mosquito buzzing around your desk.", daughterKo: "어디요? 엄마 잡아줘요! 모기 물리는 거 질색이야.", daughterEn: "Where? Catch it, Mom! I hate bug bites.", tip: "[mosquito buzzing] / [Catch it] 단호한 명령" },
+    { id: 85, part: "Part 4. 밤 공부 & 취침", scene: "알람 맞추기 확인", momKo: "휴대폰 아침 알람 맞춰뒀어?", momEn: "Did you set your morning alarm on your phone?", daughterKo: "6시 40분에 맞춰뒀어요. 쉽게 일어났으면 좋겠다.", daughterEn: "Set it for six forty. Hope I wake up easily.", tip: "[set morning alarm] / [Set it for 6:40]" },
+    { id: 86, part: "Part 4. 밤 공부 & 취침", scene: "겨울 수면잠옷", momKo: "포근한 겨울 수면잠옷으로 갈아입으렴.", momEn: "Change into your cozy winter pajamas.", daughterKo: "벌써 입고 있어요. 털이 완전 몽실몽실해요.", daughterEn: "Already wearing them. They are so fluffy.", tip: "[Change into pajamas] / [so fluffy] 촉감 직결" },
+    { id: 87, part: "Part 4. 밤 공부 & 취침", scene: "스킨케어 잔소리", momKo: "코에 로션 발라. 각질 일어나잖아.", momEn: "Put moisturizer on your nose. It's peeling.", daughterKo: "벌써 찹찹 발랐어요. 제 꿀피부 좀 보세요!", daughterEn: "Already patted it down. Look at my glowing skin!", tip: "[moisturizer on nose] / [glowing skin] 유머" },
+    { id: 88, part: "Part 4. 밤 공부 & 취침", scene: "독서 권유", momKo: "자기 전에 소설책 열 페이지만 읽어봐.", momEn: "Read ten pages of this novel before sleep.", daughterKo: "책 읽으면 바로 잠 쏟아져요. 안녕히 주무세요!", daughterEn: "Reading makes me sleepy instantly. Good night!", tip: "[Read ten pages] / [makes me sleepy] 인과 단문" },
+    { id: 89, part: "Part 4. 밤 공부 & 취침", scene: "관심 과목 토크", momKo: "요즘 어떤 과목이 제일 흥미롭니?", momEn: "What subject do you find most interesting these days?", daughterKo: "생물이랑 시각 디자인이 진짜 재미있어요.", daughterEn: "I really like biology and graphic design.", tip: "[most interesting] / [biology and design]" },
+    { id: 90, part: "Part 4. 밤 공부 & 취침", scene: "파티 끝나는 시간", momKo: "소윤이 생일 파티 몇 시에 끝나?", momEn: "What time does Soyun's birthday party finish?", daughterKo: "오후 6시쯤이요. 출발하기 전에 전화할게요.", daughterEn: "Around six PM. I'll call you before leaving.", tip: "[party finish] / [call you before leaving]" },
+    { id: 91, part: "Part 4. 밤 공부 & 취침", scene: "침대 속 폰 금지", momKo: "책상 위에 폰 올려둬. 침대에서 보지 말고.", momEn: "Put your phone away on your desk. Don't scroll in bed.", daughterKo: "여기서 충전 중이에요! 손도 안 댈게요.", daughterEn: "It's charging right here! I won't touch it.", tip: "[Put phone away] / [won't touch it]" },
+    { id: 92, part: "Part 4. 밤 공부 & 취침", scene: "내일 아침 메뉴", momKo: "내일 아침에 뭐 먹고 싶어?", momEn: "What do you want for breakfast tomorrow morning?", daughterKo: "간단하게 계란 토스트랑 찬 우유 주시면 좋겠어요.", daughterEn: "Simple egg toast and cold milk would be great.", tip: "[want for breakfast] / [egg toast and milk]" },
+    { id: 93, part: "Part 4. 밤 공부 & 취침", scene: "방 불 끄기", momKo: "천장 불 끈다. 잘 자렴.", momEn: "I'm turning off your ceiling light. Good night.", daughterKo: "무드등은 켜두세요, 제발요. 너무 어두워요.", daughterEn: "Leave the nightlight on, please. It's too dark.", tip: "[turning off light] / [Leave nightlight on]" },
+    { id: 94, part: "Part 4. 밤 공부 & 취침", scene: "주말 늦잠 약속", momKo: "내일 아침엔 약속 없으니까 푹 자렴!", momEn: "We have no morning plans tomorrow. Sleep in!", daughterKo: "신난다! 저 내일 정오까지 절대 안 일어날 거예요!", daughterEn: "Yay! I'm not waking up until noon!", tip: "[Sleep in!] 늦잠 표현 / [not waking up until noon]" },
+    { id: 95, part: "Part 4. 밤 공부 & 취침", scene: "포옹과 사랑 표현", momKo: "엄마 한 번 꽉 안아줘. 사랑해 딸.", momEn: "Give Mom a big warm hug. I love you, sweetie.", daughterKo: "나도 사랑해요 엄마. 잔소리할 때도 사랑해!", daughterEn: "I love you too, Mom. Even when you nag me.", tip: "[Give Mom a hug] / [Even when you nag] 솔직함" },
+    { id: 96, part: "Part 4. 밤 공부 & 취침", scene: "엄마의 응원", momKo: "엄마한테 뭐든 털어놔도 돼. 엄만 항상 네 편이야.", momEn: "You can tell Mom anything. I'm always on your side.", daughterKo: "고마워요 엄마. 그 말이 진짜 마음에 위로가 돼요.", daughterEn: "Thanks, Mom. It really comforts my heart.", tip: "[always on your side] / [comforts my heart]" },
+    { id: 97, part: "Part 4. 밤 공부 & 취침", scene: "이불 덮어주기", momKo: "목까지 이불 잘 덮어. 감기 걸리지 말고.", momEn: "Pull the blanket up to your neck. Don't catch a cold.", daughterKo: "쏙 들어왔어요. 따뜻하고 포근해요.", daughterEn: "Tucked in completely. Warm and cozy.", tip: "[Pull blanket up] / [Tucked in] 쏙 들어가다" },
+    { id: 98, part: "Part 4. 밤 공부 & 취침", scene: "내일 날씨 예보", momKo: "일기예보에서 내일 바람 엄청 분대.", momEn: "The forecast says it will be super windy tomorrow.", daughterKo: "그럼 패딩 입어야겠네요. 알려줘서 고마워요.", daughterEn: "Then I'll wear my padded jacket. Thanks for telling me.", tip: "[forecast says] / [wear padded jacket]" },
+    { id: 99, part: "Part 4. 밤 공부 & 취침", scene: "발표 전 마인드컨트롤", momKo: "내일 발표 너무 걱정하지 마.", momEn: "Stop overthinking about tomorrow's presentation.", daughterKo: "다섯 번이나 연습했어요. 내일 찢고 올게요!", daughterEn: "I practiced five times. I'll crush it tomorrow.", tip: "[Stop overthinking] / [I'll crush it] 자신감" },
+    { id: 100, part: "Part 4. 밤 공부 & 취침", scene: "하루의 마지막 인사", momKo: "좋은 꿈 꿔, 사랑하는 내 딸. 푹 자렴.", momEn: "Sweet dreams, my lovely daughter. Rest well.", daughterKo: "잘 자요 엄마. 아침에 봐요!", daughterEn: "Good night, Mom. See you in the morning!", tip: "[Sweet dreams] / [See you in the morning]" }
   ];
 
   let playlist = [...rawData];
   let currentIndex = 0;
-  let currentMode = "mom"; // "mom" | "daughter" | "all"
+  let currentMode = "mom";
   let isRunning = false;
   let isRandom = false;
   let synth = window.speechSynthesis;
@@ -539,8 +556,10 @@
   const sceneBadge = document.getElementById("sceneBadge");
   const momBubble = document.getElementById("momBubble");
   const daughterBubble = document.getElementById("daughterBubble");
-  const momText = document.getElementById("momText");
-  const daughterText = document.getElementById("daughterText");
+  const momKo = document.getElementById("momKo");
+  const momEn = document.getElementById("momEn");
+  const daughterKo = document.getElementById("daughterKo");
+  const daughterEn = document.getElementById("daughterEn");
   const momTip = document.getElementById("momTip");
   const daughterTip = document.getElementById("daughterTip");
   const dialogueList = document.getElementById("dialogueList");
@@ -582,7 +601,7 @@
       li.id = `item-${item.id}`;
       li.innerHTML = `
         <div class="item-scene">${item.id}. [${item.scene}]</div>
-        <div class="item-en">👩 ${item.mom}<br>👧 ${item.daughter}</div>
+        <div class="item-text">👩 ${item.momKo} <span style="color:#bae6fd;">(${item.momEn})</span><br>👧 ${item.daughterKo} <span style="color:#f472b6;">(${item.daughterEn})</span></div>
       `;
       li.addEventListener("click", () => {
         unlockAudio();
@@ -606,8 +625,10 @@
 
     metaBadge.innerText = `Set ${currentIndex + 1} / ${playlist.length}`;
     sceneBadge.innerText = `[${curr.scene}]`;
-    momText.innerText = curr.mom;
-    daughterText.innerText = curr.daughter;
+    momKo.innerText = `"${curr.momKo}"`;
+    momEn.innerText = curr.momEn;
+    daughterKo.innerText = `"${curr.daughterKo}"`;
+    daughterEn.innerText = curr.daughterEn;
     momTip.innerText = `💡 팁: ${curr.tip}`;
     daughterTip.innerText = `💡 딸 팁: 조사 떼고 명사-동사 직결`;
 
@@ -637,10 +658,10 @@
 
       if (enVoices.length > 0) {
         if (role === "mom") {
-          utter.pitch = 0.95; // 차분하고 따뜻한 엄마 음성
+          utter.pitch = 0.95;
           utter.voice = enVoices.find(v => v.name.toLowerCase().includes("samantha") || v.name.toLowerCase().includes("zira")) || enVoices[0];
         } else {
-          utter.pitch = 1.28; // 밝고 통통 튀는 15세 사춘기 딸 음성
+          utter.pitch = 1.28;
           utter.voice = enVoices.find(v => v.name.toLowerCase().includes("victoria") || v.name.toLowerCase().includes("karen")) || enVoices[enVoices.length - 1];
         }
       }
@@ -675,45 +696,43 @@
     const delay = parseInt(intervalSelect.value);
 
     if (currentMode === "mom") {
-      // 엄마 롤플레잉: 딸의 말을 컴퓨터가 들려주고 ➔ 엄마가 직접 소리 내어 말하기
+      // 엄마 롤플레잉: 딸의 말을 먼저 듣고 ➔ 엄마가 한글을 보며 영어로 대답
       cueBanner.innerText = "👧 딸의 말을 먼저 들으세요";
       daughterBubble.classList.add("active");
-      await speakRole(item.daughter, "daughter", spd);
+      await speakRole(item.daughterEn, "daughter", spd);
       daughterBubble.classList.remove("active");
       if (!isRunning) return;
 
-      // 엄마 발화 큐
-      cueBanner.innerText = "👩 [엄마 차례] 위 영어를 소리 내어 말하세요! (3초)";
+      cueBanner.innerText = `👩 [엄마 차례] 한글 뜻을 보며 위 영어를 말하세요! (대기)`;
       momBubble.classList.add("active");
-      await sleep(delay + 1000);
+      await sleep(delay + 800);
       momBubble.classList.remove("active");
 
     } else if (currentMode === "daughter") {
-      // 딸 롤플레잉: 엄마의 말을 컴퓨터가 들려주고 ➔ 딸이 직접 소리 내어 답하기
+      // 딸 롤플레잉: 엄마의 말을 먼저 듣고 ➔ 딸이 한글을 보며 영어로 대답
       cueBanner.innerText = "👩 엄마의 말을 먼저 들으세요";
       momBubble.classList.add("active");
-      await speakRole(item.mom, "mom", spd);
+      await speakRole(item.momEn, "mom", spd);
       momBubble.classList.remove("active");
       if (!isRunning) return;
 
-      // 딸 발화 큐
-      cueBanner.innerText = "👧 [딸 차례] 위 영어를 소리 내어 대답하세요! (3초)";
+      cueBanner.innerText = `👧 [딸 차례] 한글 뜻을 보며 위 영어를 대답하세요! (대기)`;
       daughterBubble.classList.add("active");
-      await sleep(delay + 1000);
+      await sleep(delay + 800);
       daughterBubble.classList.remove("active");
 
     } else {
       // 전체 대화 듣기 (엄마 ➔ 딸 연속 낭독)
-      cueBanner.innerText = "👩 엄마 발화 청취 중...";
+      cueBanner.innerText = `👩 엄마 발화: "${item.momKo}"`;
       momBubble.classList.add("active");
-      await speakRole(item.mom, "mom", spd);
+      await speakRole(item.momEn, "mom", spd);
       momBubble.classList.remove("active");
       if (!isRunning) return;
       await sleep(400);
 
-      cueBanner.innerText = "👧 딸 발화 청취 중...";
+      cueBanner.innerText = `👧 딸 발화: "${item.daughterKo}"`;
       daughterBubble.classList.add("active");
-      await speakRole(item.daughter, "daughter", spd);
+      await speakRole(item.daughterEn, "daughter", spd);
       daughterBubble.classList.remove("active");
       if (!isRunning) return;
 
@@ -764,11 +783,11 @@
       btn.classList.add("active");
       currentMode = btn.getAttribute("data-mode");
       if (currentMode === "mom") {
-        cueBanner.innerText = "👩 [엄마 롤플레잉 모드]: 딸의 말을 듣고 엄마가 영어로 대답합니다.";
+        cueBanner.innerText = "👩 [엄마 롤플레잉 모드]: 딸의 말을 듣고 엄마가 한글을 보며 영어로 대답합니다.";
       } else if (currentMode === "daughter") {
-        cueBanner.innerText = "👧 [딸 롤플레잉 모드]: 엄마의 말을 듣고 딸이 영어로 대답합니다.";
+        cueBanner.innerText = "👧 [딸 롤플레잉 모드]: 엄마의 말을 듣고 딸이 한글을 보며 영어로 대답합니다.";
       } else {
-        cueBanner.innerText = "🎧 [전체 대화 듣기]: 엄마와 딸의 대화를 차례대로 자동 연속 청취합니다.";
+        cueBanner.innerText = "🎧 [전체 대화 듣기]: 한글과 영어를 동시에 보며 엄마와 딸의 대화를 청취합니다.";
       }
     });
   });
