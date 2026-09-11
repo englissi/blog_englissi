@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>모녀 실전 티키타카 100 (한글/영문 동시 표기)</title>
+  <title>모녀 실전 티키타카 100 (자연스러운 순서 개편)</title>
   <style>
     :root {
       --bg: #090d16;
@@ -342,22 +342,22 @@
 <div class="container">
   <header>
     <h1>모녀 실전 티키타카 100</h1>
-    <p>한글 뜻을 보고 영어로 툭! 엄마와 15세 중학생 딸의 100문답 스피킹</p>
+    <p>엄마가 먼저 말하고 딸이 받아친다! 자연스러운 일상 100문답 훈련</p>
   </header>
 
   <!-- 3개 모드 선택 바 -->
   <div class="mode-selector">
     <button class="mode-btn mom-mode active" data-mode="mom">
       <span>👩 엄마 롤플레잉</span>
-      <span style="font-size:0.68rem; font-weight:normal;">딸 듣고 ➔ 엄마 말하기</span>
+      <span style="font-size:0.68rem; font-weight:normal;">엄마 말하기 ➔ 딸 답변 듣기</span>
     </button>
     <button class="mode-btn daughter-mode" data-mode="daughter">
       <span>👧 딸 롤플레잉</span>
-      <span style="font-size:0.68rem; font-weight:normal;">엄마 듣고 ➔ 딸 말하기</span>
+      <span style="font-size:0.68rem; font-weight:normal;">엄마 말 듣고 ➔ 딸 대답하기</span>
     </button>
     <button class="mode-btn all-mode" data-mode="all">
       <span>🎧 전체 대화 듣기</span>
-      <span style="font-size:0.68rem; font-weight:normal;">엄마 & 딸 연속 청취</span>
+      <span style="font-size:0.68rem; font-weight:normal;">엄마 ➔ 딸 연속 낭독</span>
     </button>
   </div>
 
@@ -371,17 +371,17 @@
     <div class="cue-banner" id="cueBanner">준비 버튼을 눌러 모녀 대화를 시작하세요.</div>
 
     <div class="dialogue-box">
-      <!-- 엄마 발화 박스 (한글 + 영문) -->
+      <!-- 1순위: 엄마 발화 박스 (항상 먼저 발화) -->
       <div class="bubble bubble-mom" id="momBubble">
-        <div class="speaker-tag mom">👩 MOM (엄마)</div>
+        <div class="speaker-tag mom">👩 MOM (엄마 - 먼저 말하기)</div>
         <div class="speech-ko" id="momKo">"일어날 시간이야. 학교 늦겠다!"</div>
         <div class="speech-en" id="momEn">Time to get up. You'll be late for school.</div>
         <div class="point-tip" id="momTip">💡 포인트: [get up] 바로 던지기 / [late for school] 상태 직결</div>
       </div>
 
-      <!-- 딸 발화 박스 (한글 + 영문) -->
+      <!-- 2순위: 딸 발화 박스 (엄마 말에 대답) -->
       <div class="bubble bubble-daughter" id="daughterBubble">
-        <div class="speaker-tag daughter">👧 DAUGHTER (15세 딸)</div>
+        <div class="speaker-tag daughter">👧 DAUGHTER (15세 딸 - 받아치기)</div>
         <div class="speech-ko" id="daughterKo">"5분만 더요. 눈이 안 떠져요."</div>
         <div class="speech-en" id="daughterEn">Five more minutes. My eyes won't open.</div>
         <div class="point-tip" id="daughterTip">💡 딸 팁: [Five more minutes] 숫자 단문 / [eyes won't open] 무생물 주어</div>
@@ -407,11 +407,11 @@
       </select>
     </div>
     <div class="setting-item">
-      <label for="intervalSelect">턴 대기 시간:</label>
+      <label for="intervalSelect">내 발화 시간:</label>
       <select id="intervalSelect">
-        <option value="1200">1.2초 (빠른 호흡)</option>
-        <option value="2200" selected>2.2초 (표준 말하기)</option>
-        <option value="3200">3.2초 (여유 있는 발화)</option>
+        <option value="2000">2.0초 (스피드)</option>
+        <option value="2800" selected>2.8초 (표준 발화)</option>
+        <option value="3800">3.8초 (여유 있게)</option>
       </select>
     </div>
   </div>
@@ -629,7 +629,7 @@
     momEn.innerText = curr.momEn;
     daughterKo.innerText = `"${curr.daughterKo}"`;
     daughterEn.innerText = curr.daughterEn;
-    momTip.innerText = `💡 팁: ${curr.tip}`;
+    momTip.innerText = `💡 포인트: ${curr.tip}`;
     daughterTip.innerText = `💡 딸 팁: 조사 떼고 명사-동사 직결`;
 
     clearHighlights();
@@ -689,55 +689,72 @@
     });
   }
 
+  // 핵심 발화 루프: 항상 [엄마 먼저 말하기] ➔ [딸이 받아치기] 순서
   async function playCycle(index) {
     if (!isRunning) return;
     const item = playlist[index];
     const spd = parseFloat(speedSelect.value);
-    const delay = parseInt(intervalSelect.value);
+    const userSpeakDelay = parseInt(intervalSelect.value);
 
     if (currentMode === "mom") {
-      // 엄마 롤플레잉: 딸의 말을 먼저 듣고 ➔ 엄마가 한글을 보며 영어로 대답
-      cueBanner.innerText = "👧 딸의 말을 먼저 들으세요";
+      // 1. [엄마 롤플레잉]: 엄마가 먼저 소리 내어 말하고 ➔ 딸의 대답을 컴퓨터가 들려줌
+      clearHighlights();
+      cueBanner.innerText = `👩 [엄마 차례] 한글을 보고 영어를 먼저 말하세요! (대기 중)`;
+      momBubble.classList.add("active");
+      await sleep(userSpeakDelay);
+      momBubble.classList.remove("active");
+      if (!isRunning) return;
+
+      await sleep(350);
+
+      cueBanner.innerText = `👧 딸이 대답합니다 (귀 기울여 들으세요)`;
       daughterBubble.classList.add("active");
       await speakRole(item.daughterEn, "daughter", spd);
       daughterBubble.classList.remove("active");
       if (!isRunning) return;
 
-      cueBanner.innerText = `👩 [엄마 차례] 한글 뜻을 보며 위 영어를 말하세요! (대기)`;
-      momBubble.classList.add("active");
-      await sleep(delay + 800);
-      momBubble.classList.remove("active");
+      cueBanner.innerText = "숨고르기 (Next)";
+      await sleep(1000);
 
     } else if (currentMode === "daughter") {
-      // 딸 롤플레잉: 엄마의 말을 먼저 듣고 ➔ 딸이 한글을 보며 영어로 대답
-      cueBanner.innerText = "👩 엄마의 말을 먼저 들으세요";
+      // 2. [딸 롤플레잉]: 엄마가 먼저 질문하고 ➔ 딸이 한글을 보고 영어로 대답
+      clearHighlights();
+      cueBanner.innerText = `👩 엄마의 말을 먼저 들으세요`;
       momBubble.classList.add("active");
       await speakRole(item.momEn, "mom", spd);
       momBubble.classList.remove("active");
       if (!isRunning) return;
 
-      cueBanner.innerText = `👧 [딸 차례] 한글 뜻을 보며 위 영어를 대답하세요! (대기)`;
+      await sleep(350);
+
+      cueBanner.innerText = `👧 [딸 차례] 한글을 보고 영어로 즉시 대답하세요! (대기 중)`;
       daughterBubble.classList.add("active");
-      await sleep(delay + 800);
+      await sleep(userSpeakDelay);
       daughterBubble.classList.remove("active");
+      if (!isRunning) return;
+
+      cueBanner.innerText = "숨고르기 (Next)";
+      await sleep(1000);
 
     } else {
-      // 전체 대화 듣기 (엄마 ➔ 딸 연속 낭독)
-      cueBanner.innerText = `👩 엄마 발화: "${item.momKo}"`;
+      // 3. [전체 대화 듣기]: 엄마 먼저 낭독 ➔ 딸 후속 낭독 (자연스러운 순서)
+      clearHighlights();
+      cueBanner.innerText = `👩 엄마: "${item.momKo}"`;
       momBubble.classList.add("active");
       await speakRole(item.momEn, "mom", spd);
       momBubble.classList.remove("active");
       if (!isRunning) return;
+
       await sleep(400);
 
-      cueBanner.innerText = `👧 딸 발화: "${item.daughterKo}"`;
+      cueBanner.innerText = `👧 딸: "${item.daughterKo}"`;
       daughterBubble.classList.add("active");
       await speakRole(item.daughterEn, "daughter", spd);
       daughterBubble.classList.remove("active");
       if (!isRunning) return;
 
-      cueBanner.innerText = "대기 (Breathe)";
-      await sleep(delay);
+      cueBanner.innerText = "숨고르기 (Breathe)";
+      await sleep(1200);
     }
   }
 
@@ -783,11 +800,11 @@
       btn.classList.add("active");
       currentMode = btn.getAttribute("data-mode");
       if (currentMode === "mom") {
-        cueBanner.innerText = "👩 [엄마 롤플레잉 모드]: 딸의 말을 듣고 엄마가 한글을 보며 영어로 대답합니다.";
+        cueBanner.innerText = "👩 [엄마 롤플레잉]: 엄마가 먼저 말하고, 딸의 대답을 컴퓨터가 들려줍니다.";
       } else if (currentMode === "daughter") {
-        cueBanner.innerText = "👧 [딸 롤플레잉 모드]: 엄마의 말을 듣고 딸이 한글을 보며 영어로 대답합니다.";
+        cueBanner.innerText = "👧 [딸 롤플레잉]: 엄마의 말을 컴퓨터가 들려주고, 딸이 영어로 대답합니다.";
       } else {
-        cueBanner.innerText = "🎧 [전체 대화 듣기]: 한글과 영어를 동시에 보며 엄마와 딸의 대화를 청취합니다.";
+        cueBanner.innerText = "🎧 [전체 대화 듣기]: 엄마의 말 ➔ 딸의 대답 순서로 자동 연속 청취합니다.";
       }
     });
   });
