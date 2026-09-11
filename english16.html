@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>모녀 실전 티키타카 100 (엄마 & 15세 딸)</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #38bdf8;
+      --mom-color: #f472b6;
+      --daughter-color: #38bdf8;
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --success: #34d399;
+      --cue: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0.8rem 0.75rem 2.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 0.3rem 0;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* 3가지 모드 선택 탭 */
+    .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      background: #090d16;
+      padding: 0.3rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.6rem 0.4rem;
+      border-radius: 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--card-bg);
+      color: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .mode-btn.active.mom-mode { color: var(--mom-color); border-color: rgba(244, 114, 182, 0.4); }
+    .mode-btn.active.daughter-mode { color: var(--daughter-color); border-color: rgba(56, 189, 248, 0.4); }
+    .mode-btn.active.all-mode { color: #a5b4fc; border-color: rgba(99, 102, 241, 0.4); }
+
+    /* 대화 스테이지 카드 */
+    .stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.2rem 1.1rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+    }
+
+    .top-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .meta-badge {
+      background: #1e293b;
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .scene-badge {
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* 발화 큐 알림창 */
+    .cue-banner {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #334155;
+      border-radius: 0.6rem;
+      padding: 0.45rem 0.8rem;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--cue);
+      min-height: 2.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.01em;
+    }
+
+    /* 엄마 & 딸 말풍선 */
+    .dialogue-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .bubble {
+      border-radius: 0.9rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(15, 23, 42, 0.5);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .bubble.active {
+      transform: scale(1.015);
+    }
+
+    .bubble-mom.active {
+      background: rgba(244, 114, 182, 0.12);
+      border-color: var(--mom-color);
+      box-shadow: 0 0 15px rgba(244, 114, 182, 0.25);
+    }
+
+    .bubble-daughter.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--daughter-color);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+
+    .speaker-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .speaker-tag.mom { color: var(--mom-color); }
+    .speaker-tag.daughter { color: var(--daughter-color); }
+
+    .speech-en {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #94a3b8;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .bubble.active .speech-en {
+      color: #fff;
+    }
+
+    .point-tip {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 0.35rem;
+    }
+
+    /* 조작 컨트롤 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.65rem 0.95rem;
+      border-radius: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button:active { transform: scale(0.96); }
+    button.btn-primary { background: var(--primary); border-color: var(--primary); }
+
+    .settings-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    select {
+      background: #070b14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.4rem;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* 100세트 목록 */
+    .list-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .dialogue-list {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .dialogue-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e293b44;
+      cursor: pointer;
+    }
+
+    .dialogue-item:last-child { border-bottom: none; }
+
+    .dialogue-item.playing {
+      background: rgba(99, 102, 241, 0.15);
+      border-left: 4px solid var(--accent);
+    }
+
+    .item-scene {
+      font-size: 0.76rem;
+      color: var(--cue);
+      margin-bottom: 0.15rem;
+      font-weight: 700;
+    }
+
+    .item-en {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #bae6fd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>모녀 실전 티키타카 100</h1>
+    <p>조사 떼고 1초 만에 툭! 엄마와 15세 중학생 딸의 100문답 스피킹</p>
+  </header>
+
+  <!-- 3개 모드 선택 바 -->
+  <div class="mode-selector">
+    <button class="mode-btn mom-mode active" data-mode="mom">
+      <span>👩 엄마 롤플레잉</span>
+      <span style="font-size:0.68rem; font-weight:normal;">딸 듣고 ➔ 엄마 말하기</span>
+    </button>
+    <button class="mode-btn daughter-mode" data-mode="daughter">
+      <span>👧 딸 롤플레잉</span>
+      <span style="font-size:0.68rem; font-weight:normal;">엄마 듣고 ➔ 딸 말하기</span>
+    </button>
+    <button class="mode-btn all-mode" data-mode="all">
+      <span>🎧 전체 대화 듣기</span>
+      <span style="font-size:0.68rem; font-weight:normal;">엄마 & 딸 연속 청취</span>
+    </button>
+  </div>
+
+  <div class="stage-card">
+    <div class="top-meta-bar">
+      <div class="meta-badge" id="metaBadge">Set 1 / 100</div>
+      <div class="scene-badge" id="sceneBadge">Part 1. 아침 기상 & 등교</div>
+    </div>
+
+    <!-- 진행 상황 알림창 -->
+    <div class="cue-banner" id="cueBanner">준비 버튼을 눌러 모녀 대화를 시작하세요.</div>
+
+    <div class="dialogue-box">
+      <!-- 엄마 발화 박스 -->
+      <div class="bubble bubble-mom" id="momBubble">
+        <div class="speaker-tag mom">👩 MOM (엄마)</div>
+        <div class="speech-en" id="momText">Time to get up. You'll be late for school.</div>
+        <div class="point-tip" id="momTip">💡 포인트: [get up] 바로 던지기 / [late for school] 상태 직결</div>
+      </div>
+
+      <!-- 딸 발화 박스 -->
+      <div class="bubble bubble-daughter" id="daughterBubble">
+        <div class="speaker-tag daughter">👧 DAUGHTER (15세 딸)</div>
+        <div class="speech-en" id="daughterText">Five more minutes. My eyes won't open.</div>
+        <div class="point-tip" id="daughterTip">💡 포인트: [Five more minutes] 숫자 단문 / [eyes won't open] 무생물 주어</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn">⏮ 이전</button>
+    <button class="btn-primary" id="playBtn">▶ 대화 시작</button>
+    <button id="stopBtn">⏹ 정지</button>
+    <button id="nextBtn">다음 ⏭</button>
+    <button id="randomBtn">🔀 랜덤: OFF</button>
+  </div>
+
+  <div class="settings-bar">
+    <div class="setting-item">
+      <label for="speedSelect">말하기 속도:</label>
+      <select id="speedSelect">
+        <option value="0.85">0.85x (또박또박)</option>
+        <option value="1.0" selected>1.0x (표준)</option>
+        <option value="1.15">1.15x (실전 고속)</option>
+      </select>
+    </div>
+    <div class="setting-item">
+      <label for="intervalSelect">턴 대기 시간:</label>
+      <select id="intervalSelect">
+        <option value="1200">1.2초 (빠른 호흡)</option>
+        <option value="2000" selected>2.0초 (표준 말하기)</option>
+        <option value="3000">3.0초 (여유 있는 발화)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <span>100개 모녀 일상 대화 목록</span>
+      <span>터치 시 해당 번호 즉시 이동</span>
+    </div>
+    <ul class="dialogue-list" id="dialogueList"></ul>
+  </div>
+</div>
+
+<script>
+  const rawData = [
+    // Part 1. 아침 기상, 등교 & 외출 준비 (01 ~ 25)
+    { id: 1, part: "Part 1. 아침 기상 & 등교", scene: "아침 기상 깨우기", mom: "Time to get up. You'll be late for school.", daughter: "Five more minutes. My eyes won't open.", tip: "[get up] 바로 던지기 / [eyes won't open] 무생물 주어" },
+    { id: 2, part: "Part 1. 아침 기상 & 등교", scene: "아침 식사 챙기기", mom: "Eat some toast. You need brain power today.", daughter: "I have zero appetite. Just give me water.", tip: "[Eat toast] 툭 치기 / [zero appetite] 명사 직결" },
+    { id: 3, part: "Part 1. 아침 기상 & 등교", scene: "교복 겉옷 지적", mom: "Zip up your jacket. It's freezing outside.", daughter: "It looks so uncool. I'm totally fine.", tip: "[Zip up] 동작 먼저 / [looks uncool] 느낌 직결" },
+    { id: 4, part: "Part 1. 아침 기상 & 등교", scene: "머리 손질 지체", mom: "Hurry up in the bathroom. Your bus is coming.", daughter: "I need to fix my bangs. Just one second.", tip: "[Hurry up] 마침표 / [fix my bangs] 앞머리 고정" },
+    { id: 5, part: "Part 1. 아침 기상 & 등교", scene: "가방 소지품 확인", mom: "Did you pack your iPad? Don't forget your charger.", daughter: "Already in my bag. Stop nagging, Mom.", tip: "[pack iPad] 동사+명사 / [Stop nagging] 단호한 단문" },
+    { id: 6, part: "Part 1. 아침 기상 & 등교", scene: "신발 신고 나가기", mom: "Put your sneakers on right now. Run!", daughter: "I can't find my shoes. Oh, here they are.", tip: "[Put sneakers on] 만능동사 Put / [can't find] 즉시 발화" },
+    { id: 7, part: "Part 1. 아침 기상 & 등교", scene: "현관문 나서며 인사", mom: "Have a great day, sweetie! Do well on your quiz.", daughter: "See you later. Wish me luck today!", tip: "[Have a great day] 통문장 / [Wish me luck] 관용 직결" },
+    { id: 8, part: "Part 1. 아침 기상 & 등교", scene: "텀블러 챙겨주기", mom: "Take this water bottle. Stay hydrated today.", daughter: "Thanks, Mom. I'll drink it during break.", tip: "[Take bottle] Take 활용 / [Stay hydrated] 결과 제시" },
+    { id: 9, part: "Part 1. 아침 기상 & 등교", scene: "비 올 것 같은 날씨", mom: "Grab an umbrella. The sky looks very dark.", daughter: "It won't rain. Carrying an umbrella is annoying.", tip: "[Grab umbrella] Grab 던지기 / [annoying] 감정 직결" },
+    { id: 10, part: "Part 1. 아침 기상 & 등교", scene: "립밤/선크림 바르기", mom: "Put on some sunscreen. Your face looks dry.", daughter: "I already put on lip balm. I'm good.", tip: "[Put on] 바르다 퉁치기 / [I'm good] 거절 만능패턴" },
+    { id: 11, part: "Part 1. 아침 기상 & 등교", scene: "버스 시간 알림", mom: "Your bus arrives in three minutes. Move it!", daughter: "I'm sprinting right now. Bye!", tip: "[Move it!] 1초 컷 / [I'm sprinting] 생생한 현재진행" },
+    { id: 12, part: "Part 1. 아침 기상 & 등교", scene: "지갑/교통카드 확인", mom: "Where is your transit card? Check your pocket.", daughter: "Tapped it already. It has enough balance.", tip: "[Check pocket] 명령조 / [Tapped it] 탭 동작 직결" },
+    { id: 13, part: "Part 1. 아침 기상 & 등교", scene: "아침 세수 재촉", mom: "Wash your face with cold water. Wake up!", daughter: "I'm half asleep. I need coffee like you.", tip: "[Wash face] 명사+동사 / [half asleep] 상태 묘사" },
+    { id: 14, part: "Part 1. 아침 기상 & 등교", scene: "방 불 끄고 나오기", mom: "Turn off your bedroom light before leaving.", daughter: "Did it already! I'm not a baby anymore.", tip: "[Turn off light] / [not a baby] 자아 표현" },
+    { id: 15, part: "Part 1. 아침 기상 & 등교", scene: "안경 찾기", mom: "Wear your glasses today. Your eyes look red.", daughter: "I want to wear contacts. Glasses look nerdy.", tip: "[Wear glasses] / [look nerdy] 10대 말투" },
+    { id: 16, part: "Part 1. 아침 기상 & 등교", scene: "간식 챙겨주기", mom: "Put this cereal bar in your pocket.", daughter: "Yum, thanks! I'll eat it after math class.", tip: "[Put bar in pocket] / [Yum] 감탄사 즉답" },
+    { id: 17, part: "Part 1. 아침 기상 & 등교", scene: "엘리베이터 잡기", mom: "Hold the elevator! Don't let the door close.", daughter: "Pressed the button. Hurry, it's going down.", tip: "[Hold elevator] / [Pressed button] 동작 즉결" },
+    { id: 18, part: "Part 1. 아침 기상 & 등교", scene: "준비물 출력 확인", mom: "Did you print your science report last night?", daughter: "Oops, I forgot. Can I print it at school?", tip: "[print report] / [Oops, I forgot] 0.5초 반사" },
+    { id: 19, part: "Part 1. 아침 기상 & 등교", scene: "걸음걸이 재촉", mom: "Walk faster! We are running out of time.", daughter: "My backpack is killing my shoulders.", tip: "[Walk faster] / [backpack is killing] 의인화" },
+    { id: 20, part: "Part 1. 아침 기상 & 등교", scene: "모자 쓰기", mom: "Put on your beanie. The wind is brutal.", daughter: "It messes up my hair! Absolutely not.", tip: "[Put on beanie] / [messes up hair] 동작 결과" },
+    { id: 21, part: "Part 1. 아침 기상 & 등교", scene: "아침 약 챙겨 먹기", mom: "Take this allergy pill right now.", daughter: "Tastes so bitter! Give me juice quickly.", tip: "[Take pill] / [Tastes bitter] 미각 직결" },
+    { id: 22, part: "Part 1. 아침 기상 & 등교", scene: "양말 짝짝이", mom: "Look at your socks. They don't match at all.", daughter: "It's a new trend, Mom. You don't get it.", tip: "[don't match] / [You don't get it] 10대 방어" },
+    { id: 23, part: "Part 1. 아침 기상 & 등교", scene: "친구와 등교 약속", mom: "Is Minji waiting for you at the corner?", daughter: "Yeah, she just texted me. Gotta run!", tip: "[waiting at corner] / [Gotta run] 1초 마무리" },
+    { id: 24, part: "Part 1. 아침 기상 & 등교", scene: "급식 메뉴 확인", mom: "Check your school lunch menu today.", daughter: "It's tonkatsu today! My favorite day of the week.", tip: "[Check menu] / [favorite day] 감정 연결" },
+    { id: 25, part: "Part 1. 아침 기상 & 등교", scene: "등교 직전 마지막 당부", mom: "Pay attention in class today. No dozing off!", daughter: "I'll try my best. See you at dinner!", tip: "[Pay attention] / [No dozing off] 금지 표현" },
+
+    // Part 2. 방과 후 하교, 학원 & 스마트폰 (26 ~ 50)
+    { id: 26, part: "Part 2. 하교 & 스마트폰", scene: "집에 돌아왔을 때", mom: "Welcome home! How was your day at school?", daughter: "Exhausting. Middle school is so stressful.", tip: "[How was your day] / [Exhausting] 형용사 단문" },
+    { id: 27, part: "Part 2. 하교 & 스마트폰", scene: "가방 바닥에 던짐", mom: "Don't drop your heavy bag in the hallway.", daughter: "My arms have no power left. Let me rest.", tip: "[Don't drop bag] / [no power left]" },
+    { id: 28, part: "Part 2. 하교 & 스마트폰", scene: "손 씻기 잔소리", mom: "Wash your hands with soap before touching snacks.", daughter: "Doing it now! What snack do we have?", tip: "[Wash hands] / [Doing it now] 현재진행 즉답" },
+    { id: 29, part: "Part 2. 하교 & 스마트폰", scene: "간식 요청 (떡볶이)", mom: "I made some fruit salad for you.", daughter: "Can we order spicy tteokbokki instead?", tip: "[made salad] / [order spicy tteokbokki]" },
+    { id: 30, part: "Part 2. 하교 & 스마트폰", scene: "릴스 중독 지적", mom: "Put your phone down. You've been scrolling for an hour.", daughter: "Just one more video! The algorithm is crazy.", tip: "[Put phone down] / [algorithm is crazy]" },
+    { id: 31, part: "Part 2. 하교 & 스마트폰", scene: "학원 시간 알림", mom: "Your math academy starts at five. Get ready.", daughter: "Already? Time flies way too fast.", tip: "[starts at five] / [Time flies] 관용 단문" },
+    { id: 32, part: "Part 2. 하교 & 스마트폰", scene: "학원 숙제 확인", mom: "Did you finish your English homework?", daughter: "Almost done. Just two reading passages left.", tip: "[finish homework] / [two passages left]" },
+    { id: 33, part: "Part 2. 하교 & 스마트폰", scene: "시험 결과 확인", mom: "Did you get your history test score back?", daughter: "Don't be mad... The test was super tricky.", tip: "[get score back] / [Don't be mad] 방어막" },
+    { id: 34, part: "Part 2. 하교 & 스마트폰", scene: "학원 라이딩 문의", mom: "Do you need a ride to your academy today?", daughter: "Yes please, Mom! It's raining too hard.", tip: "[need a ride] 픽업 표현 / [Yes please]" },
+    { id: 35, part: "Part 2. 하교 & 스마트폰", scene: "친구 생일 선물", mom: "Whose birthday is it this weekend?", daughter: "Soyun's! Can I get her a cute tumbler?", tip: "[Whose birthday] / [get her tumbler]" },
+    { id: 36, part: "Part 2. 하교 & 스마트폰", scene: "폰 충전기 싸움", mom: "Did you take my phone charger again?", daughter: "Mine is broken! I'll give it back soon.", tip: "[take charger] / [Mine is broken]" },
+    { id: 37, part: "Part 2. 하교 & 스마트폰", scene: "방 정리 상태", mom: "Look at your desk. It looks like a tornado hit.", daughter: "I know where everything is. It's organized chaos.", tip: "[looks like tornado] / [organized chaos] 위트" },
+    { id: 38, part: "Part 2. 하교 & 스마트폰", scene: "이어폰 끼고 못 들음", mom: "Take off your earbuds when I'm talking.", daughter: "Sorry, I couldn't hear you. What did you say?", tip: "[Take off earbuds] / [couldn't hear you]" },
+    { id: 39, part: "Part 2. 하교 & 스마트폰", scene: "친구 관계 고민", mom: "You look a bit down. Did something happen with Yuna?", daughter: "We had a small argument. I feel awkward.", tip: "[look down] 표정 인지 / [feel awkward] 감정 직결" },
+    { id: 40, part: "Part 2. 하교 & 스마트폰", scene: "학원 가기 싫을 때", mom: "Don't skip academy. Consistency is key.", daughter: "I just have a headache today. Please, Mom?", tip: "[Don't skip] / [have headache] 핑계 단문" },
+    { id: 41, part: "Part 2. 하교 & 스마트폰", scene: "배달 음식 추천", mom: "What should we eat tonight? Mom is tired.", daughter: "Maratang! Mild spice with extra beef, please!", tip: "[Mom is tired] / [Mild spice] 구체적 옵션" },
+    { id: 42, part: "Part 2. 하교 & 스마트폰", scene: "옷 쇼핑 조르기", mom: "You bought a hoodie just two weeks ago.", daughter: "This oversized zip-up is trending right now!", tip: "[bought hoodie] / [trending right now] 트렌드" },
+    { id: 43, part: "Part 2. 하교 & 스마트폰", scene: "귀가 시간 약속", mom: "Come straight home after academy. It gets dark early.", daughter: "I'll be home by eight thirty. Don't worry.", tip: "[Come straight home] / [home by eight thirty]" },
+    { id: 44, part: "Part 2. 하교 & 스마트폰", scene: "로그인 비번 문의", mom: "What's the Netflix password again? It logged out.", daughter: "It's my birthday numbers. Let me type it.", tip: "[logged out] / [Let me type it] 주도권" },
+    { id: 45, part: "Part 2. 하교 & 스마트폰", scene: "수행평가 스트레스", mom: "How is your group project presentation going?", daughter: "Terrible. My group members aren't doing anything.", tip: "[presentation going] / [aren't doing anything]" },
+    { id: 46, part: "Part 2. 하교 & 스마트폰", scene: "간식비 요청", mom: "Here is some cash for your convenience store snack.", daughter: "Thanks, Mom! You're the best in the world.", tip: "[Here is cash] / [You're the best] 칭찬 폭격" },
+    { id: 47, part: "Part 2. 하교 & 스마트폰", scene: "신조어 물어보기", mom: "What does that slang mean? Kids say it a lot.", daughter: "You're so boomer, Mom! It means something cool.", tip: "[slang mean] / [so boomer] 10대 유머" },
+    { id: 48, part: "Part 2. 하교 & 스마트폰", scene: "침대 위 뒹굴거림", mom: "Stop lying down like a potato. Go sit at your desk.", daughter: "My body is glued to this mattress.", tip: "[lying down like potato] / [glued to mattress]" },
+    { id: 49, part: "Part 2. 하교 & 스마트폰", scene: "폰 진동 소음", mom: "Your phone keeps vibrating like crazy. Who is texting?", daughter: "Just our class group chat. It never stops.", tip: "[keeps vibrating] / [never stops] 현상 설명" },
+    { id: 50, part: "Part 2. 하교 & 스마트폰", scene: "미술 과제 칭찬", mom: "I saw your art project. The colors look fantastic.", daughter: "Really? I worked on that for three straight days!", tip: "[colors look fantastic] / [worked for three days]" },
+
+    // Part 3. 저녁 식사, 집안일 & 일상 수다 (51 ~ 75)
+    { id: 51, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 세팅 돕기", mom: "Set the table, please. Put spoons and chopsticks out.", daughter: "Setting it now! What's for dinner tonight?", tip: "[Set the table] / [What's for dinner] 단문 콤보" },
+    { id: 52, part: "Part 3. 저녁 식사 & 수다", scene: "반찬 골고루 먹기", mom: "Eat your broccoli. Vitamins keep your skin clear.", daughter: "Broccoli tastes like grass. Can I eat kimchi instead?", tip: "[tastes like grass] 비유 / [instead] 대체" },
+    { id: 53, part: "Part 3. 저녁 식사 & 수다", scene: "물 쏟았을 때", mom: "Be careful! Grab a kitchen towel and wipe it.", daughter: "My bad! My elbow accidentally knocked it over.", tip: "[Grab towel and wipe] / [My bad] 0.1초 사과" },
+    { id: 54, part: "Part 3. 저녁 식사 & 수다", scene: "선생님 이야기", mom: "Tell me about your new English teacher.", daughter: "She is super funny and tells cool travel stories.", tip: "[Tell me about] / [super funny] 즉각 수식" },
+    { id: 55, part: "Part 3. 저녁 식사 & 수다", scene: "식탁 폰 사용 금지", mom: "No phones at the dinner table. Family time first.", daughter: "Just checking this one text from Minji!", tip: "[No phones at table] / [checking one text]" },
+    { id: 56, part: "Part 3. 저녁 식사 & 수다", scene: "설거지 분담", mom: "Can you put the empty bowls in the sink?", daughter: "Done! Can I get dessert now?", tip: "[put bowls in sink] / [Done!] 1초 마침표" },
+    { id: 57, part: "Part 3. 저녁 식사 & 수다", scene: "과일 깎아주기", mom: "I sliced some sweet apples for dessert.", daughter: "Apples are my absolute favorite. Thank you, Mom.", tip: "[sliced sweet apples] / [absolute favorite]" },
+    { id: 58, part: "Part 3. 저녁 식사 & 수다", scene: "아이돌 토크", mom: "Who is that singer on your wallpaper?", daughter: "Mom, that's NewJeans! How do you not know them?", tip: "[singer on wallpaper] / [How do you not know]" },
+    { id: 59, part: "Part 3. 저녁 식사 & 수다", scene: "빨래통에 옷 넣기", mom: "Put your dirty gym clothes in the laundry basket.", daughter: "I threw them in already. Can you wash them today?", tip: "[Put clothes in basket] / [Can you wash]" },
+    { id: 60, part: "Part 3. 저녁 식사 & 수다", scene: "치과 다녀온 날", mom: "Did your dentist appointment hurt today?", daughter: "My teeth feel sore. I can only chew soft things.", tip: "[dentist hurt] / [feel sore / chew soft things]" },
+    { id: 61, part: "Part 3. 저녁 식사 & 수다", scene: "엄마의 하루 공유", mom: "Mom had three crazy meetings at work today.", daughter: "Poor Mom. You should take a hot bath tonight.", tip: "[three crazy meetings] / [Poor Mom] 공감 척추" },
+    { id: 62, part: "Part 3. 저녁 식사 & 수다", scene: "남은 피자 정리", mom: "Wrap this leftover pizza and put it in the fridge.", daughter: "I'll eat that as a midnight snack later!", tip: "[Wrap leftover pizza] / [midnight snack]" },
+    { id: 63, part: "Part 3. 저녁 식사 & 수다", scene: "주말 영화 계획", mom: "Want to watch a movie together this Saturday?", daughter: "Yes! Can we watch that new animated film?", tip: "[watch movie together] / [animated film]" },
+    { id: 64, part: "Part 3. 저녁 식사 & 수다", scene: "자세 교정 지적", mom: "Sit up straight. Your back is curving like a shrimp.", daughter: "My chair is so uncomfortable! We need a new one.", tip: "[Sit up straight] / [curving like shrimp]" },
+    { id: 65, part: "Part 3. 저녁 식사 & 수다", scene: "배부름 표현", mom: "Have one more bite. There's only a little left.", daughter: "I'm stuffed! My stomach is going to explode.", tip: "[Have one more bite] / [I'm stuffed] 포만감 직결" },
+    { id: 66, part: "Part 3. 저녁 식사 & 수다", scene: "바디미스트 향기", mom: "What is that strong smell? Did you spray something?", daughter: "It's peach body mist! My friend gave it to me.", tip: "[strong smell] / [spray something] 동작 인지" },
+    { id: 67, part: "Part 3. 저녁 식사 & 수다", scene: "친구 고민 털기", mom: "Don't let mean classmates bother you too much.", daughter: "I know, but her words really hurt my feelings.", tip: "[Don't let them bother] / [hurt my feelings]" },
+    { id: 68, part: "Part 3. 저녁 식사 & 수다", scene: "방 청소 검사", mom: "Pick up those clothes scattered all over your floor.", daughter: "I'll clean my whole room this Sunday, promise!", tip: "[scattered on floor] / [clean this Sunday]" },
+    { id: 69, part: "Part 3. 저녁 식사 & 수다", scene: "생선구이 타협", mom: "At least finish half of the grilled fish.", daughter: "Deal. Only if I get an ice cream after this.", tip: "[finish half] / [Deal] 협상 즉각 종결" },
+    { id: 70, part: "Part 3. 저녁 식사 & 수다", scene: "된장찌개 칭찬", mom: "How does the soybean paste stew taste?", daughter: "Chef's kiss! You should open a restaurant, Mom.", tip: "[How does it taste] / [Chef's kiss] 위트 칭찬" },
+    { id: 71, part: "Part 3. 저녁 식사 & 수다", scene: "물병 세척 요청", mom: "Did you bring your dirty water bottle from your bag?", daughter: "Here it is. Can you rinse it with hot water?", tip: "[bring dirty bottle] / [rinse with hot water]" },
+    { id: 72, part: "Part 3. 저녁 식사 & 수다", scene: "용돈 인상 요구", mom: "Why do you need more allowance this month?", daughter: "Stationery items and photo booths are so expensive now.", tip: "[need more allowance] / [so expensive now]" },
+    { id: 73, part: "Part 3. 저녁 식사 & 수다", scene: "손톱 물어뜯기", mom: "Stop biting your fingernails. It ruins your fingers.", daughter: "It's a nervous habit. I'm trying to stop.", tip: "[Stop biting nails] / [nervous habit] 현상 설명" },
+    { id: 74, part: "Part 3. 저녁 식사 & 수다", scene: "주말 홍대 외출", mom: "Who are you going to Hongdae with this Saturday?", daughter: "Just Minji and Soyun. We'll only visit cute cafes.", tip: "[Who are you going with] / [visit cute cafes]" },
+    { id: 75, part: "Part 3. 저녁 식사 & 수다", scene: "택배 상자 언박싱", mom: "Your new sneakers arrived by courier today.", daughter: "OMG! Let me unbox it right now!", tip: "[sneakers arrived] / [unbox it] 신조어 결합" },
+
+    // Part 4. 밤 공부, 취침 & 마음 터놓기 (76 ~ 100)
+    { id: 76, part: "Part 4. 밤 공부 & 취침", scene: "야식 챙겨주기", mom: "Do you want some warm milk or toast while studying?", daughter: "Can I get sliced bananas with peanut butter?", tip: "[warm milk while studying] / [sliced bananas]" },
+    { id: 77, part: "Part 4. 밤 공부 & 취침", scene: "시험공부 격려", mom: "Don't stress too much about test scores. Health first.", daughter: "I want to get an A this time. Math is so hard.", tip: "[Health first] 가치관 / [Math is hard] 단문 연결" },
+    { id: 78, part: "Part 4. 밤 공부 & 취침", scene: "졸려서 졸 때", mom: "You are nodding off. Wash your face and reset.", daughter: "My eyelids feel like lead weights right now.", tip: "[nodding off] / [eyelids feel like lead] 비유" },
+    { id: 79, part: "Part 4. 밤 공부 & 취침", scene: "샤워 순서 정하기", mom: "Take a quick shower first so I can wash up.", daughter: "Can I go in five minutes? Finishing this chapter.", tip: "[Take shower first] / [Finishing this chapter]" },
+    { id: 80, part: "Part 4. 밤 공부 & 취침", scene: "드라이기 소음", mom: "Dry your wet hair completely before going to bed.", daughter: "The hairdryer is too loud. I'll just towel-dry it.", tip: "[Dry wet hair] / [towel-dry it] 만능 합성어" },
+    { id: 81, part: "Part 4. 밤 공부 & 취침", scene: "방 온도 조절", mom: "Is your bedroom too chilly? Should I turn on heat?", daughter: "No, it's perfect. I like sleeping under thick blankets.", tip: "[bedroom chilly] / [sleeping under blankets]" },
+    { id: 82, part: "Part 4. 밤 공부 & 취침", scene: "새벽 공부 말리기", mom: "It's past midnight. Wrap it up and sleep.", daughter: "Just ten more minutes. Almost done with history notes.", tip: "[past midnight] / [Wrap it up] 끝내다" },
+    { id: 83, part: "Part 4. 밤 공부 & 취침", scene: "체육복 건조 확인", mom: "Do you need gym uniform tomorrow?", daughter: "Yes! Is it completely dry from the dryer?", tip: "[gym uniform] / [completely dry] 상태 확인" },
+    { id: 84, part: "Part 4. 밤 공부 & 취침", scene: "모기 잡기", mom: "There's a mosquito buzzing around your desk.", daughter: "Where? Catch it, Mom! I hate bug bites.", tip: "[mosquito buzzing] / [Catch it] 단호한 명령" },
+    { id: 85, part: "Part 4. 밤 공부 & 취침", scene: "알람 맞추기 확인", mom: "Did you set your morning alarm on your phone?", daughter: "Set it for six forty. Hope I wake up easily.", tip: "[set morning alarm] / [Set it for 6:40]" },
+    { id: 86, part: "Part 4. 밤 공부 & 취침", scene: "겨울 수면잠옷", mom: "Change into your cozy winter pajamas.", daughter: "Already wearing them. They are so fluffy.", tip: "[Change into pajamas] / [so fluffy] 촉감 직결" },
+    { id: 87, part: "Part 4. 밤 공부 & 취침", scene: "스킨케어 잔소리", mom: "Put moisturizer on your nose. It's peeling.", daughter: "Already patted it down. Look at my glowing skin!", tip: "[moisturizer on nose] / [glowing skin] 유머" },
+    { id: 88, part: "Part 4. 밤 공부 & 취침", scene: "독서 권유", mom: "Read ten pages of this novel before sleep.", daughter: "Reading makes me sleepy instantly. Good night!", tip: "[Read ten pages] / [makes me sleepy] 인과 단문" },
+    { id: 89, part: "Part 4. 밤 공부 & 취침", scene: "관심 과목 토크", mom: "What subject do you find most interesting these days?", daughter: "I really like biology and graphic design.", tip: "[most interesting] / [biology and design]" },
+    { id: 90, part: "Part 4. 밤 공부 & 취침", scene: "파티 끝나는 시간", mom: "What time does Soyun's birthday party finish?", daughter: "Around six PM. I'll call you before leaving.", tip: "[party finish] / [call you before leaving]" },
+    { id: 91, part: "Part 4. 밤 공부 & 취침", scene: "침대 속 폰 금지", mom: "Put your phone away on your desk. Don't scroll in bed.", daughter: "It's charging right here! I won't touch it.", tip: "[Put phone away] / [won't touch it]" },
+    { id: 92, part: "Part 4. 밤 공부 & 취침", scene: "내일 아침 메뉴", mom: "What do you want for breakfast tomorrow morning?", daughter: "Simple egg toast and cold milk would be great.", tip: "[want for breakfast] / [egg toast and milk]" },
+    { id: 93, part: "Part 4. 밤 공부 & 취침", scene: "방 불 끄기", mom: "I'm turning off your ceiling light. Good night.", daughter: "Leave the nightlight on, please. It's too dark.", tip: "[turning off light] / [Leave nightlight on]" },
+    { id: 94, part: "Part 4. 밤 공부 & 취침", scene: "주말 늦잠 약속", mom: "We have no morning plans tomorrow. Sleep in!", daughter: "Yay! I'm not waking up until noon!", tip: "[Sleep in!] 늦잠 표현 / [not waking up until noon]" },
+    { id: 95, part: "Part 4. 밤 공부 & 취침", scene: "포옹과 사랑 표현", mom: "Give Mom a big warm hug. I love you, sweetie.", daughter: "I love you too, Mom. Even when you nag me.", tip: "[Give Mom a hug] / [Even when you nag] 솔직함" },
+    { id: 96, part: "Part 4. 밤 공부 & 취침", scene: "엄마의 응원", mom: "You can tell Mom anything. I'm always on your side.", daughter: "Thanks, Mom. It really comforts my heart.", tip: "[always on your side] / [comforts my heart]" },
+    { id: 97, part: "Part 4. 밤 공부 & 취침", scene: "이불 덮어주기", mom: "Pull the blanket up to your neck. Don't catch a cold.", daughter: "Tucked in completely. Warm and cozy.", tip: "[Pull blanket up] / [Tucked in] 쏙 들어가다" },
+    { id: 98, part: "Part 4. 밤 공부 & 취침", scene: "내일 날씨 예보", mom: "The forecast says it will be super windy tomorrow.", daughter: "Then I'll wear my padded jacket. Thanks for telling me.", tip: "[forecast says] / [wear padded jacket]" },
+    { id: 99, part: "Part 4. 밤 공부 & 취침", scene: "발표 전 마인드컨트롤", mom: "Stop overthinking about tomorrow's presentation.", daughter: "I practiced five times. I'll crush it tomorrow.", tip: "[Stop overthinking] / [I'll crush it] 자신감" },
+    { id: 100, part: "Part 4. 밤 공부 & 취침", scene: "하루의 마지막 인사", mom: "Sweet dreams, my lovely daughter. Rest well.", daughter: "Good night, Mom. See you in the morning!", tip: "[Sweet dreams] / [See you in the morning]" }
+  ];
+
+  let playlist = [...rawData];
+  let currentIndex = 0;
+  let currentMode = "mom"; // "mom" | "daughter" | "all"
+  let isRunning = false;
+  let isRandom = false;
+  let synth = window.speechSynthesis;
+  let voices = [];
+  let isUnlocked = false;
+
+  const modeBtns = document.querySelectorAll(".mode-btn");
+  const playBtn = document.getElementById("playBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const cueBanner = document.getElementById("cueBanner");
+  const metaBadge = document.getElementById("metaBadge");
+  const sceneBadge = document.getElementById("sceneBadge");
+  const momBubble = document.getElementById("momBubble");
+  const daughterBubble = document.getElementById("daughterBubble");
+  const momText = document.getElementById("momText");
+  const daughterText = document.getElementById("daughterText");
+  const momTip = document.getElementById("momTip");
+  const daughterTip = document.getElementById("daughterTip");
+  const dialogueList = document.getElementById("dialogueList");
+  const speedSelect = document.getElementById("speedSelect");
+  const intervalSelect = document.getElementById("intervalSelect");
+
+  function initVoices() {
+    voices = synth.getVoices() || [];
+  }
+  initVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+
+  function unlockAudio() {
+    if (isUnlocked) return;
+    try {
+      const dummy = new SpeechSynthesisUtterance(" ");
+      dummy.volume = 0.01;
+      synth.speak(dummy);
+      isUnlocked = true;
+    } catch(e){}
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderList() {
+    dialogueList.innerHTML = "";
+    rawData.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "dialogue-item";
+      li.id = `item-${item.id}`;
+      li.innerHTML = `
+        <div class="item-scene">${item.id}. [${item.scene}]</div>
+        <div class="item-en">👩 ${item.mom}<br>👧 ${item.daughter}</div>
+      `;
+      li.addEventListener("click", () => {
+        unlockAudio();
+        stopPlayback();
+        const found = playlist.findIndex(p => p.id === item.id);
+        currentIndex = found !== -1 ? found : 0;
+        updateUI();
+      });
+      dialogueList.appendChild(li);
+    });
+  }
+
+  function updateUI() {
+    const curr = playlist[currentIndex];
+    document.querySelectorAll(".dialogue-item").forEach(el => el.classList.remove("playing"));
+    const activeLi = document.getElementById(`item-${curr.id}`);
+    if (activeLi) {
+      activeLi.classList.add("playing");
+      activeLi.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    metaBadge.innerText = `Set ${currentIndex + 1} / ${playlist.length}`;
+    sceneBadge.innerText = `[${curr.scene}]`;
+    momText.innerText = curr.mom;
+    daughterText.innerText = curr.daughter;
+    momTip.innerText = `💡 팁: ${curr.tip}`;
+    daughterTip.innerText = `💡 딸 팁: 조사 떼고 명사-동사 직결`;
+
+    clearHighlights();
+  }
+
+  function clearHighlights() {
+    momBubble.classList.remove("active");
+    daughterBubble.classList.remove("active");
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function speakRole(text, role, rate = 1.0) {
+    return new Promise((resolve) => {
+      if (!isRunning) return resolve();
+      synth.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      if (!voices || voices.length === 0) voices = synth.getVoices() || [];
+      const enVoices = voices.filter(v => v.lang && (v.lang.includes("en-US") || v.lang.includes("en_US") || v.lang.startsWith("en")));
+
+      if (enVoices.length > 0) {
+        if (role === "mom") {
+          utter.pitch = 0.95; // 차분하고 따뜻한 엄마 음성
+          utter.voice = enVoices.find(v => v.name.toLowerCase().includes("samantha") || v.name.toLowerCase().includes("zira")) || enVoices[0];
+        } else {
+          utter.pitch = 1.28; // 밝고 통통 튀는 15세 사춘기 딸 음성
+          utter.voice = enVoices.find(v => v.name.toLowerCase().includes("victoria") || v.name.toLowerCase().includes("karen")) || enVoices[enVoices.length - 1];
+        }
+      }
+
+      let isDone = false;
+      function finish() {
+        if (!isDone) {
+          isDone = true;
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+
+      utter.onend = finish;
+      utter.onerror = finish;
+
+      const dur = (text.length / 4.5) * 1000 * (1 / rate) + 3600;
+      const timeout = setTimeout(finish, dur);
+
+      try {
+        synth.speak(utter);
+      } catch(e) {
+        finish();
+      }
+    });
+  }
+
+  async function playCycle(index) {
+    if (!isRunning) return;
+    const item = playlist[index];
+    const spd = parseFloat(speedSelect.value);
+    const delay = parseInt(intervalSelect.value);
+
+    if (currentMode === "mom") {
+      // 엄마 롤플레잉: 딸의 말을 컴퓨터가 들려주고 ➔ 엄마가 직접 소리 내어 말하기
+      cueBanner.innerText = "👧 딸의 말을 먼저 들으세요";
+      daughterBubble.classList.add("active");
+      await speakRole(item.daughter, "daughter", spd);
+      daughterBubble.classList.remove("active");
+      if (!isRunning) return;
+
+      // 엄마 발화 큐
+      cueBanner.innerText = "👩 [엄마 차례] 위 영어를 소리 내어 말하세요! (3초)";
+      momBubble.classList.add("active");
+      await sleep(delay + 1000);
+      momBubble.classList.remove("active");
+
+    } else if (currentMode === "daughter") {
+      // 딸 롤플레잉: 엄마의 말을 컴퓨터가 들려주고 ➔ 딸이 직접 소리 내어 답하기
+      cueBanner.innerText = "👩 엄마의 말을 먼저 들으세요";
+      momBubble.classList.add("active");
+      await speakRole(item.mom, "mom", spd);
+      momBubble.classList.remove("active");
+      if (!isRunning) return;
+
+      // 딸 발화 큐
+      cueBanner.innerText = "👧 [딸 차례] 위 영어를 소리 내어 대답하세요! (3초)";
+      daughterBubble.classList.add("active");
+      await sleep(delay + 1000);
+      daughterBubble.classList.remove("active");
+
+    } else {
+      // 전체 대화 듣기 (엄마 ➔ 딸 연속 낭독)
+      cueBanner.innerText = "👩 엄마 발화 청취 중...";
+      momBubble.classList.add("active");
+      await speakRole(item.mom, "mom", spd);
+      momBubble.classList.remove("active");
+      if (!isRunning) return;
+      await sleep(400);
+
+      cueBanner.innerText = "👧 딸 발화 청취 중...";
+      daughterBubble.classList.add("active");
+      await speakRole(item.daughter, "daughter", spd);
+      daughterBubble.classList.remove("active");
+      if (!isRunning) return;
+
+      cueBanner.innerText = "대기 (Breathe)";
+      await sleep(delay);
+    }
+  }
+
+  async function startCycle() {
+    unlockAudio();
+    isRunning = true;
+    playBtn.innerText = "⏸ 일시정지";
+    playBtn.classList.remove("btn-primary");
+
+    while (isRunning && currentIndex < playlist.length) {
+      updateUI();
+      await playCycle(currentIndex);
+      if (!isRunning) break;
+
+      if (currentIndex < playlist.length - 1) {
+        currentIndex++;
+      } else {
+        if (isRandom) playlist = shuffle(rawData);
+        currentIndex = 0;
+        break;
+      }
+    }
+
+    if (currentIndex === 0 && !isRunning) {
+      stopPlayback();
+    }
+  }
+
+  function stopPlayback() {
+    isRunning = false;
+    synth.cancel();
+    playBtn.innerText = "▶ 대화 시작";
+    playBtn.classList.add("btn-primary");
+    clearHighlights();
+    cueBanner.innerText = "정지됨. 원하는 세트를 선택하세요.";
+  }
+
+  // 모드 전환
+  modeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      stopPlayback();
+      modeBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentMode = btn.getAttribute("data-mode");
+      if (currentMode === "mom") {
+        cueBanner.innerText = "👩 [엄마 롤플레잉 모드]: 딸의 말을 듣고 엄마가 영어로 대답합니다.";
+      } else if (currentMode === "daughter") {
+        cueBanner.innerText = "👧 [딸 롤플레잉 모드]: 엄마의 말을 듣고 딸이 영어로 대답합니다.";
+      } else {
+        cueBanner.innerText = "🎧 [전체 대화 듣기]: 엄마와 딸의 대화를 차례대로 자동 연속 청취합니다.";
+      }
+    });
+  });
+
+  playBtn.addEventListener("click", () => {
+    if (isRunning) stopPlayback();
+    else startCycle();
+  });
+
+  stopBtn.addEventListener("click", () => {
+    stopPlayback();
+    currentIndex = 0;
+    updateUI();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex > 0) currentIndex--;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const wasRunning = isRunning;
+    stopPlayback();
+    if (currentIndex < playlist.length - 1) currentIndex++;
+    updateUI();
+    if (wasRunning) startCycle();
+  });
+
+  randomBtn.addEventListener("click", () => {
+    isRandom = !isRandom;
+    randomBtn.innerText = isRandom ? "🔀 랜덤: ON" : "🔀 랜덤: OFF";
+    randomBtn.style.color = isRandom ? "var(--accent)" : "#fff";
+    playlist = isRandom ? shuffle(rawData) : [...rawData];
+    currentIndex = 0;
+    updateUI();
+  });
+
+  renderList();
+  updateUI();
+</script>
+
+</body>
+</html>
