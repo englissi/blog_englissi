@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Englissi 200 - 토익스피킹 만능문장 쉐도잉 플레이어</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --primary-light: #e0e7ff;
+    --secondary: #06b6d4;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --accent: #f59e0b;
+    --success: #10b981;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 80px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 12px 0 6px;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .header p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Controls Section */
+  .control-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .selector-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .selector-row label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .select-custom {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .select-custom:focus {
+    border-color: var(--primary);
+  }
+
+  /* Settings Grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .setting-item span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .setting-item select, .setting-item input[type="range"] {
+    width: 100%;
+  }
+
+  /* Toggle Pill Buttons */
+  .toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pill-btn.active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+  }
+
+  /* Main Player Display */
+  .player-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    border: 2px solid var(--primary-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    min-height: 240px;
+    justify-content: center;
+  }
+
+  .progress-badge {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    background: #f1f5f9;
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+
+  .domain-tag {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .korean-box {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+
+  .english-box {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    line-height: 1.4;
+    margin-bottom: 12px;
+    word-break: keep-all;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Repeat Counter Indicator */
+  .repeat-indicator {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: all 0.3s;
+  }
+  .dot.active {
+    background: var(--secondary);
+    transform: scale(1.25);
+    box-shadow: 0 0 8px rgba(6,182,212,0.6);
+  }
+  .dot.completed {
+    background: var(--primary);
+  }
+
+  /* Button Actions */
+  .btn-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .ctrl-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 14px rgba(79,70,229,0.35);
+  }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    color: var(--text-dark);
+  }
+  .btn-secondary:hover {
+    background: #f1f5f9;
+  }
+
+  /* Quick List View */
+  .list-section {
+    margin-top: 10px;
+  }
+  .list-toggle-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .sentence-list {
+    max-height: 380px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 8px;
+    display: none;
+    padding: 8px;
+  }
+  .sentence-list.open {
+    display: block;
+  }
+  .list-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+  }
+  .list-item:hover, .list-item.selected {
+    background: var(--primary-light);
+  }
+  .list-item .kr {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .list-item .en {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🎧 Englissi 200 쉐도잉 플레이어</h1>
+    <p>토익스피킹 만능문장 200제 · 한글 1회 + 영어 3회 무한 반복 훈련</p>
+  </div>
+
+  <!-- Domain & Mode Selection -->
+  <div class="control-card">
+    <div class="selector-row">
+      <label>도메인(주제) 선택</label>
+      <select id="domainSelect" class="select-custom" onchange="onDomainChange()">
+        <option value="all">전체 도메인 (1 ~ 200 전체 무한순환)</option>
+        <option value="1">Domain 1: 업무 효율성 & 생산성 (1~20)</option>
+        <option value="2">Domain 2: 비용 & 시간 절약 (21~40)</option>
+        <option value="3">Domain 3: 커뮤니케이션 & 대인관계 (41~60)</option>
+        <option value="4">Domain 4: IT 기기 & 정보 접근성 (61~80)</option>
+        <option value="5">Domain 5: 스트레스 완화 & 워라밸 (81~100)</option>
+        <option value="6">Domain 6: 고객 서비스 & 비즈니스 경쟁력 (101~120)</option>
+        <option value="7">Domain 7: 행사 일정 & 비즈니스 공지 (Part 4) (121~140)</option>
+        <option value="8">Domain 8: 인물 동작 및 상태 묘사 (Part 2) (141~160)</option>
+        <option value="9">Domain 9: 사물 위치 및 배경 묘사 (Part 2) (161~180)</option>
+        <option value="10">Domain 10: 사회적 이슈 & 종합 의견 (Part 5) (181~200)</option>
+      </select>
+    </div>
+
+    <!-- Speed & Voice Settings -->
+    <div class="settings-grid">
+      <div class="setting-item">
+        <span>재생 속도 (Speed): <strong id="speedVal">1.0x</strong></span>
+        <input type="range" id="speedSlider" min="0.7" max="1.3" step="0.05" value="1.0" oninput="updateSpeed(this.value)">
+      </div>
+      <div class="setting-item">
+        <span>반복 간격 쉬는시간 (Pause)</span>
+        <select id="pauseSelect" class="select-custom" style="padding: 6px 10px; font-size:0.85rem;">
+          <option value="700">보통 (0.7초)</option>
+          <option value="1200" selected>쉐도잉 여유 (1.2초)</option>
+          <option value="2000">긴 호흡 (2.0초)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Toggle Controls -->
+    <div class="toggle-row">
+      <button class="pill-btn active" id="infiniteLoopBtn" onclick="toggleInfinite()">
+        🔁 무한 반복 모드: ON
+      </button>
+      <button class="pill-btn active" id="koreanReadBtn" onclick="toggleKoreanRead()">
+        🇰🇷 한글 TTS 읽기: ON
+      </button>
+      <button class="pill-btn" id="randomBtn" onclick="toggleRandom()">
+        🔀 랜덤 순서: OFF
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Training Card -->
+  <div class="player-card">
+    <div class="progress-badge" id="cardProgress">No. 1 / 200</div>
+    <div class="domain-tag" id="cardDomain">Domain 1</div>
+
+    <div class="korean-box" id="krText">직원들은 더 효율적이고 생산적으로 일할 수 있습니다.</div>
+    <div class="english-box" id="enText">Employees can work more efficiently and productively.</div>
+
+    <!-- 3 Repeat Dots -->
+    <div class="repeat-indicator">
+      <span style="font-size: 0.75rem; font-weight:700; color:var(--text-muted); margin-right:4px;">ENG REPEAT:</span>
+      <div class="dot" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+      <div class="dot" id="dot3"></div>
+    </div>
+  </div>
+
+  <!-- Main Controller Buttons -->
+  <div class="btn-bar">
+    <button class="ctrl-btn btn-secondary" onclick="prevSentence()">⏮ 이전</button>
+    <button class="ctrl-btn btn-primary" id="playBtn" onclick="togglePlay()">▶️ 시작하기</button>
+    <button class="ctrl-btn btn-secondary" onclick="nextSentence()">⏭ 다음</button>
+  </div>
+
+  <!-- Sentence Quick Finder Accordion -->
+  <div class="list-section">
+    <div class="list-toggle-bar" onclick="toggleList()">
+      <span>📑 현재 목록 전체보기 (<span id="listCount">200</span>개)</span>
+      <span id="listArrow">▼</span>
+    </div>
+    <div class="sentence-list" id="sentenceList"></div>
+  </div>
+</div>
+
+<script>
+// 200 Sentences Database
+const DATA = [
+  // Domain 1: 업무 효율성 및 생산성 (1-20)
+  { id: 1, d: 1, domain: "Domain 1: 업무 효율성", kr: "직원들은 더 효율적이고 생산적으로 일할 수 있습니다.", en: "Employees can work more efficiently and productively." },
+  { id: 2, d: 1, domain: "Domain 1: 업무 효율성", kr: "이것은 업무 효율성을 크게 높여줍니다.", en: "It greatly increases work efficiency." },
+  { id: 3, d: 1, domain: "Domain 1: 업무 효율성", kr: "우리는 마감 기한을 맞출 수 있습니다.", en: "We can meet the deadline on time." },
+  { id: 4, d: 1, domain: "Domain 1: 업무 효율성", kr: "마감 기한을 넘기는 것을 방지할 수 있습니다.", en: "It prevents us from missing deadlines." },
+  { id: 5, d: 1, domain: "Domain 1: 업무 효율성", kr: "이것은 더 나은 근무 환경을 만들어 줍니다.", en: "It can make a better work environment." },
+  { id: 6, d: 1, domain: "Domain 1: 업무 효율성", kr: "직원들은 자신의 직무에 더 만족할 것입니다.", en: "Employees will be more satisfied with their jobs." },
+  { id: 7, d: 1, domain: "Domain 1: 업무 효율성", kr: "그들은 방해받지 않고 업무에 더 잘 집중할 수 있습니다.", en: "They can focus better on their tasks without distractions." },
+  { id: 8, d: 1, domain: "Domain 1: 업무 효율성", kr: "다른 사람들에게 방해받지 않을 것입니다.", en: "They will not be distracted by others." },
+  { id: 9, d: 1, domain: "Domain 1: 업무 효율성", kr: "직원들은 스스로 일정을 관리할 수 있습니다.", en: "Employees can manage their own schedules." },
+  { id: 10, d: 1, domain: "Domain 1: 업무 효율성", kr: "업무 부담을 크게 줄여줄 수 있습니다.", en: "It can significantly reduce the workload." },
+  { id: 11, d: 1, domain: "Domain 1: 업무 효율성", kr: "업무 진행 속도를 빠르게 만들어 줍니다.", en: "It speeds up the work process." },
+  { id: 12, d: 1, domain: "Domain 1: 업무 효율성", kr: "불필요한 서류 작업을 줄일 수 있습니다.", en: "We can reduce unnecessary paperwork." },
+  { id: 13, d: 1, domain: "Domain 1: 업무 효율성", kr: "실수를 줄이고 작업의 질을 높일 수 있습니다.", en: "It reduces mistakes and improves work quality." },
+  { id: 14, d: 1, domain: "Domain 1: 업무 효율성", kr: "한 번에 여러 업무를 처리하기가 수월합니다.", en: "It is easier to multitask during busy hours." },
+  { id: 15, d: 1, domain: "Domain 1: 업무 효율성", kr: "창의성 덕분에 돌발 상황을 유연하게 처리할 수 있습니다.", en: "He is able to handle unexpected situations due to his creativity." },
+  { id: 16, d: 1, domain: "Domain 1: 업무 효율성", kr: "체계적인 시스템은 혼선을 방지합니다.", en: "A systematic approach prevents confusion." },
+  { id: 17, d: 1, domain: "Domain 1: 업무 효율성", kr: "직원들의 사기를 북돋아 줄 수 있습니다.", en: "It can boost employee morale." },
+  { id: 18, d: 1, domain: "Domain 1: 업무 효율성", kr: "퇴근 시간을 앞당기는 데 도움이 됩니다.", en: "It helps employees leave work on time." },
+  { id: 19, d: 1, domain: "Domain 1: 업무 효율성", kr: "에너지를 아끼고 업무 피로도를 낮춥니다.", en: "It saves energy and reduces work fatigue." },
+  { id: 20, d: 1, domain: "Domain 1: 업무 효율성", kr: "전반적인 생산성 향상으로 이어집니다.", en: "It leads to an overall improvement in productivity." },
+
+  // Domain 2: 비용 및 시간 절약 (21-40)
+  { id: 21, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "가격이 저렴해서 예산을 아낄 수 있습니다.", en: "It is inexpensive, so I can save my budget." },
+  { id: 22, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "가격 대비 품질이 매우 뛰어납니다.", en: "It offers great value for money." },
+  { id: 23, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "가격이 매우 합리적입니다.", en: "The price is very reasonable." },
+  { id: 24, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "처리 속도가 빨라서 귀중한 시간을 절약합니다.", en: "It is fast, so it saves valuable time." },
+  { id: 25, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "예산이 빠듯해서 비싼 것을 살 여유가 없습니다.", en: "My budget is tight, so I cannot afford expensive items." },
+  { id: 26, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "불필요한 곳에 돈을 낭비하고 싶지 않습니다.", en: "I do not want to waste money on unnecessary things." },
+  { id: 27, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "이것은 명백한 시간 낭비입니다.", en: "It is a complete waste of time." },
+  { id: 28, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "이것은 삶의 질을 높이는 훌륭한 투자입니다.", en: "It is a great investment because it improves quality of life." },
+  { id: 29, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "이동 시간을 대폭 줄일 수 있습니다.", en: "We can significantly reduce travel time." },
+  { id: 30, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "줄을 서서 기다릴 필요가 없습니다.", en: "There is no need to wait in line." },
+  { id: 31, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "유지 관리 비용을 절감할 수 있습니다.", en: "It lowers maintenance and operating costs." },
+  { id: 32, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "할인 혜택을 받으면 훨씬 경제적입니다.", en: "It is much more economical with promotional discounts." },
+  { id: 33, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "장기적으로 보았을 때 돈을 절약해 줍니다.", en: "In the long run, it saves a lot of money." },
+  { id: 34, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "짧은 시간에 더 많은 성과를 낼 수 있습니다.", en: "We can accomplish more in a shorter amount of time." },
+  { id: 35, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "추가 지출을 피할 수 있습니다.", en: "We can avoid unexpected extra expenses." },
+  { id: 36, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "무료 서비스나 혜택을 이용할 수 있습니다.", en: "We can take advantage of free services." },
+  { id: 37, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "시간 낭비 없이 빠르게 결정을 내릴 수 있습니다.", en: "We can make quick decisions without wasting time." },
+  { id: 38, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "교통비를 절약할 수 있습니다.", en: "It helps me save on transportation costs." },
+  { id: 39, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "합리적인 소비를 할 수 있습니다.", en: "It allows me to spend money wisely." },
+  { id: 40, d: 2, domain: "Domain 2: 비용 & 시간 절약", kr: "시간과 비용 두 마리 토끼를 모두 잡을 수 있습니다.", en: "We can save both time and money at once." },
+
+  // Domain 3: 커뮤니케이션 및 대인관계 (41-60)
+  { id: 41, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "동료들과 더 원활하게 소통할 수 있습니다.", en: "They can communicate with colleagues much better." },
+  { id: 42, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "팀원 간의 신뢰와 협동심을 길러줍니다.", en: "It builds trust and teamwork among team members." },
+  { id: 43, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "훌륭한 팀 플레이어가 되어 원만한 관계를 유지할 수 있습니다.", en: "They can be good team players and maintain good relationships." },
+  { id: 44, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "사내에 긍정적이고 따뜻한 분위기를 형성합니다.", en: "It creates a positive and friendly atmosphere in the office." },
+  { id: 45, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "불필요한 오해와 마찰을 사전에 줄여줍니다.", en: "It prevents unnecessary misunderstandings and conflicts." },
+  { id: 46, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "서로의 아이디어를 자유롭게 공유할 수 있습니다.", en: "We can share innovative ideas freely with each other." },
+  { id: 47, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "화자의 의도와 감정을 더 정확하게 파악할 수 있습니다.", en: "I can understand the speaker's intentions and emotions accurately." },
+  { id: 48, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "팀원들에게 강력한 동기부여를 심어줄 수 있습니다.", en: "A good leader can motivate and inspire team members." },
+  { id: 49, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "업무 피드백을 실시간으로 주고받을 수 있습니다.", en: "We can exchange constructive feedback in real time." },
+  { id: 50, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "네트워크를 넓히고 다양한 인맥을 쌓을 수 있습니다.", en: "It allows us to expand our professional network." },
+  { id: 51, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "대면 소통이 메시지보다 훨씬 친밀감을 줍니다.", en: "Face-to-face communication feels much more personal." },
+  { id: 52, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "다른 사람의 의견을 경청하는 태도가 중요합니다.", en: "Listening carefully to others is essential." },
+  { id: 53, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "갈등을 평화롭고 합리적으로 해결할 수 있습니다.", en: "We can resolve conflicts smoothly and rationally." },
+  { id: 54, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "회사 내 결속력을 다지는 데 큰 도움이 됩니다.", en: "It helps strengthen solidarity within the company." },
+  { id: 55, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "개방적인 의사소통 문화가 정착됩니다.", en: "It fosters an open culture of communication." },
+  { id: 56, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "새로운 사람들과 쉽게 친해질 수 있습니다.", en: "It is easy to make friends with new people." },
+  { id: 57, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "솔직한 대화를 통해 유대감을 쌓습니다.", en: "Honest conversations help build strong bonds." },
+  { id: 58, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "팀 프로젝트의 협업 능력이 향상됩니다.", en: "Collaborative skills for team projects will improve." },
+  { id: 59, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "직장 동료를 넘어 가족 같은 느낌을 줍니다.", en: "It feels more like a supportive family." },
+  { id: 60, d: 3, domain: "Domain 3: 소통 & 팀워크", kr: "존중하는 태도로 일할 때 성과가 극대화됩니다.", en: "Mutual respect maximizes team performance." },
+
+  // Domain 4: IT 기기 및 정보 접근성 (61-80)
+  { id: 61, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "스마트폰으로 언제 어디서나 정보에 접속할 수 있습니다.", en: "I can access information anytime, anywhere on my smartphone." },
+  { id: 62, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "출처가 공신력 있어 정보를 신뢰할 수 있습니다.", en: "The source is reliable, so the information is trustworthy." },
+  { id: 63, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "인터넷에서 유용한 팁과 노하우를 많이 얻습니다.", en: "I can find lots of useful tips and know-how online." },
+  { id: 64, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "문의 사항에 대한 답변을 즉시 받을 수 있습니다.", en: "I can get immediate responses to my inquiries." },
+  { id: 65, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "인터넷상의 부정확한 정보는 걸러내야 합니다.", en: "We must filter out inaccurate information found online." },
+  { id: 66, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "최신 트렌드를 파악하는 데 매우 유용합니다.", en: "It is very helpful for catching up with current trends." },
+  { id: 67, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "종이 서류 대신 디지털 파일로 보관하는 것이 안전합니다.", en: "Storing digital files is safer than keeping paper documents." },
+  { id: 68, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "소셜 미디어를 활용한 홍보가 가장 효과적입니다.", en: "Promoting through social media is the most effective way." },
+  { id: 69, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "클릭 몇 번으로 필요한 데이터를 다운로드할 수 있습니다.", en: "We can download necessary data with just a few clicks." },
+  { id: 70, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "장소에 구애받지 않고 원격으로 일할 수 있습니다.", en: "We can work remotely regardless of location." },
+  { id: 71, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "모바일 앱을 이용해 일정을 실시간 공유합니다.", en: "We share schedules in real time using a mobile application." },
+  { id: 72, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "사용자 친화적인 인터페이스로 누구나 쓰기 쉽습니다.", en: "The user-friendly interface makes it easy for everyone to use." },
+  { id: 73, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "스마트 기기는 알림 기능을 통해 마감을 잊지 않게 돕습니다.", en: "Smart devices remind us of deadlines through push notifications." },
+  { id: 74, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "온라인 강의를 통해 새로운 기술을 쉽게 배웁니다.", en: "We can learn new practical skills easily through online classes." },
+  { id: 75, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "대용량 파일도 메일이나 클라우드로 빠르게 전송합니다.", en: "We can send large files quickly via email or cloud storage." },
+  { id: 76, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "전자기기 과다 사용은 업무 집중을 방해하기도 합니다.", en: "Excessive use of gadgets can distract employees from work." },
+  { id: 77, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "보안 프로그램을 업데이트하여 데이터 유출을 막아야 합니다.", en: "We should update security programs to prevent data leaks." },
+  { id: 78, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "최신 소프트웨어는 업무 호환성을 높여줍니다.", en: "Up-to-date software ensures better system compatibility." },
+  { id: 79, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "인공지능 도구를 쓰면 초안 작성이 빨라집니다.", en: "Using AI tools speeds up the drafting process." },
+  { id: 80, d: 4, domain: "Domain 4: IT 기기 & 정보", kr: "기술의 발전 덕분에 일상이 훨씬 편리해졌습니다.", en: "Technological advances have made daily life much more convenient." },
+
+  // Domain 5: 스트레스 완화 및 워라밸 (81-100)
+  { id: 81, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "그것은 스트레스를 날리고 머리를 식히는 데 좋습니다.", en: "It relieves stress and helps me clear my head." },
+  { id: 82, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "요즘 업무로 스트레스를 많이 받아서 휴식이 절실합니다.", en: "I am stressed out from work these days, so I desperately need a break." },
+  { id: 83, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "기분을 상쾌하게 전환시켜 모든 걱정을 잊게 합니다.", en: "It refreshes my mind and makes me forget all my worries." },
+  { id: 84, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "일과 삶의 균형을 유지하는 것이 가장 중요합니다.", en: "Maintaining a work-life balance is the most important thing." },
+  { id: 85, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "이것은 제 일상의 소중한 루틴이자 습관입니다.", en: "It is a meaningful part of my daily routine and habit." },
+  { id: 86, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "번아웃을 예방하기 위해선 정기적인 휴식이 필수적입니다.", en: "Regular breaks are essential to prevent professional burnout." },
+  { id: 87, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "가벼운 운동은 신체 건강뿐 아니라 정신 건강에도 좋습니다.", en: "Light exercise is good for both physical and mental health." },
+  { id: 88, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "주말에 온전히 재충전해야 주중에 집중할 수 있습니다.", en: "Recharging over the weekend allows me to focus during the week." },
+  { id: 89, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "집에서 편안히 쉬는 것이 최고의 힐링입니다.", en: "Relaxing comfortably at home is the best way to heal." },
+  { id: 90, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "취미 생활을 즐기면 삶의 활력을 되찾을 수 있습니다.", en: "Enjoying personal hobbies brings vitality back into my life." },
+  { id: 91, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "충분한 수면은 다음 날의 피로를 풀어줍니다.", en: "Getting enough sleep relieves fatigue for the next day." },
+  { id: 92, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "동료들과 가볍게 차 한잔 마시며 담소를 나눕니다.", en: "We enjoy a quick cup of tea and chat with colleagues." },
+  { id: 93, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "산책을 하면서 복잡했던 생각을 정리합니다.", en: "Taking a short walk helps me organize my complicated thoughts." },
+  { id: 94, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "쾌적하고 조용한 환경에서 마음의 안정을 얻습니다.", en: "A quiet and cozy environment provides peace of mind." },
+  { id: 95, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "건강을 해치면서까지 야근을 하고 싶지는 않습니다.", en: "I do not want to work overtime at the expense of my health." },
+  { id: 96, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "긍정적인 마인드셋은 어려운 상황을 버티게 해줍니다.", en: "A positive mindset helps us endure difficult situations." },
+  { id: 97, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "신선한 공기를 마시면 집중력이 다시 회복됩니다.", en: "Getting some fresh air restores my power of concentration." },
+  { id: 98, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "짧은 휴식 시간이 장기적인 업무 생산성을 높입니다.", en: "Short breaks ultimately increase long-term productivity." },
+  { id: 99, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "자기만의 스트레스 해소법을 갖는 것이 중요합니다.", en: "It is important to have your own way to relieve stress." },
+  { id: 100, d: 5, domain: "Domain 5: 스트레스 & 워라밸", kr: "기분 좋은 경험은 하루 전체의 에너지를 바꿉니다.", en: "A pleasant experience changes the energy of the whole day." },
+
+  // Domain 6: 고객 서비스 및 비즈니스 경쟁력 (101-120)
+  { id: 101, d: 6, domain: "Domain 6: 고객 서비스", kr: "고객들은 만족할 것이며 충성 고객으로 남을 것입니다.", en: "Customers will feel satisfied and remain loyal." },
+  { id: 102, d: 6, domain: "Domain 6: 고객 서비스", kr: "더 많은 신규 고객을 끌어들일 수 있습니다.", en: "It will attract more new potential customers." },
+  { id: 103, d: 6, domain: "Domain 6: 고객 서비스", kr: "회사의 브랜드 이미지와 평판이 향상됩니다.", en: "It enhances the brand image and reputation of the company." },
+  { id: 104, d: 6, domain: "Domain 6: 고객 서비스", kr: "시장에서 경쟁 우위를 점할 수 있습니다.", en: "We can gain a competitive edge in the market." },
+  { id: 105, d: 6, domain: "Domain 6: 고객 서비스", kr: "고객들의 불만 사항에 신속하게 대처해야 합니다.", en: "We need to respond promptly to customer complaints." },
+  { id: 106, d: 6, domain: "Domain 6: 고객 서비스", kr: "우수한 품질 덕분에 재구매율이 높습니다.", en: "Thanks to top quality, the repurchase rate is high." },
+  { id: 107, d: 6, domain: "Domain 6: 고객 서비스", kr: "경쟁이 치열할수록 차별화된 전략이 필요합니다.", en: "Fierce competition requires a differentiated strategy." },
+  { id: 108, d: 6, domain: "Domain 6: 고객 서비스", kr: "고객의 요구사항을 제품 개발에 즉시 반영합니다.", en: "We reflect customer needs directly in product development." },
+  { id: 109, d: 6, domain: "Domain 6: 고객 서비스", kr: "친절한 응대는 좋은 입소문 마케팅으로 이어집니다.", en: "Friendly service leads to positive word-of-mouth marketing." },
+  { id: 110, d: 6, domain: "Domain 6: 고객 서비스", kr: "이 제품은 요즘 젊은 세대 사이에서 큰 인기를 끌고 있습니다.", en: "This product is hugely popular among the younger generation." },
+  { id: 111, d: 6, domain: "Domain 6: 고객 서비스", kr: "회원가입 고객에게는 추가 적립금을 지급합니다.", en: "Registered members receive extra loyalty points." },
+  { id: 112, d: 6, domain: "Domain 6: 고객 서비스", kr: "신제품 출시는 매출 증대에 기여할 것입니다.", en: "The new product launch will contribute to boosting sales." },
+  { id: 113, d: 6, domain: "Domain 6: 고객 서비스", kr: "고객 후기는 서비스 개선에 훌륭한 나침반입니다.", en: "Customer reviews serve as a great guide for improvement." },
+  { id: 114, d: 6, domain: "Domain 6: 고객 서비스", kr: "환불 및 교환 절차를 간소화했습니다.", en: "We simplified the refund and exchange process." },
+  { id: 115, d: 6, domain: "Domain 6: 고객 서비스", kr: "트렌드 변화를 빠르게 포착해야 도태되지 않습니다.", en: "We must adapt quickly to trend shifts to stay ahead." },
+  { id: 116, d: 6, domain: "Domain 6: 고객 서비스", kr: "전문성을 갖춘 직원이 상담을 도와드립니다.", en: "Professional staff members are ready to assist you." },
+  { id: 117, d: 6, domain: "Domain 6: 고객 서비스", kr: "편리한 결제 시스템이 구매 전환율을 높입니다.", en: "A convenient checkout system boosts the conversion rate." },
+  { id: 118, d: 6, domain: "Domain 6: 고객 서비스", kr: "고객과의 약속을 지키는 것이 비즈니스의 기본입니다.", en: "Keeping promises to customers is the foundation of business." },
+  { id: 119, d: 6, domain: "Domain 6: 고객 서비스", kr: "다양한 맞춤형 프로모션을 진행하고 있습니다.", en: "We offer a wide range of customized promotions." },
+  { id: 120, d: 6, domain: "Domain 6: 고객 서비스", kr: "장기적인 고객 신뢰가 기업의 가장 큰 자산입니다.", en: "Long-term customer trust is the company's greatest asset." },
+
+  // Domain 7: 행사 일정 및 비즈니스 공지 (121-140)
+  { id: 121, d: 7, domain: "Domain 7: 일정 & 공지", kr: "컨퍼런스는 6월 20일 메인 홀에서 열릴 예정입니다.", en: "The conference will be held on June 20th in the main hall." },
+  { id: 122, d: 7, domain: "Domain 7: 일정 & 공지", kr: "오리엔테이션 세션은 오전 9시에 시작됩니다.", en: "The orientation session will start at 9 AM sharp." },
+  { id: 123, d: 7, domain: "Domain 7: 일정 & 공지", kr: "전체 행사는 오후 5시에 마무리될 예정입니다.", en: "The entire event is scheduled to finish at 5 PM." },
+  { id: 124, d: 7, domain: "Domain 7: 일정 & 공지", kr: "죄송하지만 잘못 알고 계십니다. 사실 회의는 취소되었습니다.", en: "No, I am afraid you have wrong info. Actually, it has been canceled." },
+  { id: 125, d: 7, domain: "Domain 7: 일정 & 공지", kr: "원래 예정되어 있던 미팅 일정이 금요일로 연기되었습니다.", en: "The scheduled meeting has been postponed to Friday." },
+  { id: 126, d: 7, domain: "Domain 7: 일정 & 공지", kr: "점심 식사는 정오부터 오후 1시까지 제공됩니다.", en: "Lunch will be provided from 12 PM to 1 PM." },
+  { id: 127, d: 7, domain: "Domain 7: 일정 & 공지", kr: "김 박사님이 기조연설을 진행해 주실 예정입니다.", en: "Dr. Kim will deliver the opening keynote speech." },
+  { id: 128, d: 7, domain: "Domain 7: 일정 & 공지", kr: "워크숍 참가비는 1인당 30달러입니다.", en: "The registration fee for the workshop is thirty dollars per person." },
+  { id: 129, d: 7, domain: "Domain 7: 일정 & 공지", kr: "사전 등록을 하시면 20% 할인 혜택이 주어집니다.", en: "If you register in advance, you can get a twenty percent discount." },
+  { id: 130, d: 7, domain: "Domain 7: 일정 & 공지", kr: "늦어도 이번 주 금요일까지 등록을 완료하셔야 합니다.", en: "You must complete the registration by this Friday at the latest." },
+  { id: 131, d: 7, domain: "Domain 7: 일정 & 공지", kr: "회원은 무료 입장이며, 비회원은 15달러를 지불해야 합니다.", en: "It is free for members, but non-members have to pay fifteen dollars." },
+  { id: 132, d: 7, domain: "Domain 7: 일정 & 공지", kr: "오후 세션에는 두 개의 개별 세미나가 준비되어 있습니다.", en: "There are two separate seminars scheduled for the afternoon session." },
+  { id: 133, d: 7, domain: "Domain 7: 일정 & 공지", kr: "그녀는 서울대학교에서 경영학 석사 학위를 취득했습니다.", en: "She got a master's degree in business from Seoul National University." },
+  { id: 134, d: 7, domain: "Domain 7: 일정 & 공지", kr: "그는 동종 업계에서 7년 이상의 실무 경력을 보유하고 있습니다.", en: "He has more than seven years of practical experience in this field." },
+  { id: 135, d: 7, domain: "Domain 7: 일정 & 공지", kr: "지원자는 영어와 일본어를 유창하게 구사할 수 있습니다.", en: "The applicant is fluent in both English and Japanese." },
+  { id: 136, d: 7, domain: "Domain 7: 일정 & 공지", kr: "이 강좌는 초보자 및 입문자를 위해 개설되었습니다.", en: "This course is designed specifically for beginners and novices." },
+  { id: 137, d: 7, domain: "Domain 7: 일정 & 공지", kr: "오후 2시에 인사팀장과의 면접이 잡혀 있습니다.", en: "You have an interview with the HR manager at 2 PM." },
+  { id: 138, d: 7, domain: "Domain 7: 일정 & 공지", kr: "비행기는 오전 10시에 인천공항에서 이륙할 예정입니다.", en: "The flight will depart from Incheon Airport at 10 AM." },
+  { id: 139, d: 7, domain: "Domain 7: 일정 & 공지", kr: "호텔 체크인은 오후 3시 이후부터 가능합니다.", en: "Hotel check-in is available anytime after 3 PM." },
+  { id: 140, d: 7, domain: "Domain 7: 일정 & 공지", kr: "추가 문의 사항이 있으시면 안내 데스크로 연락 바랍니다.", en: "If you have further questions, please contact the front desk." },
+
+  // Domain 8: 사진 속 인물 행동 묘사 (141-160)
+  { id: 141, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "한 남자가 컴퓨터 화면을 진지하게 들여다보고 있습니다.", en: "A man is staring intently at his computer monitor." },
+  { id: 142, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "그녀는 수첩에 중요한 메모를 받아 적고 있습니다.", en: "She is taking down important notes in her notepad." },
+  { id: 143, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "사람들은 원형 테이블에 둘러앉아 토론을 벌이고 있습니다.", en: "People are sitting around a round table having a discussion." },
+  { id: 144, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "발표자가 스크린의 그래프를 손으로 가리키고 있습니다.", en: "The presenter is pointing at the graph on the projection screen." },
+  { id: 145, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "그녀는 고객에게 서류 봉투를 두 손으로 건네주고 있습니다.", en: "She is handing over an envelope to the client with both hands." },
+  { id: 146, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "남자가 서류함에서 파일을 찾으려 손을 뻗고 있습니다.", en: "A man is reaching for a file inside the filing cabinet." },
+  { id: 147, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "동료들이 복사기 옆에서 인쇄된 출력물을 확인하고 있습니다.", en: "Coworkers are checking printouts next to the copy machine." },
+  { id: 148, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "한 여성이 탕비실에서 머그잔에 커피를 따르고 있습니다.", en: "A woman is pouring hot coffee into a mug in the pantry." },
+  { id: 149, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "그들은 모두 단정한 비즈니스 정장을 착용하고 있습니다.", en: "All of them are dressed in formal business suits." },
+  { id: 150, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "한 직원이 서류를 들고 복도를 빠르게 걸어가고 있습니다.", en: "An employee is walking quickly down the hallway holding documents." },
+  { id: 151, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "두 사람이 서로 악수를 나누며 밝게 미소 짓고 있습니다.", en: "Two people are shaking hands with bright smiles." },
+  { id: 152, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "그녀는 전화를 받으면서 동시에 키보드를 타이핑하고 있습니다.", en: "She is talking on the phone while typing on the keyboard." },
+  { id: 153, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "직원들이 사무실 게시판에 새 공지문을 핀으로 고정하고 있습니다.", en: "Employees are pinning a new notice onto the bulletin board." },
+  { id: 154, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "청중들이 발표자의 강연을 경청하며 박수를 치고 있습니다.", en: "The audience is listening attentively and applauding the speaker." },
+  { id: 155, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "엔지니어가 작업복을 입고 장비를 점검하고 있습니다.", en: "An engineer in working clothes is inspecting the machinery." },
+  { id: 156, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "계산대 앞에 사람들이 차례대로 줄을 서서 대기하고 있습니다.", en: "Customers are standing in a straight line at the checkout counter." },
+  { id: 157, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "남자가 카트에 박스를 가득 싣고 복도를 밀고 가고 있습니다.", en: "A man is pushing a handcart fully loaded with boxes." },
+  { id: 158, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "그녀는 안경을 고쳐 쓰며 화면의 작은 글씨를 읽고 있습니다.", en: "She is adjusting her glasses while reading tiny text on the screen." },
+  { id: 159, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "동료들이 휴게실 소파에 앉아 가벼운 농담을 나누고 있습니다.", en: "Coworkers are sitting on the lounge sofa sharing casual jokes." },
+  { id: 160, d: 8, domain: "Domain 8: 인물 동작 묘사", kr: "직원이 진열대 위의 상품들을 줄 맞추어 정리하고 있습니다.", en: "A clerk is neatly arranging merchandise on the display shelf." },
+
+  // Domain 9: 사물 위치 및 주변 배경 묘사 (161-180)
+  { id: 161, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "이 사진은 전형적인 현대식 사무실 내부에서 촬영되었습니다.", en: "This picture was taken inside a modern open-plan office." },
+  { id: 162, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "사진 전경에는 책상 위에 사무용품들이 어지럽게 놓여 있습니다.", en: "In the foreground, office supplies are placed on the desk." },
+  { id: 163, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "사진 중앙에는 대형 화이트보드와 회의용 탁자가 있습니다.", en: "In the middle of the picture, there is a whiteboard and conference table." },
+  { id: 164, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "사진 오른쪽에는 천장부터 바닥까지 이어지는 큰 창문이 보입니다.", en: "On the right side, there is a large floor-to-ceiling window." },
+  { id: 165, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "사진 배경에는 여러 층의 고층 빌딩들이 늘어서 있습니다.", en: "In the background of the picture, high-rise buildings are visible." },
+  { id: 166, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "벽면 선반 위에는 두꺼운 파일철과 책들이 꽂혀 있습니다.", en: "Thick binders and reference books are arranged on the wall shelves." },
+  { id: 167, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "천장 조명이 밝게 켜져 있어 실내가 환합니다.", en: "The indoor space is brightly lit by modern ceiling lights." },
+  { id: 168, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "바닥에는 얼룩 없이 깔끔한 카펫이 깔려 있습니다.", en: "A clean carpet is spread across the entire office floor." },
+  { id: 169, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "방 한구석에 화분과 공기청정기가 놓여 있습니다.", en: "Potted plants and an air purifier are placed in the corner." },
+  { id: 170, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "회의실 벽면에 회사의 로고와 슬로건이 걸려 있습니다.", en: "The company logo and slogan are hanging on the meeting room wall." },
+  { id: 171, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "야외 거리에는 보행자들이 횡단보도를 건너고 있습니다.", en: "Pedestrians are crossing the street using the marked crosswalk." },
+  { id: 172, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "도로변을 따라 여러 대의 차량들이 나란히 주차되어 있습니다.", en: "Several vehicles are parked side by side along the curb." },
+  { id: 173, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "가게 입구 위로 눈에 띄는 화려한 간판이 설치되어 있습니다.", en: "An eye-catching signboard is installed above the shop entrance." },
+  { id: 174, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "공원의 잔디밭 위에서 벤치와 가로등을 볼 수 있습니다.", en: "Park benches and streetlamps can be seen along the green lawn." },
+  { id: 175, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "선반 위 박스들이 바닥부터 천장까지 높게 쌓여 있습니다.", en: "Cardboard boxes are stacked high from floor to ceiling." },
+  { id: 176, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "카페 야외 테라스에 파라솔과 의자들이 펼쳐져 있습니다.", en: "Sunshades and patio chairs are set up on the outdoor terrace." },
+  { id: 177, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "출입문 옆에 비상구 표지판이 선명하게 표시되어 있습니다.", en: "The emergency exit sign is clearly marked right next to the door." },
+  { id: 178, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "전반적으로 사무실 내 모든 구성원이 매우 바빠 보입니다.", en: "Overall, everyone in the workplace seems extremely busy." },
+  { id: 179, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "전반적으로 햇살이 비치는 평화롭고 한적한 오후 풍경 같습니다.", en: "Overall, it looks like a peaceful and sunny afternoon." },
+  { id: 180, d: 9, domain: "Domain 9: 배경 & 사물 묘사", kr: "전체적으로 잘 정돈되고 전문적인 작업 공간으로 보입니다.", en: "Overall, it appears to be a well-organized and professional workspace." },
+
+  // Domain 10: 사회적 이슈 및 종합 의견 개진 (181-200)
+  { id: 181, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "모든 것이 급변하는 시대에는 지속적인 학습이 필수입니다.", en: "In an era of rapid change, continuous learning is essential." },
+  { id: 182, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "다양한 경험은 개인의 시야와 견문을 넓혀줍니다.", en: "Broad experiences widen personal perspectives and horizons." },
+  { id: 183, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "환경오염은 오늘날 우리가 직면한 가장 심각한 과제입니다.", en: "Environmental pollution is the most serious challenge we face today." },
+  { id: 184, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "친환경 정책을 실천하면 기업 이미지에도 긍정적입니다.", en: "Implementing eco-friendly policies positively affects company image." },
+  { id: 185, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "우리는 미래 세대를 위해 에너지와 자원을 아껴야 합니다.", en: "We should conserve energy and natural resources for future generations." },
+  { id: 186, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "대중교통 이용을 장려하면 교통 체증과 탄소를 줄입니다.", en: "Encouraging public transit reduces traffic congestion and carbon emissions." },
+  { id: 187, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "실패를 두려워하지 않는 도전 정신이 성장의 밑거름입니다.", en: "A challenging mindset without fear of failure drives growth." },
+  { id: 188, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "경험이 풍부한 멘토의 조언은 실수를 줄여줍니다.", en: "Practical advice from experienced mentors helps prevent critical errors." },
+  { id: 189, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "투명하고 공정한 보상 시스템이 직원의 열정을 이끕니다.", en: "A fair and transparent reward system drives employee passion." },
+  { id: 190, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "지나친 경쟁은 심리적 불안감과 피로를 유발할 수 있습니다.", en: "Excessive competition can cause psychological anxiety and exhaustion." },
+  { id: 191, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "안전 규정을 철저히 준수하여 사고를 미연에 방지해야 합니다.", en: "We must strictly follow safety regulations to prevent accidents." },
+  { id: 192, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "지역 사회와의 상생 협력이 기업의 사회적 책임입니다.", en: "Win-win cooperation with local communities is corporate social responsibility." },
+  { id: 193, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "작은 문제라도 조기에 발견하여 해결하는 것이 경제적입니다.", en: "Solving minor issues early is much more economical." },
+  { id: 194, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "새로운 아이디어를 수용하는 유연한 태도가 필요합니다.", en: "We need a flexible mindset that embraces innovative ideas." },
+  { id: 195, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "장기적인 관점에서 체계적인 전략 계획을 세워야 합니다.", en: "We should establish strategic plans from a long-term perspective." },
+  { id: 196, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "고객과 직원 모두가 윈윈할 수 있는 해결책을 찾아야 합니다.", en: "We need to find a win-win solution for both customers and employees." },
+  { id: 197, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "직무 교육 프로그램은 신입 직원의 빠른 적응을 돕습니다.", en: "Job training programs help new hires adapt quickly." },
+  { id: 198, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "온라인과 오프라인의 장점을 결합하는 하이브리드 방식이 대세입니다.", en: "Combining online and offline advantages is currently the dominant trend." },
+  { id: 199, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "충분한 사전 준비만이 실전에서의 실수를 막아줍니다.", en: "Thorough preparation beforehand is the only way to prevent mistakes." },
+  { id: 200, d: 10, domain: "Domain 10: 이슈 & 의견 개진", kr: "끊임없이 소통하고 개선할 때 진정한 성공을 거둘 수 있습니다.", en: "True success comes when we communicate and improve continuously." }
+];
+
+// App State
+let activePool = [...DATA];
+let currentIndex = 0;
+let isPlaying = false;
+let isInfinite = true;
+let readKorean = true;
+let isRandom = false;
+let currentRepeatCount = 0; // 0: KR reading (optional), 1: EN repeat 1, 2: EN repeat 2, 3: EN repeat 3
+let speechRate = 1.0;
+let speechPause = 1200;
+let synth = window.speechSynthesis;
+let timerId = null;
+
+function init() {
+  renderCard();
+  renderList();
+}
+
+function onDomainChange() {
+  const val = document.getElementById('domainSelect').value;
+  if (val === 'all') {
+    activePool = [...DATA];
+  } else {
+    const dNum = parseInt(val, 10);
+    activePool = DATA.filter(item => item.d === dNum);
+  }
+  if (isRandom) {
+    activePool.sort(() => Math.random() - 0.5);
+  }
+  currentIndex = 0;
+  stopSpeech();
+  renderCard();
+  renderList();
+  document.getElementById('listCount').innerText = activePool.length;
+}
+
+function updateSpeed(val) {
+  speechRate = parseFloat(val);
+  document.getElementById('speedVal').innerText = val + 'x';
+}
+
+function toggleInfinite() {
+  isInfinite = !isInfinite;
+  const btn = document.getElementById('infiniteLoopBtn');
+  btn.classList.toggle('active', isInfinite);
+  btn.innerText = `🔁 무한 반복 모드: ${isInfinite ? 'ON' : 'OFF'}`;
+}
+
+function toggleKoreanRead() {
+  readKorean = !readKorean;
+  const btn = document.getElementById('koreanReadBtn');
+  btn.classList.toggle('active', readKorean);
+  btn.innerText = `🇰🇷 한글 TTS 읽기: ${readKorean ? 'ON' : 'OFF'}`;
+}
+
+function toggleRandom() {
+  isRandom = !isRandom;
+  const btn = document.getElementById('randomBtn');
+  btn.classList.toggle('active', isRandom);
+  btn.innerText = `🔀 랜덤 순서: ${isRandom ? 'ON' : 'OFF'}`;
+  onDomainChange();
+}
+
+function renderCard() {
+  if (!activePool || activePool.length === 0) return;
+  const item = activePool[currentIndex];
+  document.getElementById('cardProgress').innerText = `No. ${item.id} (${currentIndex + 1}/${activePool.length})`;
+  document.getElementById('cardDomain').innerText = item.domain;
+  document.getElementById('krText').innerText = item.kr;
+  document.getElementById('enText').innerText = item.en;
+  resetDots();
+}
+
+function resetDots() {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.className = 'dot';
+  }
+}
+
+function setDotActive(index) {
+  resetDots();
+  for (let i = 1; i <= index; i++) {
+    const dot = document.getElementById('dot' + i);
+    if (i === index) dot.className = 'dot active';
+    else dot.className = 'dot completed';
+  }
+}
+
+function renderList() {
+  const container = document.getElementById('sentenceList');
+  container.innerHTML = '';
+  activePool.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = `list-item ${idx === currentIndex ? 'selected' : ''}`;
+    div.id = `list-item-${idx}`;
+    div.onclick = () => selectItem(idx);
+    div.innerHTML = `
+      <div class="kr">${item.id}. ${item.kr}</div>
+      <div class="en">${item.en}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function selectItem(idx) {
+  currentIndex = idx;
+  stopSpeech();
+  renderCard();
+  highlightListItem();
+}
+
+function highlightListItem() {
+  document.querySelectorAll('.list-item').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === currentIndex);
+  });
+  const currentEl = document.getElementById(`list-item-${currentIndex}`);
+  if (currentEl) {
+    currentEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function toggleList() {
+  const list = document.getElementById('sentenceList');
+  const arrow = document.getElementById('listArrow');
+  list.classList.toggle('open');
+  arrow.innerText = list.classList.contains('open') ? '▲' : '▼';
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    stopSpeech();
+  } else {
+    isPlaying = true;
+    document.getElementById('playBtn').innerText = '⏸️ 일시 정지';
+    document.getElementById('playBtn').classList.replace('btn-primary', 'btn-secondary');
+    startLoopCycle();
+  }
+}
+
+function stopSpeech() {
+  isPlaying = false;
+  synth.cancel();
+  if (timerId) clearTimeout(timerId);
+  document.getElementById('playBtn').innerText = '▶️ 시작하기';
+  document.getElementById('playBtn').classList.replace('btn-secondary', 'btn-primary');
+  resetDots();
+}
+
+function startLoopCycle() {
+  if (!isPlaying) return;
+  const item = activePool[currentIndex];
+  renderCard();
+  highlightListItem();
+  speechPause = parseInt(document.getElementById('pauseSelect').value, 10);
+
+  if (readKorean) {
+    // 1 Korean utterance first
+    resetDots();
+    speakText(item.kr, 'ko-KR', () => {
+      if (!isPlaying) return;
+      timerId = setTimeout(() => {
+        runEnglishRepeats(1);
+      }, speechPause);
+    });
+  } else {
+    runEnglishRepeats(1);
+  }
+}
+
+function runEnglishRepeats(repNum) {
+  if (!isPlaying) return;
+  const item = activePool[currentIndex];
+  setDotActive(repNum);
+
+  speakText(item.en, 'en-US', () => {
+    if (!isPlaying) return;
+    if (repNum < 3) {
+      timerId = setTimeout(() => {
+        runEnglishRepeats(repNum + 1);
+      }, speechPause);
+    } else {
+      // Finished 3 repeats for this sentence
+      timerId = setTimeout(() => {
+        advanceToNext();
+      }, speechPause + 400);
+    }
+  });
+}
+
+function advanceToNext() {
+  if (!isPlaying) return;
+  if (currentIndex < activePool.length - 1) {
+    currentIndex++;
+    startLoopCycle();
+  } else {
+    // Reached end of current pool
+    if (isInfinite) {
+      currentIndex = 0;
+      startLoopCycle();
+    } else {
+      stopSpeech();
+    }
+  }
+}
+
+function prevSentence() {
+  if (currentIndex > 0) {
+    currentIndex--;
+  } else {
+    currentIndex = activePool.length - 1;
+  }
+  const wasPlaying = isPlaying;
+  stopSpeech();
+  renderCard();
+  highlightListItem();
+  if (wasPlaying) togglePlay();
+}
+
+function nextSentence() {
+  if (currentIndex < activePool.length - 1) {
+    currentIndex++;
+  } else {
+    currentIndex = 0;
+  }
+  const wasPlaying = isPlaying;
+  stopSpeech();
+  renderCard();
+  highlightListItem();
+  if (wasPlaying) togglePlay();
+}
+
+function speakText(text, lang, onEndCallback) {
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  utterance.rate = lang === 'ko-KR' ? 1.0 : speechRate;
+
+  utterance.onend = () => {
+    if (onEndCallback) onEndCallback();
+  };
+  utterance.onerror = () => {
+    if (onEndCallback) onEndCallback();
+  };
+
+  synth.speak(utterance);
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
